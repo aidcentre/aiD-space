@@ -1,9 +1,9 @@
 <script lang="ts">
 	import '../../routes/layout.css';
-	let { nodeText, nodeNum, leftPos, topPos } = $props();
+	let { nodeText, nodeNum, leftPos, topPos, nodeWidth } = $props();
 </script>
 
-<div class="node" style:left={leftPos} style:top={topPos}>
+<div class="node" style:left={leftPos} style:top={topPos} style:width={nodeWidth}>
 	<div class="node-top">
 		<div class="square"></div>
 		<span class="node-title">NODE 000{nodeNum}</span>
@@ -15,7 +15,6 @@
 	.node {
 		display: flex;
 		position: absolute;
-		width: 40%;
 		padding: 1.5%;
 		flex-direction: column;
 		justify-content: center;

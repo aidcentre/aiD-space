@@ -14,9 +14,17 @@
 <Header lastCommit="2 days ago" author="CamillaS" />
 <Node
 	nodeNum="1"
+	nodeWidth="40%"
 	topPos="30%"
 	leftPos="20%"
 	nodeText="The Norwegian Centre on AI for Decisions (aiD) is a premier research hub dedicated to advancing the role of artificial intelligence in complex decision-making processes. As a cornerstone of the Research Council of Norway’s (RCN) AI portfolio, aiD bridges technological, organizational, and human-centric gaps to foster a society where AI-driven value creation is safe and ethical."
+/>
+<Node
+	nodeWidth="fit-content"
+	nodeNum="2"
+	topPos="70%"
+	leftPos="50%"
+	nodeText="We are building something great here. Watch this space."
 />
 
 <style>
