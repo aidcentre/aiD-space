@@ -12,20 +12,14 @@
 <div class="grid-bg"></div>
 
 <Header lastCommit="2 days ago" author="CamillaS" />
-<div class="main">
-	<Node
-		nodeText="The Norwegian Centre on AI for Decisions (aiD) is a premier research hub dedicated to advancing the role of artificial intelligence in complex decision-making processes. As a cornerstone of the Research Council of Norway’s (RCN) AI portfolio, aiD bridges technological, organizational, and human-centric gaps to foster a society where AI-driven value creation is safe and ethical."
-	/>
-</div>
+<Node
+	nodeNum="1"
+	topPos="30%"
+	leftPos="20%"
+	nodeText="The Norwegian Centre on AI for Decisions (aiD) is a premier research hub dedicated to advancing the role of artificial intelligence in complex decision-making processes. As a cornerstone of the Research Council of Norway’s (RCN) AI portfolio, aiD bridges technological, organizational, and human-centric gaps to foster a society where AI-driven value creation is safe and ethical."
+/>
 
 <style>
-	.main {
-		position: absolute;
-		top: 0;
-		bottom: 0;
-		left: 200;
-		right: 0;
-	}
 	.grid-bg {
 		position: fixed;
 		inset: 0;

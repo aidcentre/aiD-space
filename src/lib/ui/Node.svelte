@@ -1,12 +1,12 @@
 <script lang="ts">
 	import '../../routes/layout.css';
-	let { nodeText } = $props();
+	let { nodeText, nodeNum, leftPos, topPos } = $props();
 </script>
 
-<div class="node">
+<div class="node" style:left={leftPos} style:top={topPos}>
 	<div class="node-top">
 		<div class="square"></div>
-		<span class="node-title">NODE 0001</span>
+		<span class="node-title">NODE 000{nodeNum}</span>
 	</div>
 	<span class="node-text">{nodeText}</span>
 </div>
@@ -14,6 +14,7 @@
 <style>
 	.node {
 		display: flex;
+		position: absolute;
 		width: 40%;
 		padding: 1.5%;
 		flex-direction: column;
@@ -37,14 +38,14 @@
 		background-color: #e8e8e8;
 		border-radius: 2px;
 	}
-    .node-title {
-        color: #969696;
-        font-size: 0.4rem;
-    }
-    .node-text {
-        align-self: stretch;
-        color: #e8e8e8;
-        font-size: 0.7rem;
-        line-height: 1rem; /* 125% */
-    }
+	.node-title {
+		color: #969696;
+		font-size: 0.4rem;
+	}
+	.node-text {
+		align-self: stretch;
+		color: #e8e8e8;
+		font-size: 0.7rem;
+		line-height: 1rem; /* 125% */
+	}
 </style>
