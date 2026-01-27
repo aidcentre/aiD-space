@@ -19,7 +19,7 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: flex-start;
-		gap: 2px;
+		gap: 4px;
 		border-radius: 8px;
 		border: 1px solid rgba(63, 63, 63, 0.5);
 		background: #050505;
@@ -29,22 +29,22 @@
 	.node-top {
 		display: flex;
 		align-items: center;
-		gap: 4px;
+		gap: 6px;
 	}
 	.square {
-		height: 0.4rem;
-		width: 0.4rem;
+		height: 0.6rem;
+		width: 0.6rem;
 		background-color: #e8e8e8;
 		border-radius: 2px;
 	}
 	.node-title {
 		color: #969696;
-		font-size: 0.4rem;
+		font-size: 0.6rem;
 	}
 	.node-text {
 		align-self: stretch;
 		color: #e8e8e8;
-		font-size: 0.7rem;
-		line-height: 1rem; /* 125% */
+		font-size: 1.2rem;
+		line-height: 1.5rem; /* 125% */
 	}
 </style>

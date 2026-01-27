@@ -9,14 +9,14 @@
 	<title>AID Home</title>
 </svelte:head>
 
-<div class="grid-bg"></div>
+<div class="grid-bg" style:box-shadow="0 0 35.5px 6px rgba(255, 255, 255, 0.07) inset"></div>
 
 <Header lastCommit="2 days ago" author="CamillaS" />
 <Node
 	nodeNum="1"
-	nodeWidth="40%"
-	topPos="30%"
-	leftPos="20%"
+	nodeWidth="48%"
+	topPos="20%"
+	leftPos="10%"
 	nodeText="The Norwegian Centre on AI for Decisions (aiD) is a premier research hub dedicated to advancing the role of artificial intelligence in complex decision-making processes. As a cornerstone of the Research Council of Norway’s (RCN) AI portfolio, aiD bridges technological, organizational, and human-centric gaps to foster a society where AI-driven value creation is safe and ethical."
 />
 <Node
@@ -32,8 +32,8 @@
 		position: fixed;
 		inset: 0;
 		background-color: #050505;
-		background-image: radial-gradient(#3f3f3f 1px, transparent 1px);
-		background-size: 24px 24px;
+		background-image: radial-gradient(#383838 0.5px, transparent 1px);
+		background-size: 16px 16px;
 		z-index: -1;
 	}
 </style>
