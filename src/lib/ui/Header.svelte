@@ -15,7 +15,6 @@
 			alt="aiD logo and description, Norwegian Centre on AI for Decisions"
 			width="200rem"
 			height="200rem"
-			xmlns="http://www.w3.org/2000/svg"
 		/>
 	</div>
 	<div class="navbar-end pr-3 text-xs">
