@@ -1,40 +1,38 @@
 <script lang="ts">
 	import '../../routes/layout.css';
 	import { gsap } from 'gsap';
-	import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+	// import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 	import { onMount } from 'svelte';
-	gsap.registerPlugin(ScrambleTextPlugin);
+	// gsap.registerPlugin(ScrambleTextPlugin);
 
 	let { nodeText, nodeNum, leftPos, topPos, nodeWidth } = $props();
 
-	let textEl: HTMLSpanElement;
+	// let textEl: HTMLSpanElement;
 
-	function runScramble() {
-		if (!textEl) return;
+	// function runScramble() {
+	// 	if (!textEl) return;
 
-		gsap.killTweensOf(textEl); // prevents animation from running over itself
+	// 	gsap.killTweensOf(textEl); // prevents animation from running over itself
 
-		gsap.fromTo(
-			textEl,
-			{ scrambleText: { text: '', chars: '01!@#$%^&*', speed: 0.8 } },
-			{
-				scrambleText: { text: nodeText, chars: '01!@#$%^&*', speed: 0.8 },
-				duration: 1.2,
-				ease: 'power2.out'
-			}
-		);
-	}
+	// 	gsap.fromTo(
+	// 		textEl,
+	// 		{ scrambleText: { text: '', chars: '01!@#$%^&*', speed: 0.8 } },
+	// 		{
+	// 			scrambleText: { text: nodeText, chars: '01!@#$%^&*', speed: 0.8 },
+	// 			duration: 1.2,
+	// 			ease: 'power2.out'
+	// 		}
+	// 	);
+	// }
 
-	onMount(() => {
-		runScramble();
-	});
+	// onMount(() => {
+	// 	runScramble();
+	// });
 </script>
 
 <!-- TODO: for accessibility, make button instead of div. this is a workaround -->
 <div
 	class="node"
-	onclick={runScramble}
-	onkeydown={runScramble}
 	style:left={leftPos}
 	style:top={topPos}
 	style:width={nodeWidth}
@@ -45,7 +43,7 @@
 		<div class="square"></div>
 		<span class="node-title">NODE 000{nodeNum}</span>
 	</div>
-	<span class="node-text" bind:this={textEl}>{nodeText}</span>
+	<span class="node-text">{nodeText}</span>
 </div>
 
 <style>
