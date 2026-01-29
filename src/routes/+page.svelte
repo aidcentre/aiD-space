@@ -9,8 +9,6 @@
 	<title>AID Home</title>
 </svelte:head>
 
-<div class="grid-bg" style:box-shadow="0 0 35.5px 6px rgba(255, 255, 255, 0.07) inset"></div>
-
 <Header lastCommit="2 days ago" author="CamillaS" />
 <Node
 	nodeNum="1"
@@ -26,6 +24,26 @@
 	leftPos="50%"
 	nodeText="We are building something great here. Watch this space."
 />
+
+<div class="grid-bg" style:box-shadow="0 0 35.5px 6px rgba(255, 255, 255, 0.07) inset">
+	<SvelteFlow minZoom={1} maxZoom={1} fitView>
+		<Background
+			id="1"
+			bgColor="#0A0A0A"
+			patternColor="#575757"
+			variant={BackgroundVariant.Cross}
+			size={12}
+			gap={200}
+		/>
+		<Background
+			id="2"
+			patternColor="#0A0A0A"
+			variant={BackgroundVariant.Dots}
+			size={2}
+			gap={200}
+		/>
+	</SvelteFlow>
+</div>
 
 <style>
 	.grid-bg {
