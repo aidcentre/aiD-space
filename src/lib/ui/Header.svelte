@@ -18,7 +18,7 @@
 		/>
 	</div>
 	<div class="navbar-end pr-3 text-xs">
-		<span>Last commit {lastCommit} ago by {author}</span>
+		<span>Last commit &nbsp; {lastCommit} ago &nbsp by &nbsp; {author}</span>
 	</div>
 </div>
 
