@@ -4,7 +4,7 @@
 	let { lastCommit, author } = $props();
 </script>
 
-<div class="header navbar text-gray-200 shadow-sm">
+<div class="header navbar text-gray-200 shadow-sm items-start pt-4">
 	<div class="navbar-start pl-3 text-xs">
 		<span>v0.1</span>
 	</div>
