@@ -1,6 +1,6 @@
 <script>
 	import { SvelteFlow, Background, BackgroundVariant } from '@xyflow/svelte';
-	import Node from '$lib/ui/Node.svelte';
+	import TextNode from '$lib/ui/TextNode.svelte';
 	import Header from '$lib/ui/Header.svelte';
 	import '@xyflow/svelte/dist/style.css';
 
@@ -11,14 +11,14 @@
 </svelte:head>
 
 <Header lastCommit="2 days" author="CamillaS" />
-<Node
+<TextNode
 	nodeNum="1"
 	nodeWidth="48%"
 	topPos="20%"
 	leftPos="10%"
 	nodeText="The Norwegian Centre on AI for Decisions (aiD) is a premier research hub dedicated to advancing the role of artificial intelligence in complex decision-making processes. As a cornerstone of the Research Council of Norway’s (RCN) AI portfolio, aiD bridges technological, organizational, and human-centric gaps to foster a society where AI-driven value creation is safe and ethical."
 />
-<Node
+<TextNode
 	nodeWidth="fit-content"
 	nodeNum="2"
 	topPos="70%"
