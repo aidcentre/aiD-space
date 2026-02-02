@@ -3,13 +3,14 @@
 	import Node from '$lib/ui/Node.svelte';
 	import Header from '$lib/ui/Header.svelte';
 	import '@xyflow/svelte/dist/style.css';
+
 </script>
 
 <svelte:head>
 	<title>AID Home</title>
 </svelte:head>
 
-<Header lastCommit="2 days ago" author="CamillaS" />
+<Header lastCommit="2 days" author="CamillaS" />
 <Node
 	nodeNum="1"
 	nodeWidth="48%"
@@ -29,18 +30,11 @@
 	<SvelteFlow minZoom={1} maxZoom={1} fitView>
 		<Background
 			id="1"
-			bgColor="#0A0A0A"
-			patternColor="#575757"
-			variant={BackgroundVariant.Cross}
-			size={12}
-			gap={200}
-		/>
-		<Background
-			id="2"
-			patternColor="#0A0A0A"
+			bgColor="#050505"
+			patternColor="#3F3F3F"
 			variant={BackgroundVariant.Dots}
-			size={2}
-			gap={200}
+			size={1.5}
+			gap={20}
 		/>
 	</SvelteFlow>
 </div>
