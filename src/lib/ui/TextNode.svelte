@@ -1,11 +1,12 @@
 <script lang="ts">
+	import { type NodeProps } from '@xyflow/svelte';
 	import '../../routes/layout.css';
+	let { id, width, draggable, data }: NodeProps = $props();
+
 	// import { gsap } from 'gsap';
 	// import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 	// import { onMount } from 'svelte';
 	// gsap.registerPlugin(ScrambleTextPlugin);
-
-	let { nodeText, nodeNum, leftPos, topPos, nodeWidth } = $props();
 
 	// let textEl: HTMLSpanElement;
 
@@ -31,26 +32,18 @@
 </script>
 
 <!-- TODO: for accessibility, make button instead of div. this is a workaround -->
-<div
-	class="node"
-	style:left={leftPos}
-	style:top={topPos}
-	style:width={nodeWidth}
-	tabindex="0"
-	role="button"
->
+<div class="node" role="button" tabindex="0">
 	<div class="node-top">
 		<div class="square"></div>
-		<span class="node-title">NODE 000{nodeNum}</span>
+		<span class="node-title">NODE 000{id}</span>
 	</div>
-	<span class="node-text">{nodeText}</span>
+	<span class="node-text">{data.text}</span>
 </div>
 
 <style>
 	.node {
 		display: flex;
-		position: absolute;
-		padding: 1.5%;
+		padding: 1.6rem;
 		flex-direction: column;
 		justify-content: center;
 		align-items: flex-start;

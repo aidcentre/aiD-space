@@ -4,6 +4,28 @@
 	import Header from '$lib/ui/Header.svelte';
 	import '@xyflow/svelte/dist/style.css';
 
+	let nodeTypes = {
+		textNode: TextNode
+	};
+
+	let nodes = $state.raw([
+		{
+			id: '1',
+			width: 400,
+			draggable: false,
+			data: { text: 'aiD is building a scientific and technological foundation that makes reliable, real-world AI possible.' },
+			type: 'textNode',
+			position: { x: 0, y: 0 }
+		},
+		{
+			id: '5',
+			width: 300,
+			draggable: false,
+			data: { text: 'aiD is building something great here. Watch this space.' },
+			type: 'textNode',
+			position: { x: 900, y: 20 }
+		}
+	]);
 </script>
 
 <svelte:head>
@@ -11,23 +33,9 @@
 </svelte:head>
 
 <Header lastCommit="2 days" author="CamillaS" />
-<TextNode
-	nodeNum="1"
-	nodeWidth="48%"
-	topPos="20%"
-	leftPos="10%"
-	nodeText="The Norwegian Centre on AI for Decisions (aiD) is a premier research hub dedicated to advancing the role of artificial intelligence in complex decision-making processes. As a cornerstone of the Research Council of Norway’s (RCN) AI portfolio, aiD bridges technological, organizational, and human-centric gaps to foster a society where AI-driven value creation is safe and ethical."
-/>
-<TextNode
-	nodeWidth="fit-content"
-	nodeNum="2"
-	topPos="70%"
-	leftPos="50%"
-	nodeText="We are building something great here. Watch this space."
-/>
 
-<div class="grid-bg" style:box-shadow="0 0 35.5px 6px rgba(255, 255, 255, 0.07) inset">
-	<SvelteFlow minZoom={1} maxZoom={1} fitView>
+<div class="sf-bg">
+	<SvelteFlow bind:nodes {nodeTypes} minZoom={1} maxZoom={1} fitView>
 		<Background
 			id="1"
 			bgColor="#050505"
@@ -40,12 +48,9 @@
 </div>
 
 <style>
-	.grid-bg {
+	.sf-bg {
 		position: fixed;
 		inset: 0;
-		background-color: #050505;
-		background-image: radial-gradient(#383838 0.5px, transparent 1px);
-		background-size: 16px 16px;
 		z-index: -1;
 	}
 </style>
