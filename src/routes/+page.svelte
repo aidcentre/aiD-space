@@ -3,11 +3,11 @@
 	import TextNode from '$lib/ui/TextNode.svelte';
 	import Header from '$lib/ui/Header.svelte';
 	import '@xyflow/svelte/dist/style.css';
-	import ImgNode from '$lib/ui/imgNode.svelte';
+	import ImageNode from '$lib/ui/ImageNode.svelte';
 
 	let nodeTypes = {
 		textNode: TextNode,
-		imageNode: ImgNode
+		imageNode: ImageNode,
 	};
 
 	let nodes = $state.raw([
