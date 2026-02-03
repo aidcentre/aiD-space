@@ -21,7 +21,7 @@
 			id: '5',
 			width: 300,
 			draggable: false,
-			data: { text: 'aiD is building something great here. Watch this space.' },
+			data: { text: 'We\'re building something great here. Watch this space.' },
 			type: 'textNode',
 			position: { x: 900, y: 20 }
 		}
@@ -35,7 +35,7 @@
 <Header lastCommit="2 days" author="CamillaS" />
 
 <div class="sf-bg">
-	<SvelteFlow bind:nodes {nodeTypes} minZoom={1} maxZoom={1} fitView>
+	<SvelteFlow bind:nodes {nodeTypes} minZoom={1} maxZoom={1} fitView  proOptions={{ hideAttribution: true }}>
 		<Background
 			id="1"
 			bgColor="#050505"
