@@ -1,39 +1,78 @@
 <script>
 	import { SvelteFlow, Background, BackgroundVariant } from '@xyflow/svelte';
-	import Node from '$lib/ui/Node.svelte';
+	import TextNode from '$lib/ui/TextNode.svelte';
 	import Header from '$lib/ui/Header.svelte';
 	import '@xyflow/svelte/dist/style.css';
+	import ImageNode from '$lib/ui/ImageNode.svelte';
+
+	let nodeTypes = {
+		textNode: TextNode,
+		imageNode: ImageNode,
+	};
+
+	let nodes = $state.raw([
+		{
+			id: '1',
+			width: 400,
+			draggable: false,
+			data: {
+				text: 'aiD is building a scientific and technological foundation that makes reliable, real-world AI possible.'
+			},
+			type: 'textNode',
+			position: { x: 0, y: 0 }
+		},
+		{
+			id: '3',
+			width: 400,
+			draggable: false,
+			data: {
+				text: 'THIS IS AN IMAGE NODE!',
+				fileName: 'image'
+			},
+			type: 'imageNode',
+			position: { x: 0, y: 300 }
+		},
+		{
+			id: '5',
+			width: 300,
+			draggable: false,
+			data: { text: "We're building something great here. Watch this space." },
+			type: 'textNode',
+			position: { x: 900, y: 20 }
+		}
+	]);
 </script>
 
 <svelte:head>
 	<title>AID Home</title>
 </svelte:head>
 
-<div class="grid-bg" style:box-shadow="0 0 35.5px 6px rgba(255, 255, 255, 0.07) inset"></div>
+<Header lastCommit="2 days" author="CamillaS" />
 
-<Header lastCommit="2 days ago" author="CamillaS" />
-<Node
-	nodeNum="1"
-	nodeWidth="48%"
-	topPos="20%"
-	leftPos="10%"
-	nodeText="The Norwegian Centre on AI for Decisions (aiD) is a premier research hub dedicated to advancing the role of artificial intelligence in complex decision-making processes. As a cornerstone of the Research Council of Norway’s (RCN) AI portfolio, aiD bridges technological, organizational, and human-centric gaps to foster a society where AI-driven value creation is safe and ethical."
-/>
-<Node
-	nodeWidth="fit-content"
-	nodeNum="2"
-	topPos="70%"
-	leftPos="50%"
-	nodeText="We are building something great here. Watch this space."
-/>
+<div class="sf-bg">
+	<SvelteFlow
+		bind:nodes
+		{nodeTypes}
+		minZoom={1}
+		maxZoom={1}
+		fitView
+		proOptions={{ hideAttribution: true }}
+	>
+		<Background
+			id="1"
+			bgColor="#050505"
+			patternColor="#3F3F3F"
+			variant={BackgroundVariant.Dots}
+			size={1.5}
+			gap={20}
+		/>
+	</SvelteFlow>
+</div>
 
 <style>
-	.grid-bg {
+	.sf-bg {
 		position: fixed;
 		inset: 0;
-		background-color: #050505;
-		background-image: radial-gradient(#383838 0.5px, transparent 1px);
-		background-size: 16px 16px;
 		z-index: -1;
 	}
 </style>
