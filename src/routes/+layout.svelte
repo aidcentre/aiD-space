@@ -1,5 +1,5 @@
 <script lang="ts">
-	import './layout.css';
+	import '$lib/styles/layout.css';
 	import favicon from '$lib/assets/aiD_profile_picture_black.png';
 	import Header from '$lib/ui/Header.svelte';
 

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { type NodeProps } from '@xyflow/svelte';
-	import '../../routes/layout.css';
 	let { id, width, draggable, data }: NodeProps = $props();
 
 	// import { gsap } from 'gsap';

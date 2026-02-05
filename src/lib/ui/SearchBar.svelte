@@ -1,5 +1,4 @@
 <script>
-	import '../../routes/layout.css';
 	let query = $state('');
 </script>
 

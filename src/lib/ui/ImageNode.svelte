@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { type NodeProps } from '@xyflow/svelte';
-	import '../../routes/layout.css';
 	import aid_img from '../assets/aiD_website_image.jpg';
 	let { id, width, draggable, data }: NodeProps = $props();
 </script>
