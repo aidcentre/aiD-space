@@ -6,7 +6,7 @@
 <!-- note: make text in input box wrap? if so, where does the extra go? -->
 <div class="search-box">
 	<div class="textbox-label">
-		<span>Find a scientist</span><span style:color="#969696"
+		<span>Find a scientist</span><span class="textbox-label-search"
 			>Search for a research topic, name or anything else</span
 		>
 	</div>
@@ -36,7 +36,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.7rem;
-		font-family: 'Milling';
 		width: 36rem;
 		max-width: 1000px;
 		position: fixed;
@@ -51,6 +50,12 @@
 		align-items: center;
 		color: #e8e8e8;
 		font-size: 0.8rem;
+	}
+	.textbox-label-search {
+		color: #969696;
+		font-family: 'Montagu Slab';
+		font-weight: 40;
+		font-size: 0.7rem;
 	}
 	.text-box {
 		background: #050505;

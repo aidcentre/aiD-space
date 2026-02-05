@@ -29,7 +29,6 @@
 		gap: 4px;
 		border-radius: 8px;
 		color: antiquewhite;
-		font-family: 'Milling';
 		cursor: pointer;
 		overflow: hidden;
 	}
