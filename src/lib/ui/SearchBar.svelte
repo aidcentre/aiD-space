@@ -3,14 +3,15 @@
 	let query = $state('');
 </script>
 
-
-<!-- note: make text in input box wrap? if so, where does the extra? -->
+<!-- note: make text in input box wrap? if so, where does the extra go? -->
 <div class="search-box">
 	<div class="textbox-label">
-		<span>Find a scientist</span><span style:color="#969696">Search for a research topic, name or anything else</span>
+		<span>Find a scientist</span><span class="textbox-label-search"
+			>Search for a research topic, name or anything else</span
+		>
 	</div>
 	<label class="text-box input">
-		<input value={query} type="search" required placeholder="Search" />
+		<input class="form-control" value={query} type="text" required placeholder="Your query" />
 		<div class="search-icon">
 			<svg class="h-[1em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 26" stroke="#050505">
 				<g stroke-linejoin="round" stroke-linecap="round" stroke-width="3.5" fill="none">
@@ -25,19 +26,36 @@
 <!-- <h1 style:color="red">Hello {query}!!!</h1> -->
 
 <style>
+	/* prevent blue outline around input text box */
+	.form-control:focus {
+		box-shadow: none !important;
+		-moz-box-shadow: none !important;
+		-webkit-box-shadow: none !important;
+	}
 	.search-box {
 		display: flex;
 		flex-direction: column;
-		gap: 0.75rem;
-		font-family: 'Milling';
-		width: 40%;
+		gap: 0.7rem;
+		width: 36rem;
 		max-width: 1000px;
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		/* to account for the width of the component (top left corner is placed in the middle): */
+		transform: translate(-50%, -50%);
 	}
 	.textbox-label {
 		display: flex;
 		justify-content: space-between;
+		align-items: center;
 		color: #e8e8e8;
 		font-size: 0.8rem;
+	}
+	.textbox-label-search {
+		color: #969696;
+		font-family: 'Montagu Slab';
+		font-weight: 40;
+		font-size: 0.7rem;
 	}
 	.text-box {
 		background: #050505;
@@ -49,7 +67,7 @@
 		border-radius: 0.5rem;
 		border: 1px solid #3f3f3f;
 		height: 3rem;
-		width:auto;
+		width: auto;
 	}
 	.search-icon {
 		display: flex;

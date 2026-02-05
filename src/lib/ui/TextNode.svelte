@@ -52,7 +52,6 @@
 		border: 1px solid rgba(63, 63, 63, 0.5);
 		background: #050505;
 		color: antiquewhite;
-		font-family: 'Milling';
 		cursor: pointer;
 		overflow: hidden;
 	}

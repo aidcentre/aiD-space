@@ -1,13 +1,13 @@
 <script>
 	import { SvelteFlow, Background, BackgroundVariant } from '@xyflow/svelte';
 	import TextNode from '$lib/ui/TextNode.svelte';
-	import Header from '$lib/ui/Header.svelte';
-	import '@xyflow/svelte/dist/style.css';
 	import ImageNode from '$lib/ui/ImageNode.svelte';
+	import SearchBar from '$lib/ui/SearchBar.svelte';
+	import '@xyflow/svelte/dist/style.css';
 
 	let nodeTypes = {
 		textNode: TextNode,
-		imageNode: ImageNode,
+		imageNode: ImageNode
 	};
 
 	let nodes = $state.raw([
@@ -19,7 +19,7 @@
 				text: 'aiD is building a scientific and technological foundation that makes reliable, real-world AI possible.'
 			},
 			type: 'textNode',
-			position: { x: 0, y: 0 }
+			position: { x: 0, y: -100 }
 		},
 		{
 			id: '3',
@@ -38,7 +38,7 @@
 			draggable: false,
 			data: { text: "We're building something great here. Watch this space." },
 			type: 'textNode',
-			position: { x: 900, y: 20 }
+			position: { x: 1000, y: 20 }
 		}
 	]);
 </script>
@@ -46,8 +46,6 @@
 <svelte:head>
 	<title>AID Home</title>
 </svelte:head>
-
-<Header lastCommit="2 days" author="CamillaS" />
 
 <div class="sf-bg">
 	<SvelteFlow
@@ -68,6 +66,8 @@
 		/>
 	</SvelteFlow>
 </div>
+
+<SearchBar />
 
 <style>
 	.sf-bg {
