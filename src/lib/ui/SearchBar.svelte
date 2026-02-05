@@ -3,14 +3,15 @@
 	let query = $state('');
 </script>
 
-
-<!-- note: make text in input box wrap? if so, where does the extra? -->
+<!-- note: make text in input box wrap? if so, where does the extra go? -->
 <div class="search-box">
 	<div class="textbox-label">
-		<span>Find a scientist</span><span style:color="#969696">Search for a research topic, name or anything else</span>
+		<span>Find a scientist</span><span style:color="#969696"
+			>Search for a research topic, name or anything else</span
+		>
 	</div>
 	<label class="text-box input">
-		<input value={query} type="search" required placeholder="Search" />
+		<input value={query} type="search" required placeholder="Your query" />
 		<div class="search-icon">
 			<svg class="h-[1em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 26" stroke="#050505">
 				<g stroke-linejoin="round" stroke-linecap="round" stroke-width="3.5" fill="none">
@@ -30,8 +31,13 @@
 		flex-direction: column;
 		gap: 0.75rem;
 		font-family: 'Milling';
-		width: 40%;
+		width: 36rem;
 		max-width: 1000px;
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		/* to account for the width of the component (top left corner is placed in the middle) */
+		transform: translate(-50%, -50%);
 	}
 	.textbox-label {
 		display: flex;
@@ -49,7 +55,7 @@
 		border-radius: 0.5rem;
 		border: 1px solid #3f3f3f;
 		height: 3rem;
-		width:auto;
+		width: auto;
 	}
 	.search-icon {
 		display: flex;
