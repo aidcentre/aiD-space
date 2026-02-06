@@ -27,12 +27,12 @@
 		align-items: flex-start;
 		gap: 4px;
 		border-radius: 8px;
-		color: antiquewhite;
+		color: var(--light-grey);
 		cursor: pointer;
 		overflow: hidden;
 	}
 	.node-top {
-		color: #606060;
+		color: var(--grey);
 		display: flex;
 		align-items: center;
 		gap: 6px;
@@ -40,7 +40,7 @@
 	.square {
 		height: 0.6rem;
 		width: 0.6rem;
-		background-color: #e8e8e8;
+		background-color: var(--light-grey);
 		border-radius: 2px;
 	}
 	.node-title {

@@ -58,8 +58,8 @@
 	>
 		<Background
 			id="1"
-			bgColor="#050505"
-			patternColor="#3F3F3F"
+			bgColor="var(--off-black)"
+			patternColor="var(--dark-grey)"
 			variant={BackgroundVariant.Dots}
 			size={1.5}
 			gap={20}

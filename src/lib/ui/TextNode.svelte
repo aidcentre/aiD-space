@@ -48,9 +48,9 @@
 		align-items: flex-start;
 		gap: 4px;
 		border-radius: 8px;
-		border: 1px solid rgba(63, 63, 63, 0.5);
-		background: #050505;
-		color: antiquewhite;
+		border: 1px solid var(--darker-grey);
+		background: var(--off-black);
+		color: var(--light-grey);
 		cursor: pointer;
 		overflow: hidden;
 	}
@@ -62,15 +62,15 @@
 	.square {
 		height: 0.6rem;
 		width: 0.6rem;
-		background-color: #e8e8e8;
+		background-color: var(--light-grey);
 		border-radius: 2px;
 	}
 	.node-title {
-		color: #969696;
+		color: var(--medium-grey);
 		font-size: 0.6rem;
 	}
 	.node-text {
-		color: #e8e8e8;
+		color: var(--light-grey);
 		font-size: 1.2rem;
 		line-height: 1.5rem;
 		overflow-wrap: break-word;
