@@ -2,13 +2,15 @@
 	import { SvelteFlow, Background, BackgroundVariant } from '@xyflow/svelte';
 	import TextNode from '$lib/ui/TextNode.svelte';
 	import ImageNode from '$lib/ui/ImageNode.svelte';
+	import NavNode from '$lib/ui/NavNode.svelte';
 	import SearchBar from '$lib/ui/SearchBar.svelte';
 	import '@xyflow/svelte/dist/style.css';
 	import Header from '$lib/ui/Header.svelte';
 
 	let nodeTypes = {
 		textNode: TextNode,
-		imageNode: ImageNode
+		imageNode: ImageNode,
+		navNode: NavNode
 	};
 
 	let nodes = $state.raw([
@@ -21,6 +23,13 @@
 			},
 			type: 'textNode',
 			position: { x: 0, y: -100 }
+		},
+		{
+			id: '2',
+			draggable: false,
+			data: { text: 'What is aiD?' },
+			type: 'navNode',
+			position: { x: 550, y: 420 }
 		},
 		{
 			id: '3',
