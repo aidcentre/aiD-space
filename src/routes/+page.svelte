@@ -4,6 +4,7 @@
 	import ImageNode from '$lib/ui/ImageNode.svelte';
 	import SearchBar from '$lib/ui/SearchBar.svelte';
 	import '@xyflow/svelte/dist/style.css';
+	import Header from '$lib/ui/Header.svelte';
 
 	let nodeTypes = {
 		textNode: TextNode,
@@ -46,6 +47,8 @@
 <svelte:head>
 	<title>AID Home</title>
 </svelte:head>
+
+<Header lastCommit="2 days" author="CamillaS" />
 
 <div class="sf-bg">
 	<SvelteFlow
