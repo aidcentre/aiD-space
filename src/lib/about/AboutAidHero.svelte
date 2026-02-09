@@ -51,6 +51,7 @@
 		display: flex;
 		justify-content: space-between;
 		margin-right: 3rem;
+		margin-top: 3rem;
 		gap: 10rem;
 		color: var(--off-black);
 	}
