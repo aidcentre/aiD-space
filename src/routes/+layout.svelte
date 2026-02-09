@@ -8,3 +8,9 @@
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 
 {@render children()}
+
+<style>
+	:global(html) {
+		background-color: var(--light-grey);
+	}
+</style>
