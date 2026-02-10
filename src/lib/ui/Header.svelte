@@ -1,10 +1,9 @@
 <script lang="ts">
-	import '../../routes/layout.css';
 	import aiDLogo from '/src/lib/assets/aiD_lockup_white_RGB.svg';
 	let { lastCommit, author } = $props();
 </script>
 
-<div class="navbar items-start pt-4 text-gray-200 shadow-sm">
+<div class="navbar items-start pt-4 shadow-sm" style:color=var(--light-grey)>
 	<div class="navbar-start pl-3 text-xs">
 		<span>v0.1</span>
 	</div>

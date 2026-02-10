@@ -1,5 +1,4 @@
 <script>
-	import '../../routes/layout.css';
 	let query = $state('');
 </script>
 
@@ -48,24 +47,24 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		color: #e8e8e8;
+		color: var(--light-grey);
 		font-size: 0.8rem;
 	}
 	.textbox-label-search {
-		color: #969696;
+		color: var(--medium-grey);
 		font-family: 'Montagu Slab';
 		font-weight: 40;
 		font-size: 0.7rem;
 	}
 	.text-box {
-		background: #050505;
-		color: #969696;
+		background: var(--off-black);
+		color: var(--medium-grey);
 		display: flex;
 		padding: 0.5rem 0.5rem 0.5rem 1rem;
 		align-items: center;
 		gap: 1.5rem;
 		border-radius: 0.5rem;
-		border: 1px solid #3f3f3f;
+		border: 1px solid var(--dark-grey);
 		height: 3rem;
 		width: auto;
 	}
@@ -75,6 +74,6 @@
 		align-items: center;
 		gap: 0.375rem;
 		border-radius: 0.375rem;
-		background: #e8e8e8;
+		background: var(--light-grey);
 	}
 </style>

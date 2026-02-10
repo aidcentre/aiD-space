@@ -1,34 +1,23 @@
 <script lang="ts">
 	import { type NodeProps } from '@xyflow/svelte';
-	import aid_img from '../assets/aiD_website_image.jpg';
 	let { id, width, draggable, data }: NodeProps = $props();
 </script>
 
-<!-- TODO: for accessibility, make button instead of div. this is a workaround -->
-<div class="node" role="button" tabindex="0">
+<div class="node">
 	<div class="node-top">
 		<div class="square"></div>
 		<span class="node-title">NODE 000{id}</span>
-		<span class="node-title">{data.fileName}.jpg</span>
 	</div>
-	<img
-		class="node-img"
-		src={aid_img}
-		alt="Swirling white flakes with the AID centre logo in the middle"
-	/>
+	<a href="/about" class="node-content btn" type="button"><span>{data.text}</span></a>
 </div>
 
 <style>
 	.node {
 		display: flex;
-		padding: 1.6rem;
 		flex-direction: column;
 		justify-content: center;
 		align-items: flex-start;
-		gap: 4px;
-		border-radius: 8px;
-		color: var(--light-grey);
-		cursor: pointer;
+		gap: 6px;
 		overflow: hidden;
 	}
 	.node-top {
@@ -46,7 +35,24 @@
 	.node-title {
 		font-size: 0.6rem;
 	}
-	.node-img {
-		width: 14rem;
+	.node-content {
+		background-color: var(--light-grey, #e8e8e8);
+		color: var(--off-black, #050505);
+		border-radius: 8px;
+		padding: 1rem;
+		justify-content: left;
+		align-items: flex-end;
+		font-size: 1rem;
+		line-height: 1.5rem;
+		width: 10rem;
+		height: 8rem;
+		overflow-wrap: break-word;
+		word-break: break-word;
+		overflow: hidden;
+		transition-duration: 0.2s;
 	}
+	/* .node-content:hover {
+		background-color: var(--light-grey, #e8e8e8);
+		color: var(--off-black, #050505);
+	} */
 </style>
