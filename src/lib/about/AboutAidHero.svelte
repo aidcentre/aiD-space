@@ -1,11 +1,12 @@
 <script lang="ts">
 	let sectionTitle = 'What is aiD?';
 	import PartnerStats from './PartnerStats.svelte';
+	import Button from '$lib/ui/Button.svelte';
 </script>
 
 <section class="section">
 	<div class="title-area">
-		<a class="section-title btn" id="what-is-aid" href="#what-is-aid">{sectionTitle}</a>
+		<Button label="What is aiD?" section_id="what-is-aid" section_ref="what-is-aid" />
 	</div>
 	<div class="section-content">
 		<div class="org-stats">
