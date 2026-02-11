@@ -1,8 +1,14 @@
 <script>
-	let { section_id = '', section_ref = '', label } = $props();
+	let { section_id = '', section_ref = '', alignment = 'left', marginValue = 0, label } = $props();
 </script>
 
-<a class="section-title btn drop-shadow-none" id={section_id} href="#{section_ref}">{label}</a>
+<a
+	class="section-title btn drop-shadow-none"
+	style:float={alignment}
+	style="margin-{alignment}: {marginValue}%"
+	id={section_id}
+	href="#{section_ref}">{label}</a
+>
 
 <style>
 	.section-title {

@@ -1,104 +1,88 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount } from 'svelte';
 	import * as THREE from 'three';
-	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+	import Button from './Button.svelte';
+
+	// height not used currently
+	// TODO: make function that rates heights and creates ratio to get each's height out of
+	// 100%, (NOTE: height's minimum must be the height of the button itself)
+	const buttons = [
+		{ label: 'Our Research Areas', pos: 49, height: 35, align: 'left' },
+		{ label: 'What is aiD?', pos: 32, height: 20, align: 'left', sectionRef: 'what-is-aid' },
+		{ label: 'Sustainability and Ethics', pos: 28, height: 20, align: 'right' },
+		{ label: 'Core Mission and Goals', pos: 36, height: 12, align: 'right' },
+		{ label: 'Our Partners', pos: 40, height: 35, align: 'left' }
+	];
 
 	let container: HTMLDivElement;
 	let renderer: THREE.WebGLRenderer;
 	let frameId: number;
 
-	// adjustable Parameters
 	const params = {
-		width: 40,
-		height: 40,
-		depth: 40,
-		nodeCount: 100,
+		nodeCount: 200,
 		nodeSize: 1,
-		moveSpeed: 0.0,
-		orbitSpeed: 0.5
+		// below are the three parameters to control the size of the cloud
+		areaWidth: 60,
+		areaHeight: 40,
+		areaDepth: 60,
+		rotationSpeed: 0.006
 	};
 
-	const BUTTON_TEXTS = [
-		'What is aiD',
-		'Our Research Areas',
-		'Core Mission and Goals',
-		'Our Partners',
-		'Sustainability and Ethics'
-	];
-
 	onMount(() => {
-		// initialize scene
 		const scene = new THREE.Scene();
-		scene.background = new THREE.Color(0xe8e8e8);
+		// transparent background
+		scene.background = null;
 
 		const camera = new THREE.PerspectiveCamera(
-			60,
+			300,
 			container.clientWidth / container.clientHeight,
 			1,
-			3000
+			1000
 		);
-		camera.position.set(60, 40, 60);
+		camera.position.z = 70;
 
-		renderer = new THREE.WebGLRenderer({ antialias: true });
+		renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 		renderer.setPixelRatio(window.devicePixelRatio);
 		renderer.setSize(container.clientWidth, container.clientHeight);
 		container.appendChild(renderer.domElement);
 
-		const controls = new OrbitControls(camera, renderer.domElement);
-		controls.enableDamping = true;
-		controls.autoRotate = true;
-		controls.autoRotateSpeed = params.orbitSpeed;
+		// create particles
+		const cloudGroup = new THREE.Group();
+		scene.add(cloudGroup);
 
-		const nodes: THREE.Sprite[] = [];
+		const squircleTexture = createSquircleTexture();
+		const nodeMaterial = new THREE.SpriteMaterial({
+			map: squircleTexture,
+			color: 0x050505,
+			transparent: true
+		});
 
-		// helper function: create text texture
-		function createButtonTexture(text: string) {
-			const canvas = document.createElement('canvas');
-			const ctx = canvas.getContext('2d')!;
-			const fontSize = 44;
-			ctx.font = `bold ${fontSize}px Milling`;
-			const textMetrics = ctx.measureText(text);
+		for (let i = 0; i < params.nodeCount; i++) {
+			const sprite = new THREE.Sprite(nodeMaterial);
 
-			const h = 128;
-			const horizontalPadding = 80;
-			const w = textMetrics.width + horizontalPadding;
+			sprite.position.set(
+				(Math.random() - 0.5) * params.areaWidth,
+				(Math.random() - 0.5) * params.areaHeight,
+				(Math.random() - 0.5) * params.areaDepth
+			);
 
-			canvas.width = w;
-			canvas.height = h;
-
-			ctx.font = `bold ${fontSize}px Milling`;
-			ctx.fillStyle = '#000';
-			ctx.beginPath();
-			// use standard roundRect or fallback
-			ctx.roundRect(0, 0, w, h, 24);
-			ctx.fill();
-
-			ctx.fillStyle = '#FFF';
-			ctx.textAlign = 'center';
-			ctx.textBaseline = 'middle';
-			ctx.fillText(text, w / 2, h / 2);
-
-			return {
-				texture: new THREE.CanvasTexture(canvas),
-				aspect: w / h
-			};
+			sprite.scale.set(params.nodeSize, params.nodeSize, 1);
+			cloudGroup.add(sprite);
 		}
 
-		// helper function: create squircle
 		function createSquircleTexture() {
-			const size = 128;
+			const size = 64;
 			const canvas = document.createElement('canvas');
 			canvas.width = size;
 			canvas.height = size;
 			const ctx = canvas.getContext('2d')!;
 			const r = size * 0.45;
 			const n = 4.5;
-			const steps = 64;
 			const center = size / 2;
-			ctx.fillStyle = '#000';
+			ctx.fillStyle = '#ffffff';
 			ctx.beginPath();
-			for (let i = 0; i <= steps; i++) {
-				const t = (Math.PI * 2 * i) / steps;
+			for (let i = 0; i <= 64; i++) {
+				const t = (Math.PI * 2 * i) / 64;
 				const ct = Math.cos(t);
 				const st = Math.sin(t);
 				const x = center + r * Math.sign(ct) * Math.pow(Math.abs(ct), 2 / n);
@@ -110,55 +94,12 @@
 			return new THREE.CanvasTexture(canvas);
 		}
 
-		function randomizeNode(sprite: THREE.Sprite) {
-			sprite.position.set(
-				(Math.random() - 0.5) * params.width,
-				(Math.random() - 0.5) * params.height,
-				(Math.random() - 0.5) * params.depth
-			);
-			sprite.userData.velocity = new THREE.Vector3(
-				(Math.random() - 0.5) * params.moveSpeed,
-				(Math.random() - 0.5) * params.moveSpeed,
-				(Math.random() - 0.5) * params.moveSpeed
-			);
-		}
-
-		// component construction
-		const squircleTexture = createSquircleTexture();
-		const nodeMaterial = new THREE.SpriteMaterial({ map: squircleTexture, transparent: true });
-
-		for (let i = 0; i < params.nodeCount; i++) {
-			const sprite = new THREE.Sprite(nodeMaterial);
-			randomizeNode(sprite);
-			sprite.scale.set(params.nodeSize, params.nodeSize, 1);
-			scene.add(sprite);
-			nodes.push(sprite);
-		}
-
-		BUTTON_TEXTS.forEach((text) => {
-			const { texture, aspect } = createButtonTexture(text);
-			const buttonMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
-			const buttonSprite = new THREE.Sprite(buttonMaterial);
-			randomizeNode(buttonSprite);
-			const baseHeight = 3.5;
-			buttonSprite.scale.set(baseHeight * aspect, baseHeight, 1);
-			scene.add(buttonSprite);
-			nodes.push(buttonSprite);
-		});
-
-		// animation loop
 		const animate = () => {
 			frameId = requestAnimationFrame(animate);
 
-			const bounds = { x: params.width / 2, y: params.height / 2, z: params.depth / 2 };
-			nodes.forEach((node) => {
-				node.position.add(node.userData.velocity);
-				if (Math.abs(node.position.x) > bounds.x) node.userData.velocity.x *= -1;
-				if (Math.abs(node.position.y) > bounds.y) node.userData.velocity.y *= -1;
-				if (Math.abs(node.position.z) > bounds.z) node.userData.velocity.z *= -1;
-			});
+			// rotate around the vertical axis from top to bottom edge of screen
+			cloudGroup.rotation.y += params.rotationSpeed;
 
-			controls.update();
 			renderer.render(scene, camera);
 		};
 
@@ -179,13 +120,58 @@
 	});
 </script>
 
-<div class="canvas-container" bind:this={container}></div>
+<!-- TODO: fix vertical button positioning without extra div after each -->
+<div class="wrapper">
+	<div class="canvas-container" bind:this={container}></div>
+
+	<div class="button-layer">
+		{#each buttons as button}
+			<div class="button-w">
+				<Button
+					label={button.label}
+					alignment={button.align}
+					marginValue={button.pos}
+					section_ref={button.sectionRef ?? ''}
+				/>
+			</div>
+		{/each}
+		<div class="button-w"></div>
+	</div>
+</div>
 
 <style>
-	.canvas-container {
-		width: 100%;
-		height: 50vh;
+	.wrapper {
 		position: relative;
+		width: 100%;
+		height: 60vh;
+		background-color: #e8e8e8;
 		overflow: hidden;
+	}
+
+	.canvas-container {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 1;
+	}
+
+	.button-layer {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		padding-top: 4rem;
+		padding-bottom: 1rem;
+		z-index: 2;
+	}
+	.button-w {
+		display: block;
+		width: 100%;
+		height: 20%;
 	}
 </style>

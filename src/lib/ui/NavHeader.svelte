@@ -3,7 +3,7 @@
 	let { version, nodeNum } = $props();
 </script>
 
-<div class="header-main mb-12 items-start pt-4 pb-4 text-xs shadow-sm">
+<div class="header-main mb-8 items-start pt-4 pb-4 text-xs shadow-sm">
 	<div class="navbar-start overflow-hidden pl-3">
 		<span>aiD v{version}</span>
 		<img class="logo pl-18" src={aiDLogo} alt="AID logo without AID centre description" />
