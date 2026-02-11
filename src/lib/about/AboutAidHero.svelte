@@ -56,13 +56,6 @@
 		gap: 10rem;
 		color: var(--off-black);
 	}
-	.section-title {
-		background: var(--off-black);
-		color: var(--light-grey);
-		border-radius: 0.5rem;
-		padding: 0.75rem 1rem;
-		font-size: 0.8rem;
-	}
 	.section-content {
 		color: var(--off-black);
 		display: flex;
