@@ -8,10 +8,10 @@
 		<span>aiD v{version}</span>
 		<img class="logo pl-18" src={aiDLogo} alt="AID logo without AID centre description" />
 	</div>
-	<div class="navbar-center" style:gap="0.5rem">
+	<a href="/" class="navbar-center" style:gap="0.5rem">
 		<div class="back-arrow">←</div>
-		<a href="/">Back to aiD</a>
-	</div>
+		<span>Back to aiD</span>
+	</a>
 	<div class="node-text navbar-end pr-3">
 		<div class="node-text">
 			<div class="square"></div>
