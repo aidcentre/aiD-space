@@ -54,14 +54,14 @@
 		<Button label="Research Areas" section_id="research-areas" section_ref="research-areas" />
 	</div>
 	<div class="section-content">
-		<h2 class="w-full text-4xl font-extrabold">
+		<h2 class="mb-6 w-full text-4xl font-extrabold">
 			<span>To achieve its goals, aiD operates across nine specialized Research Areas (RAs):</span>
 		</h2>
 		<div class="paragraph-area columns-2 gap-40">
 			{#each researchAreas as area}
 				<div class="break-inside-avoid">
 					<p class="mb-3 font-[Milling] text-xl font-extrabold">{area.title}</p>
-					<p class="mb-12 text-[1.1rem]">{area.content}</p>
+					<p class="mb-14 text-[1.1rem]">{area.content}</p>
 				</div>
 			{/each}
 		</div>
