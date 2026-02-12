@@ -6,8 +6,15 @@
 	// height not used currently
 	// TODO: make function that rates heights and creates ratio to get each's height out of
 	// 100%, (NOTE: height's minimum must be the height of the button itself)
+	// TODO2: add smooth transition when navigating between sections (animation)
 	const buttons = [
-		{ label: 'Our Research Areas', pos: 49, height: 35, align: 'left' },
+		{
+			label: 'Our Research Areas',
+			pos: 49,
+			height: 35,
+			align: 'left',
+			sectionRef: 'research-areas'
+		},
 		{ label: 'What is aiD?', pos: 32, height: 20, align: 'left', sectionRef: 'what-is-aid' },
 		{ label: 'Sustainability and Ethics', pos: 28, height: 20, align: 'right' },
 		{ label: 'Core Mission and Goals', pos: 36, height: 12, align: 'right' },
@@ -156,9 +163,9 @@
 		position: relative;
 		width: 100%;
 		height: 100vh;
+		margin-bottom: -3rem;
 	}
 	.aid-description {
-		/* fill this out tomorrow */
 		width: 58%;
 		margin-left: 2rem;
 	}
