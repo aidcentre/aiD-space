@@ -1,5 +1,4 @@
 <script lang="ts">
-	let sectionTitle = 'What is aiD?';
 	import PartnerStats from './PartnerStats.svelte';
 	import Button from '$lib/ui/Button.svelte';
 </script>
