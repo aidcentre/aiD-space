@@ -121,30 +121,51 @@
 </script>
 
 <!-- TODO: fix vertical button positioning without extra div after each -->
-<div class="wrapper">
-	<div class="canvas-container" bind:this={container}></div>
+<div class="outer-wrapper">
+	<div class="wrapper">
+		<div class="canvas-container" bind:this={container}></div>
 
-	<div class="button-layer">
-		{#each buttons as button}
-			<div class="button-w">
-				<Button
-					label={button.label}
-					alignment={button.align}
-					marginValue={button.pos}
-					section_ref={button.sectionRef ?? ''}
-				/>
-			</div>
-		{/each}
-		<div class="button-w"></div>
+		<div class="button-layer">
+			{#each buttons as button}
+				<div class="button-w">
+					<Button
+						label={button.label}
+						alignment={button.align}
+						marginValue={button.pos}
+						section_ref={button.sectionRef ?? ''}
+					/>
+				</div>
+			{/each}
+			<div class="button-w"></div>
+		</div>
+	</div>
+	<div class="aid-description">
+		<span style:font-size="0.9rem">What is aiD?</span>
+		<p class="mt-2 text-xl font-extrabold">
+			The Norwegian Centre on AI for Decisions (aiD) is a premier research hub dedicated to
+			advancing the role of artificial intelligence in complex decision-making processes. As a
+			cornerstone of the Research Council of Norway’s (RCN) AI portfolio, aiD bridges technological,
+			organizational, and human-centric gaps to foster a society where AI-driven value creation is
+			safe and ethical.
+		</p>
 	</div>
 </div>
 
 <style>
+	.outer-wrapper {
+		position: relative;
+		width: 100%;
+		height: 100vh;
+	}
+	.aid-description {
+		/* fill this out tomorrow */
+		width: 58%;
+		margin-left: 2rem;
+	}
 	.wrapper {
 		position: relative;
 		width: 100%;
 		height: 60vh;
-		background-color: #e8e8e8;
 		overflow: hidden;
 	}
 
@@ -166,7 +187,6 @@
 		display: flex;
 		flex-direction: column;
 		padding-top: 4rem;
-		padding-bottom: 1rem;
 		z-index: 2;
 	}
 	.button-w {
