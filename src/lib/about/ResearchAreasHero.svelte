@@ -1,5 +1,52 @@
 <script lang="ts">
 	import Button from '$lib/ui/Button.svelte';
+
+	let researchAreas = [
+		{
+			title: 'Trust',
+			content:
+				'Developing frameworks for safe, responsible AI and robust system verification, assurance and compliance.'
+		},
+		{
+			title: 'Knowledge-Embedding',
+			content:
+				'Integrating physical laws, simulations, and domain expertise into AI via Scientific Machine Learning (SciML) to ensure reliability even with scarce data. Machine-learning driven causal inference in decision processes. '
+		},
+		{
+			title: 'Training',
+			content:
+				'Creating novel loss functions and training methods tailored to decision objectives like safety and utility rather than generic accuracy.'
+		},
+		{
+			title: 'Human-AI Interaction',
+			content:
+				"Designing interfaces that combine AI's speed with human intuition, ensuring operators can trust and understand AI-supported decisions."
+		},
+		{
+			title: 'Disruptive',
+			content: 'Monitor other technologies that will influence AI and adapt to the development.'
+		},
+		{
+			title: 'Barriers',
+			content:
+				'Solutions for technological and organisational barriers for AI in decisions processes.'
+		},
+		{
+			title: 'Data to Information',
+			content:
+				'Finding optimal latent data representations with maximum decision relevant information.'
+		},
+		{
+			title: 'Generalization and Uncertainty',
+			content:
+				'Managing how AI models extrapolate beyond their training data to prevent unsafe decisions in uncertain environments.'
+		},
+		{
+			title: 'Multi-Agents',
+			content:
+				'Developing fair and transparent frameworks for scenarios where multiple AI or human agents share resources or have competing objectives.'
+		}
+	];
 </script>
 
 <section class="section">
@@ -7,25 +54,16 @@
 		<Button label="Research Areas" section_id="research-areas" section_ref="research-areas" />
 	</div>
 	<div class="section-content">
-		<div class="org-stats text-4xl font-extrabold">
+		<h2 class="w-full text-4xl font-extrabold">
 			<span>To achieve its goals, aiD operates across nine specialized Research Areas (RAs):</span>
-		</div>
-		<div class="paragraph-area columns-2 gap-16">
-			<div></div>
-			<div>
-				<p class="mb-4">
-					aiD moves beyond traditional AI models that are purely descriptive. Instead, we employ a
-					holistic framework where the primary learning objective is the decision outcome itself.
-					This involves backpropagating learning through the entire decision process, from
-					converting raw data into information to predicting how actions impact the real world while
-					modeling risk and human preferences.
-				</p>
-				<p>
-					Our research addresses several critical challenges that currently limit AI adoption in
-					professional organizations, including low trustworthiness, immature technology, and a
-					shortage of expertise regarding emerging regulations.
-				</p>
-			</div>
+		</h2>
+		<div class="paragraph-area columns-2 gap-40">
+			{#each researchAreas as area}
+				<div class="break-inside-avoid">
+					<p class="mb-3 font-[Milling] text-xl font-extrabold">{area.title}</p>
+					<p class="mb-12 text-[1.1rem]">{area.content}</p>
+				</div>
+			{/each}
 		</div>
 	</div>
 </section>
@@ -36,7 +74,6 @@
 		justify-content: space-between;
 		margin-right: 3rem;
 		margin-top: 3rem;
-		gap: 10rem;
 		color: var(--off-black);
 	}
 	.section-content {
@@ -48,16 +85,13 @@
 	}
 	.title-area {
 		display: flex;
-		width: 40vw;
-		padding-left: 2rem;
+		margin-right: 10rem;
+		margin-left: 2rem;
 	}
 	.paragraph-area {
 		font-family: 'Montagu Slab';
-		font-weight: '400';
-		line-height: '1.6rem';
-		letter-spacing: '-0.02rem';
-	}
-	.org-stats {
-		width: 100%;
+		font-weight: 400;
+		line-height: 1.7rem;
+		letter-spacing: -0.02rem;
 	}
 </style>

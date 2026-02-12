@@ -3,7 +3,7 @@
 </script>
 
 <a
-	class="section-title btn drop-shadow-none"
+	class="section-title btn flex drop-shadow-none"
 	style:float={alignment}
 	style="margin-{alignment}: {marginValue}%"
 	id={section_id}

@@ -3,6 +3,8 @@
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
+/* ====== Milling ====== */
+
 @font-face {
 	font-family: 'Milling';
 	src:
@@ -22,6 +24,8 @@
 	font-weight: 800;
 	font-display: swap;
 }
+
+/* ====== Montagu Slab ====== */
 
 @font-face {
 	font-family: 'Montagu Slab';
