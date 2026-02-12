@@ -63,6 +63,7 @@
 	}
 	.paragraph-area {
 		font-family: 'Montagu Slab';
+		font-size: 1.1rem;
 		font-weight: 400;
 		line-height: 1.6rem;
 		letter-spacing: -0.02rem;
