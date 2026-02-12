@@ -39,7 +39,7 @@
 		min-width: fit-content;
 	}
 	.org-type {
-		font-size: 1.1rem;
+		font-size: 1.15rem;
 		font-weight: 800;
 		letter-spacing: 0.03rem;
 	}
