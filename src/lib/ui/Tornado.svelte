@@ -24,7 +24,7 @@
 			align: 'right',
 			sectionRef: 'mission-and-goals'
 		},
-		{ label: 'Our Partners', pos: 40, height: 35, align: 'left' }
+		{ label: 'Real-World Impact and Use Cases', pos: 40, height: 35, align: 'left' }
 	];
 
 	let container: HTMLDivElement;
