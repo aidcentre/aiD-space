@@ -51,7 +51,7 @@
 
 <section class="section">
 	<div class="title-area">
-		<Button label="Research Areas" section_id="research-areas" section_ref="research-areas" />
+		<Button label="Research areas" section_id="research-areas" section_ref="research-areas" />
 	</div>
 	<div class="section-content">
 		<h2 class="mb-6 w-full text-4xl font-extrabold">
