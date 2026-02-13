@@ -18,7 +18,7 @@
 	</div>
 	<div class="section-content">
 		<div>
-			<p class="mb-14 w-3/5 font-[Montagu_Slab] text-[1.1rem]/6">
+			<p class="mb-14 w-3/5 font-[Montagu_Slab] text-[1.1rem]/6.5 font-thin tracking-tight">
 				A core mission of AID is to develop the next generation of AI experts. We aim to educate 400
 				MSc students and 30 PhDs/postdocs, while strengthening the expertise of over 50 existing
 				researchers. By pairing academic researchers with professional partners, we ensure that our
@@ -27,7 +27,7 @@
 		</div>
 		<div class="org-stats">
 			<p class="text-[0.85rem] text-(--grey)">Key milestones</p>
-			<div class="flex flex-row">
+			<div class="flex flex-row justify-between">
 				{#each milestones as ms}
 					<p class="mb-3 font-[Milling] text-xl font-extrabold">{ms}</p>
 				{/each}
@@ -60,7 +60,6 @@
 		display: flex;
 		flex-direction: column;
 		width: 100%;
-		justify-content: space-between;
 		gap: 1rem;
 	}
 </style>
