@@ -59,7 +59,7 @@
 	.title-area {
 		display: flex;
 		margin-right: 10rem;
-		margin-left: 2rem;
+		margin-left: 1.2rem;
 	}
 	.paragraph-area {
 		font-family: 'Montagu Slab';
