@@ -17,7 +17,13 @@
 		},
 		{ label: 'What is aiD?', pos: 32, height: 20, align: 'left', sectionRef: 'what-is-aid' },
 		{ label: 'Sustainability and Ethics', pos: 28, height: 20, align: 'right' },
-		{ label: 'Core Mission and Goals', pos: 36, height: 12, align: 'right' },
+		{
+			label: 'Core Mission and Goals',
+			pos: 36,
+			height: 12,
+			align: 'right',
+			sectionRef: 'mission-and-goals'
+		},
 		{ label: 'Our Partners', pos: 40, height: 35, align: 'left' }
 	];
 

@@ -64,6 +64,7 @@
 		width: 0.6rem;
 		background-color: var(--light-grey);
 		border-radius: 2px;
+		/* NOTE: Add corner-shape: squircle; */
 	}
 	.node-title {
 		color: var(--medium-grey);

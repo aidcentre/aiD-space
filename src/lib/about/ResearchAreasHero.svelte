@@ -61,7 +61,7 @@
 			{#each researchAreas as area}
 				<div class="break-inside-avoid">
 					<p class="mb-3 font-[Milling] text-xl font-extrabold">{area.title}</p>
-					<p class="mb-14 text-[1.1rem]">{area.content}</p>
+					<p class="mb-14 text-[1.1rem] tracking-tight">{area.content}</p>
 				</div>
 			{/each}
 		</div>
