@@ -7,7 +7,7 @@
 <!-- TODO: for accessibility, make button instead of div. this is a workaround -->
 <div class="node" role="button" tabindex="0">
 	<div class="node-top">
-		<div class="square"></div>
+		<div class="squircle"></div>
 		<span class="node-title">NODE 000{id}</span>
 		<span class="node-title">{data.fileName}.jpg</span>
 	</div>
@@ -37,7 +37,7 @@
 		align-items: center;
 		gap: 6px;
 	}
-	.square {
+	.squircle {
 		height: 0.6rem;
 		width: 0.6rem;
 		background-color: var(--light-grey);
