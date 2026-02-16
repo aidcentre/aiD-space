@@ -29,8 +29,11 @@
 </script>
 
 <section class="grid grid-cols-2 gap-x-72 gap-y-24 bg-(--off-black) pt-16 pr-4 pb-16 pl-4">
-	<div class="dot-bg sticky top-10 col-span-2 pt-8 pl-8 text-white"></div>
-	<div class="title-area sticky top-40">
+	<div class="dot-bg sticky top-12 z-2 col-span-2 pt-8 text-white"></div>
+	<div
+		class="to-[rgba(0, 0, 0, 0)] sticky top-9 z-1 col-span-2 -mt-32 h-40 w-full bg-linear-to-b from-black"
+	></div>
+	<div class="title-area sticky top-40 -mt-32">
 		<a
 			class="section-title flex w-max text-[0.8rem] font-bold drop-shadow-none"
 			id="impact-and-use-cases"
@@ -43,7 +46,7 @@
 			>
 		</h6>
 	</div>
-	<div class="section-content mt-20 w-2/3">
+	<div class="section-content -mt-12 w-2/3">
 		{#each useCases as uc}
 			<div>
 				<p class="mb-4 font-[Milling] text-[0.8rem] font-extrabold tracking-wide">{uc.title}</p>
@@ -60,7 +63,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 3rem;
-		margin-left: 1.2rem;
+		margin-left: 0.2rem;
 		height: fit-content;
 	}
 	.section-content {
