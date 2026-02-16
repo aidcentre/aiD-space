@@ -46,11 +46,11 @@
 			>
 		</h6>
 	</div>
-	<div class="section-content -mt-12 w-2/3">
+	<div class="section-content -mt-16 w-3/4">
 		{#each useCases as uc}
 			<div>
 				<p class="mb-4 font-[Milling] text-[0.8rem] font-extrabold tracking-wide">{uc.title}</p>
-				<p class="mb-14 text-[1.1rem] tracking-tight">
+				<p class="mb-14 text-[1rem] tracking-tight">
 					{uc.content}
 				</p>
 			</div>
