@@ -28,12 +28,13 @@
 	];
 </script>
 
-<section class="grid grid-cols-2 gap-x-72 gap-y-24 bg-(--off-black) pt-16 pr-4 pb-16 pl-4">
-	<div class="dot-bg sticky top-12 z-2 col-span-2 pt-8 text-white"></div>
+<section class="isolate grid grid-cols-2 gap-x-72 gap-y-24 bg-(--off-black) pt-16 pr-4 pb-16 pl-4">
+	<!-- TODO: change size of parent div (make it smaller) so that the dot bg ends earlier -->
+	<div class="dot-bg pointer-events-none sticky top-12 z-20 col-span-2 pt-8 text-white"></div>
 	<div
-		class="to-[rgba(0, 0, 0, 0)] sticky top-9 z-1 col-span-2 -mt-32 h-40 w-full bg-linear-to-b from-black"
+		class="sticky top-9 z-10 col-span-2 -mt-32 h-40 w-full bg-linear-to-b from-black to-transparent"
 	></div>
-	<div class="title-area sticky top-40 -mt-32">
+	<div class="title-area sticky top-40 z-15 -mt-32">
 		<a
 			class="section-title flex w-max text-[0.8rem] font-bold drop-shadow-none"
 			id="impact-and-use-cases"
