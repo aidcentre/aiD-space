@@ -1,4 +1,5 @@
 <script lang="ts">
+	import diagonalPattern from '$lib/assets/diagonal_squares.svg';
 	let useCases = [
 		{
 			title: 'Risk-based maintenance',
@@ -27,7 +28,8 @@
 	];
 </script>
 
-<section class="section columns-2 gap-72">
+<section class="grid grid-cols-2 gap-x-72 gap-y-24 bg-(--off-black) pt-16 pr-4 pb-16 pl-4">
+	<div class="testing col-span-2 pt-8 pl-8 text-white"></div>
 	<div class="title-area">
 		<a
 			class="section-title flex w-max text-[0.8rem] font-bold drop-shadow-none"
@@ -41,7 +43,7 @@
 			>
 		</h6>
 	</div>
-	<div class="section-content mt-24 w-2/3">
+	<div class="section-content mt-20 w-2/3">
 		{#each useCases as uc}
 			<div>
 				<p class="mb-4 font-[Milling] text-[0.8rem] font-extrabold tracking-wide">{uc.title}</p>
@@ -54,16 +56,6 @@
 </section>
 
 <style>
-	.section {
-		display: flex;
-		justify-content: space-between;
-		background-color: var(--off-black);
-		padding-right: 8rem;
-		padding-top: 4rem;
-		padding-bottom: 6rem;
-		margin-top: 3rem;
-		color: var(--off-black);
-	}
 	.title-area {
 		display: flex;
 		flex-direction: column;
@@ -86,5 +78,9 @@
 		color: var(--off-black);
 		border-radius: 0.5rem;
 		padding: 0.5rem 1rem;
+	}
+	.testing {
+		background-image: url('/src/lib/assets/diagonal_squares.svg');
+		background-repeat: repeat-x;
 	}
 </style>
