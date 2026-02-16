@@ -29,7 +29,7 @@
 </script>
 
 <section class="grid grid-cols-2 gap-x-72 gap-y-24 bg-(--off-black) pt-16 pr-4 pb-16 pl-4">
-	<div class="testing col-span-2 pt-8 pl-8 text-white"></div>
+	<div class="dot-bg col-span-2 pt-8 pl-8 text-white"></div>
 	<div class="title-area">
 		<a
 			class="section-title flex w-max text-[0.8rem] font-bold drop-shadow-none"
@@ -79,7 +79,7 @@
 		border-radius: 0.5rem;
 		padding: 0.5rem 1rem;
 	}
-	.testing {
+	.dot-bg {
 		background-image: url('/src/lib/assets/diagonal_squares.svg');
 		background-repeat: repeat-x;
 	}
