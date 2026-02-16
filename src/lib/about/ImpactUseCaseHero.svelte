@@ -29,8 +29,8 @@
 </script>
 
 <section class="grid grid-cols-2 gap-x-72 gap-y-24 bg-(--off-black) pt-16 pr-4 pb-16 pl-4">
-	<div class="dot-bg col-span-2 pt-8 pl-8 text-white"></div>
-	<div class="title-area">
+	<div class="dot-bg sticky top-10 col-span-2 pt-8 pl-8 text-white"></div>
+	<div class="title-area sticky top-40">
 		<a
 			class="section-title flex w-max text-[0.8rem] font-bold drop-shadow-none"
 			id="impact-and-use-cases"
@@ -61,6 +61,7 @@
 		flex-direction: column;
 		gap: 3rem;
 		margin-left: 1.2rem;
+		height: fit-content;
 	}
 	.section-content {
 		color: var(--off-black);
