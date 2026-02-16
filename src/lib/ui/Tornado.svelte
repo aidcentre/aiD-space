@@ -24,7 +24,13 @@
 			align: 'right',
 			sectionRef: 'mission-and-goals'
 		},
-		{ label: 'Real-World Impact and Use Cases', pos: 40, height: 35, align: 'left' }
+		{
+			label: 'Real-World Impact and Use Cases',
+			pos: 40,
+			height: 35,
+			align: 'left',
+			sectionRef: 'impact-and-use-cases'
+		}
 	];
 
 	let container: HTMLDivElement;
@@ -157,7 +163,7 @@
 		<p class="mt-2 text-xl font-extrabold">
 			The Norwegian Centre on AI for Decisions (aiD) is a premier research hub dedicated to
 			advancing the role of artificial intelligence in complex decision-making processes. As a
-			cornerstone of the Research Council of Norway’s (RCN) AI portfolio, aiD bridges technological,
+			cornerstone of the Research Council of Norway's (RCN) AI portfolio, aiD bridges technological,
 			organizational, and human-centric gaps to foster a society where AI-driven value creation is
 			safe and ethical.
 		</p>
