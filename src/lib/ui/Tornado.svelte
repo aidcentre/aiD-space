@@ -16,7 +16,13 @@
 			sectionRef: 'research-areas'
 		},
 		{ label: 'What is aiD?', pos: 32, height: 20, align: 'left', sectionRef: 'what-is-aid' },
-		{ label: 'Sustainability and Ethics', pos: 28, height: 20, align: 'right' },
+		{
+			label: 'Sustainability and Ethics',
+			pos: 28,
+			height: 20,
+			align: 'right',
+			sectionRef: 'sustainability-and-ethics'
+		},
 		{
 			label: 'Core Mission and Goals',
 			pos: 36,
