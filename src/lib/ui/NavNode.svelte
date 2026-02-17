@@ -8,7 +8,7 @@
 		<div class="squircle"></div>
 		<span class="node-title">NODE 000{id}</span>
 	</div>
-	<a href="/about" class="node-content btn" type="button"><span>{data.text}</span></a>
+	<a href="/{data.pageName}" class="node-content btn" type="button"><span>{data.text}</span></a>
 </div>
 
 <style>
