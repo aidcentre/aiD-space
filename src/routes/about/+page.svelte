@@ -6,6 +6,7 @@
 	import MissionGoalsHero from '$lib/about/MissionGoalsHero.svelte';
 	import ImpactUseCaseHero from '$lib/about/ImpactUseCaseHero.svelte';
 	import EthicsHero from '$lib/about/EthicsHero.svelte';
+	import Footer from '$lib/ui/Footer.svelte';
 </script>
 
 <NavHeader version={0.1} nodeNum={2} />
@@ -17,6 +18,7 @@
 	<ImpactUseCaseHero />
 	<MissionGoalsHero />
 	<EthicsHero />
+	<Footer />
 </main>
 
 <style>
