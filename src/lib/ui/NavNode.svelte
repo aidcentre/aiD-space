@@ -44,8 +44,10 @@
 		align-items: flex-end;
 		font-size: 1rem;
 		line-height: 1.5rem;
-		width: 10rem;
+		width: fit-content;
+		min-width: 10rem;
 		height: 8rem;
+		padding-right: 2rem;
 		overflow-wrap: break-word;
 		word-break: break-word;
 		overflow: hidden;
