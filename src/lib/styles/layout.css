@@ -3,6 +3,8 @@
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
+/* ====== Milling ====== */
+
 @font-face {
 	font-family: 'Milling';
 	src:
@@ -16,12 +18,14 @@
 @font-face {
 	font-family: 'Milling';
 	src:
-		url('/fonts/Milling/Milling-Triplex2mm.woff2') format('woff2'),
-		url('/fonts/Milling/Milling-Triplex2mm.woff') format('woff');
+		url('/fonts/Milling/Milling-Triplex1,5mm.woff2') format('woff2'),
+		url('/fonts/Milling/Milling-Triplex1,5mm.woff') format('woff');
 	font-style: normal;
 	font-weight: 800;
 	font-display: swap;
 }
+
+/* ====== Montagu Slab ====== */
 
 @font-face {
 	font-family: 'Montagu Slab';

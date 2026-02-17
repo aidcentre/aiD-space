@@ -1,56 +1,19 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import * as THREE from 'three';
-	import Button from './Button.svelte';
-
-	// height not used currently
-	// TODO: make function that rates heights and creates ratio to get each's height out of
-	// 100%, (NOTE: height's minimum must be the height of the button itself)
-	// TODO2: add smooth transition when navigating between sections (animation)
-	const buttons = [
-		{
-			label: 'Our Research Areas',
-			pos: 49,
-			height: 35,
-			align: 'left',
-			sectionRef: 'research-areas'
-		},
-		{ label: 'What is aiD?', pos: 32, height: 20, align: 'left', sectionRef: 'what-is-aid' },
-		{
-			label: 'Sustainability and Ethics',
-			pos: 28,
-			height: 20,
-			align: 'right',
-			sectionRef: 'sustainability-and-ethics'
-		},
-		{
-			label: 'Core Mission and Goals',
-			pos: 36,
-			height: 12,
-			align: 'right',
-			sectionRef: 'mission-and-goals'
-		},
-		{
-			label: 'Real-World Impact and Use Cases',
-			pos: 40,
-			height: 35,
-			align: 'left',
-			sectionRef: 'impact-and-use-cases'
-		}
-	];
 
 	let container: HTMLDivElement;
 	let renderer: THREE.WebGLRenderer;
 	let frameId: number;
 
 	const params = {
-		nodeCount: 200,
-		nodeSize: 1,
+		nodeCount: 15,
+		nodeSize: 3,
 		// below are the three parameters to control the size of the cloud
-		areaWidth: 60,
-		areaHeight: 40,
-		areaDepth: 60,
-		rotationSpeed: 0.006
+		areaWidth: 27,
+		areaHeight: 27,
+		areaDepth: 27,
+		rotationSpeed: 0.003
 	};
 
 	onMount(() => {
@@ -59,12 +22,12 @@
 		scene.background = null;
 
 		const camera = new THREE.PerspectiveCamera(
-			300,
+			50,
 			container.clientWidth / container.clientHeight,
-			1,
+			0.1,
 			1000
 		);
-		camera.position.z = 70;
+		camera.position.z = 50;
 
 		renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 		renderer.setPixelRatio(window.devicePixelRatio);
@@ -78,7 +41,7 @@
 		const squircleTexture = createSquircleTexture();
 		const nodeMaterial = new THREE.SpriteMaterial({
 			map: squircleTexture,
-			color: 0x050505,
+			color: 0xe8e8e8,
 			transparent: true
 		});
 
@@ -145,78 +108,37 @@
 	});
 </script>
 
-<!-- TODO: fix vertical button positioning without extra div after each -->
-<div class="outer-wrapper">
-	<div class="wrapper">
-		<div class="canvas-container" bind:this={container}></div>
-
-		<div class="button-layer">
-			{#each buttons as button}
-				<div class="button-w">
-					<Button
-						label={button.label}
-						alignment={button.align}
-						marginValue={button.pos}
-						section_ref={button.sectionRef ?? ''}
-					/>
-				</div>
-			{/each}
-			<div class="button-w"></div>
-		</div>
-	</div>
-	<div class="aid-description">
-		<span style:font-size="0.9rem">What is aiD?</span>
-		<p class="mt-2 text-xl font-extrabold">
-			The Norwegian Centre on AI for Decisions (aiD) is a premier research hub dedicated to
-			advancing the role of artificial intelligence in complex decision-making processes. As a
-			cornerstone of the Research Council of Norway's (RCN) AI portfolio, aiD bridges technological,
-			organizational, and human-centric gaps to foster a society where AI-driven value creation is
-			safe and ethical.
+<footer
+	class="footer grid w-full grid-cols-4 bg-(--off-black) p-3 text-(--light-grey) sm:footer-horizontal"
+>
+	<aside class="font-[Montagu_Slab] font-light">
+		<p class="mb-2">
+			aiD is headquartered at the Norwegian University of Science and Technology in Trondheim,
+			Norway and at SINTEF, Norway.
 		</p>
-	</div>
-</div>
+		<p class="-mb-2">info@aid-research.com</p>
+		<p>+47 22 22 55 55</p>
+	</aside>
+	<div class="z-2 col-span-2 h-[60vh] w-full" bind:this={container}></div>
+	<nav class="justify-self-end md:justify-self-end">
+		<a href="/about" class="inline-flex items-center text-xs" style:gap="0.5rem">
+			<div class="up-arrow">←</div>
+			<span>Back to top</span>
+		</a>
+	</nav>
+</footer>
 
 <style>
-	.outer-wrapper {
-		position: relative;
-		width: 100%;
-		height: 100vh;
-		margin-bottom: -3rem;
-	}
-	.aid-description {
-		width: 58%;
-		margin-left: 2rem;
-	}
-	.wrapper {
-		position: relative;
-		width: 100%;
-		height: 60vh;
-		overflow: hidden;
-	}
-
-	.canvas-container {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: 1;
-	}
-
-	.button-layer {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
+	.up-arrow {
+		rotate: 90deg;
 		display: flex;
-		flex-direction: column;
-		padding-top: 4rem;
-		z-index: 2;
-	}
-	.button-w {
-		display: block;
-		width: 100%;
-		height: 20%;
+		padding: 0.25rem;
+		line-height: 0.75rem;
+		justify-content: center;
+		align-items: center;
+		border-radius: 0.25rem;
+		border: 2px solid var(--light-grey, #e8e8e8);
+		height: fit-content;
+		aspect-ratio: 1/1;
 	}
 </style>

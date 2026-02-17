@@ -3,15 +3,15 @@
 	let { version, nodeNum } = $props();
 </script>
 
-<div class="header-main mb-12 items-start pt-4 pb-4 text-xs shadow-sm">
+<div class="header-main sticky top-0 mb-8 items-start pt-4 pb-4 text-xs shadow-sm">
 	<div class="navbar-start overflow-hidden pl-3">
 		<span>aiD v{version}</span>
 		<img class="logo pl-18" src={aiDLogo} alt="AID logo without AID centre description" />
 	</div>
-	<div class="navbar-center" style:gap="0.5rem">
+	<a href="/" class="navbar-center" style:gap="0.5rem">
 		<div class="back-arrow">←</div>
-		<a href="/">Back to aiD</a>
-	</div>
+		<span>Back to aiD</span>
+	</a>
 	<div class="node-text navbar-end pr-3">
 		<div class="node-text">
 			<div class="square"></div>
@@ -29,6 +29,7 @@
 		color: var(--light-grey);
 		background-color: var(--off-black);
 		height: fit-content;
+		z-index: 10;
 	}
 	.logo {
 		height: 1.2rem;
