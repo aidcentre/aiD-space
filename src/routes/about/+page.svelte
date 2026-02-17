@@ -5,6 +5,7 @@
 	import ResearchAreasHero from '$lib/about/ResearchAreasHero.svelte';
 	import MissionGoalsHero from '$lib/about/MissionGoalsHero.svelte';
 	import ImpactUseCaseHero from '$lib/about/ImpactUseCaseHero.svelte';
+	import EthicsHero from '$lib/about/EthicsHero.svelte';
 </script>
 
 <NavHeader version={0.1} nodeNum={2} />
@@ -15,6 +16,7 @@
 	<ResearchAreasHero />
 	<ImpactUseCaseHero />
 	<MissionGoalsHero />
+	<EthicsHero />
 </main>
 
 <style>

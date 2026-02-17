@@ -46,7 +46,6 @@
 		margin-right: 3rem;
 		margin-top: 3rem;
 		color: var(--off-black);
-		margin-bottom: 1rem;
 	}
 	.section-content {
 		color: var(--off-black);
