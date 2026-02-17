@@ -10,9 +10,9 @@
 		nodeCount: 15,
 		nodeSize: 3,
 		// below are the three parameters to control the size of the cloud
-		areaWidth: 30,
-		areaHeight: 30,
-		areaDepth: 30,
+		areaWidth: 27,
+		areaHeight: 27,
+		areaDepth: 27,
 		rotationSpeed: 0.003
 	};
 
@@ -109,19 +109,19 @@
 </script>
 
 <footer
-	class="footer grid w-full grid-cols-4 bg-(--off-black) p-2 text-(--light-grey) sm:footer-horizontal"
+	class="footer grid w-full grid-cols-4 bg-(--off-black) p-3 text-(--light-grey) sm:footer-horizontal"
 >
 	<aside class="font-[Montagu_Slab] font-light">
-		<p>
+		<p class="mb-2">
 			aiD is headquartered at the Norwegian University of Science and Technology in Trondheim,
 			Norway and at SINTEF, Norway.
 		</p>
-		<p>info@aid-research.com</p>
+		<p class="-mb-2">info@aid-research.com</p>
 		<p>+47 22 22 55 55</p>
 	</aside>
-	<div class=" z-2 col-span-2 h-[60vh] w-full" bind:this={container}></div>
-	<nav>
-		<a href="/about" class="inline-flex items-center" style:gap="0.5rem">
+	<div class="z-2 col-span-2 h-[60vh] w-full" bind:this={container}></div>
+	<nav class="justify-self-end md:justify-self-end">
+		<a href="/about" class="inline-flex items-center text-xs" style:gap="0.5rem">
 			<div class="up-arrow">←</div>
 			<span>Back to top</span>
 		</a>
