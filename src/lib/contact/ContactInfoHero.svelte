@@ -21,7 +21,7 @@
 			<ButtonWithArrow label="aiD at SINTEF" />
 		</div>
 		<p class="mt-6 text-sm font-bold">A project by</p>
-		<div class="-mt-4 flex gap-10">
+		<div class="-mt-4 flex flex-wrap gap-10">
 			{#each projectBy as orgName}
 				<LogoTemplate name={orgName} />
 			{/each}

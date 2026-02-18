@@ -1,5 +1,4 @@
 <script lang="ts">
-	import diagonalPattern from '$lib/assets/diagonal_squares.svg';
 	let useCases = [
 		{
 			title: 'Risk-based maintenance',
@@ -85,7 +84,7 @@
 		padding: 0.5rem 1rem;
 	}
 	.dot-bg {
-		background-image: url('/src/lib/assets/diagonal_squares.svg');
+		background-image: url('/src/lib/assets/diagonal_squares_white.svg');
 		background-repeat: repeat-x;
 	}
 </style>
