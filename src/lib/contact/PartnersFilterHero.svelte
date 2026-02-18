@@ -45,7 +45,7 @@
 			<div
 				in:fade={{ duration: 300, delay: 200 }}
 				out:fade={{ duration: 200 }}
-				class="flex w-fit rounded-xl border border-transparent bg-white p-8 transition-all hover:border-blue-100"
+				class="flex w-fit rounded-xl border border-transparent bg-white p-10 transition-all hover:border-blue-100"
 			>
 				<Logo name={partner.logo} />
 			</div>
