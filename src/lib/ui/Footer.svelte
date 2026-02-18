@@ -121,7 +121,7 @@
 	</aside>
 	<div class="z-2 col-span-2 h-[60vh] w-full" bind:this={container}></div>
 	<nav class="justify-self-end md:justify-self-end">
-		<a href="/about" class="inline-flex items-center text-xs" style:gap="0.5rem">
+		<a href="#top" class="inline-flex items-center text-xs" style:gap="0.5rem">
 			<div class="up-arrow">←</div>
 			<span>Back to top</span>
 		</a>
