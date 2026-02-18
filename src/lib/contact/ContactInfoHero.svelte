@@ -2,7 +2,7 @@
 	import ButtonWithArrow from './ButtonWithArrow.svelte';
 	import LogoTemplate from './LogoTemplate.svelte';
 
-	let projectBy = ['ntnu_logo'];
+	let projectBy = ['ntnu_logo', 'sintef_logo', 'norway_research_council_logo'];
 </script>
 
 <section class="mt-20 flex w-full flex-col items-center justify-center">
@@ -21,7 +21,7 @@
 			<ButtonWithArrow label="aiD at SINTEF" />
 		</div>
 		<p class="mt-6 text-sm font-bold">A project by</p>
-		<div class="flex gap-2">
+		<div class="-mt-4 flex gap-10">
 			{#each projectBy as orgName}
 				<LogoTemplate name={orgName} />
 			{/each}

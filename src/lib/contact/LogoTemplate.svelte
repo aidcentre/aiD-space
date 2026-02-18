@@ -2,4 +2,4 @@
 	let { name } = $props();
 </script>
 
-<img src={`/src/lib/assets/${name}.svg`} alt={name} />
+<img src={`/src/lib/assets/logos/${name}.svg`} alt={name} />
