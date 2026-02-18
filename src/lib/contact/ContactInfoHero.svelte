@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ButtonWithArrow from './ButtonWithArrow.svelte';
 </script>
 
 <section class="mt-20 flex w-full flex-col items-center justify-center">
@@ -8,9 +9,13 @@
 			aiD is headquartered at the Norwegian University of Science and Technology in Trondheim,
 			Norway and at SINTEF, Norway.
 		</p>
-		<div class="flex flex-col">
+		<div class="-mt-4 flex flex-col">
 			<span class="text-sm font-bold">info@aid-research.com</span>
-			<span class="=mt-4 text-sm font-bold">+47 22 22 55 55</span>
+			<span class="mt-1 text-sm font-bold">+47 22 22 55 55</span>
+		</div>
+		<div class="flex gap-2">
+			<ButtonWithArrow label="aiD at NTNU" />
+			<ButtonWithArrow label="aiD at SINTEF" />
 		</div>
 	</div>
 </section>
