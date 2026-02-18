@@ -1,5 +1,8 @@
 <script lang="ts">
 	import ButtonWithArrow from './ButtonWithArrow.svelte';
+	import LogoTemplate from './LogoTemplate.svelte';
+
+	let projectBy = ['ntnu_logo'];
 </script>
 
 <section class="mt-20 flex w-full flex-col items-center justify-center">
@@ -16,6 +19,12 @@
 		<div class="flex gap-2">
 			<ButtonWithArrow label="aiD at NTNU" />
 			<ButtonWithArrow label="aiD at SINTEF" />
+		</div>
+		<p class="mt-6 text-sm font-bold">A project by</p>
+		<div class="flex gap-2">
+			{#each projectBy as orgName}
+				<LogoTemplate name={orgName} />
+			{/each}
 		</div>
 	</div>
 </section>
