@@ -65,13 +65,13 @@
 		border: none;
 		font-size: 0.8rem;
 		font-weight: 600;
-		color: #666;
+		color: var(--greyed-out);
 		cursor: pointer;
 		padding: 0;
 		transition: color 0.2s;
 	}
 
 	.filter-nav button.active {
-		color: #000;
+		color: var(--off-black);
 	}
 </style>
