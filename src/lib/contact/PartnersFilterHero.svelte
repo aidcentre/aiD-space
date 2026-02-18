@@ -1,5 +1,6 @@
 <script>
 	import { partners_data } from '$lib/data/partners';
+	import { fade } from 'svelte/transition';
 	import Logo from './LogoTemplate.svelte';
 
 	// use svelte 5 runes to get reactive state for the current filter, default to Core
@@ -16,8 +17,8 @@
 	const filteredPartners = $derived(partners_data.filter((p) => p.category === activeCategory));
 </script>
 
-<div class="container">
-	<h2>Our partners</h2>
+<div class="px-4">
+	<h2 class="mb-8 text-xl font-extrabold">Our partners</h2>
 
 	<nav class="filter-nav">
 		<button class:active={activeCategory === 'Core'} onclick={() => (activeCategory = 'Core')}>
@@ -41,7 +42,11 @@
 
 	<div class="flex flex-wrap gap-1">
 		{#each filteredPartners as partner (partner.name)}
-			<div class="flex w-fit rounded-xl bg-white p-8">
+			<div
+				in:fade={{ duration: 300, delay: 200 }}
+				out:fade={{ duration: 200 }}
+				class="flex w-fit rounded-xl border border-transparent bg-white p-8 transition-all hover:border-blue-100"
+			>
 				<Logo name={partner.logo} />
 			</div>
 		{/each}
@@ -49,16 +54,6 @@
 </div>
 
 <style>
-	.container {
-		padding: 3rem 1rem;
-	}
-
-	h2 {
-		font-size: 1.5rem;
-		font-weight: 800;
-		margin-bottom: 2rem;
-	}
-
 	.filter-nav {
 		display: flex;
 		gap: 1.5rem;
