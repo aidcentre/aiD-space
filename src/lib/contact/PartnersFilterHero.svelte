@@ -18,7 +18,7 @@
 </script>
 
 <div class="px-4">
-	<h2 class="mb-8 text-xl font-extrabold">Our partners</h2>
+	<h2 class="mb-6 text-xl font-extrabold">Our partners</h2>
 
 	<nav class="filter-nav">
 		<button class:active={activeCategory === 'Core'} onclick={() => (activeCategory = 'Core')}>
@@ -57,13 +57,13 @@
 	.filter-nav {
 		display: flex;
 		gap: 1.5rem;
-		margin-bottom: 2rem;
+		margin-bottom: 1rem;
 	}
 
 	.filter-nav button {
 		background: none;
 		border: none;
-		font-size: 0.9rem;
+		font-size: 0.8rem;
 		font-weight: 600;
 		color: #666;
 		cursor: pointer;
