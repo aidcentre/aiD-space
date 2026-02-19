@@ -8,7 +8,7 @@
 		<div class="squircle"></div>
 		<span class="node-title">NODE 000{id}</span>
 	</div>
-	<a href="/about" class="node-content btn" type="button"><span>{data.text}</span></a>
+	<a href="/{data.pageName}" class="node-content btn" type="button"><span>{data.text}</span></a>
 </div>
 
 <style>
@@ -44,8 +44,10 @@
 		align-items: flex-end;
 		font-size: 1rem;
 		line-height: 1.5rem;
-		width: 10rem;
+		width: fit-content;
+		min-width: 10rem;
 		height: 8rem;
+		padding-right: 2rem;
 		overflow-wrap: break-word;
 		word-break: break-word;
 		overflow: hidden;

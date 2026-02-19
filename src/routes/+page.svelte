@@ -27,7 +27,7 @@
 		{
 			id: '2',
 			draggable: false,
-			data: { text: 'What is aiD?' },
+			data: { text: 'What is aiD?', pageName: 'about' },
 			type: 'navNode',
 			position: { x: 550, y: 420 }
 		},
@@ -43,10 +43,19 @@
 			position: { x: 0, y: 300 }
 		},
 		{
+			id: '4',
+			draggable: false,
+			data: { text: 'About & contact', pageName: 'contact' },
+			type: 'navNode',
+			position: { x: 1100, y: 380 }
+		},
+		{
 			id: '5',
 			width: 300,
 			draggable: false,
-			data: { text: "We're building something great here. Watch this space." },
+			data: {
+				text: "We're building something great here. Watch this space."
+			},
 			type: 'textNode',
 			position: { x: 1000, y: 20 }
 		}
