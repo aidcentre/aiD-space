@@ -60,6 +60,8 @@
 			position: { x: 1000, y: 20 }
 		}
 	]);
+
+	let halfvw = '50vw';
 </script>
 
 <svelte:head>
@@ -76,6 +78,10 @@
 		maxZoom={1}
 		fitView
 		proOptions={{ hideAttribution: true }}
+		translateExtent={[
+			[-1000, -800],
+			[2000, 1400]
+		]}
 	>
 		<Background
 			id="1"
