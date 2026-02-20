@@ -1,7 +1,7 @@
 <script lang="ts">
 	import NavHeader from '$lib/ui/NavHeader.svelte';
 	// retire tornado component. reincorporate later when we build a more complete version of the site
-	import Tornado from '$lib/ui/Tornado.svelte';
+	import Tornado from '$lib/archive/Tornado.svelte';
 	import WhatIsAid from '$lib/about/AboutAidHero.svelte';
 	import ResearchAreasHero from '$lib/about/ResearchAreasHero.svelte';
 	import MissionGoalsHero from '$lib/about/MissionGoalsHero.svelte';

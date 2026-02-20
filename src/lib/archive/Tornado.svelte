@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import * as THREE from 'three';
-	import Button from './Button.svelte';
+	import Button from '../ui/Button.svelte';
 
 	// height not used currently
 	// TODO: make function that rates heights and creates ratio to get each's height out of
