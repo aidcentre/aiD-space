@@ -1,12 +1,12 @@
 <script>
-	import Header from '$lib/ui/Header.svelte';
+	import HomeHeader from '$lib/ui/HomeHeader.svelte';
 </script>
 
 <svelte:head>
 	<title>AID Home</title>
 </svelte:head>
 
-<Header lastCommit="2 days" author="CamillaS" />
+<HomeHeader />
 
 <style>
 </style>
