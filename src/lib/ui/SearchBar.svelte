@@ -5,7 +5,7 @@
 
 <!-- note: make text in input box wrap? if so, where does the extra go? -->
 <div class="flex w-full flex-1 flex-col items-center justify-center px-8">
-	<div class="w-full max-w-2xl">
+	<div class="pointer-events-auto w-full max-w-2xl">
 		<div class="relative flex items-center">
 			<input
 				type="text"
