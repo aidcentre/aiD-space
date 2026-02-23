@@ -9,10 +9,10 @@
 
 	// adjustable parameters
 	const params = {
-		width: 100,
-		height: 65,
-		depth: 100,
-		nodeCount: 150,
+		width: 70,
+		height: 50,
+		depth: 70,
+		nodeCount: 200,
 		nodeSize: 0.75,
 		moveSpeed: 0.0,
 		orbitSpeed: 0.5
@@ -29,7 +29,7 @@
 			1,
 			3000
 		);
-		camera.position.set(60, 40, 60);
+		camera.position.set(60, 60, 60);
 
 		renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
 		renderer.setPixelRatio(window.devicePixelRatio);
