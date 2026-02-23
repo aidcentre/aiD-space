@@ -1,5 +1,6 @@
 <script lang="ts">
 	import roundsquareFrame from '$lib/assets/roundsquare_frame.svg';
+	import Scramble from '$lib/actions/Scramble.svelte';
 
 	let { orgType, orgAmount } = $props();
 </script>
@@ -13,7 +14,7 @@
 		/>
 		<span class="amount">{orgAmount}</span>
 	</div>
-	<span class="org-type">{orgType}</span>
+	<Scramble class="org-type text-[1.15rem] font-extrabold tracking-wide" text={orgType} />
 </div>
 
 <style>
@@ -37,10 +38,5 @@
 	.dotted-box {
 		height: 4rem;
 		min-width: fit-content;
-	}
-	.org-type {
-		font-size: 1.15rem;
-		font-weight: 800;
-		letter-spacing: 0.03rem;
 	}
 </style>

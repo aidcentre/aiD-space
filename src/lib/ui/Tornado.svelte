@@ -1,113 +1,65 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import * as THREE from 'three';
-	import Button from './Button.svelte';
-
-	// height not used currently
-	// TODO: make function that rates heights and creates ratio to get each's height out of
-	// 100%, (NOTE: height's minimum must be the height of the button itself)
-	// TODO2: add smooth transition when navigating between sections (animation)
-	const buttons = [
-		{
-			label: 'Our Research Areas',
-			pos: 49,
-			height: 35,
-			align: 'left',
-			sectionRef: 'research-areas'
-		},
-		{ label: 'What is aiD?', pos: 32, height: 20, align: 'left', sectionRef: 'what-is-aid' },
-		{
-			label: 'Sustainability and Ethics',
-			pos: 28,
-			height: 20,
-			align: 'right',
-			sectionRef: 'sustainability-and-ethics'
-		},
-		{
-			label: 'Core Mission and Goals',
-			pos: 36,
-			height: 12,
-			align: 'right',
-			sectionRef: 'mission-and-goals'
-		},
-		{
-			label: 'Real-World Impact and Use Cases',
-			pos: 40,
-			height: 35,
-			align: 'left',
-			sectionRef: 'impact-and-use-cases'
-		}
-	];
+	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 	let container: HTMLDivElement;
 	let renderer: THREE.WebGLRenderer;
 	let frameId: number;
 
+	// adjustable parameters
 	const params = {
+		width: 70,
+		height: 50,
+		depth: 70,
 		nodeCount: 200,
-		nodeSize: 1,
-		// below are the three parameters to control the size of the cloud
-		areaWidth: 60,
-		areaHeight: 40,
-		areaDepth: 60,
-		rotationSpeed: 0.006
+		nodeSize: 0.75,
+		moveSpeed: 0.0,
+		orbitSpeed: 0.5
 	};
 
 	onMount(() => {
+		// initialize scene
 		const scene = new THREE.Scene();
-		// transparent background
-		scene.background = null;
+		scene.background = new THREE.Color(0xe8e8e8);
 
 		const camera = new THREE.PerspectiveCamera(
-			300,
+			60,
 			container.clientWidth / container.clientHeight,
 			1,
-			1000
+			3000
 		);
-		camera.position.z = 70;
+		camera.position.set(60, 60, 60);
 
-		renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+		renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
 		renderer.setPixelRatio(window.devicePixelRatio);
 		renderer.setSize(container.clientWidth, container.clientHeight);
 		container.appendChild(renderer.domElement);
 
-		// create particles
-		const cloudGroup = new THREE.Group();
-		scene.add(cloudGroup);
+		const controls = new OrbitControls(camera, renderer.domElement);
+		controls.enableDamping = true;
+		controls.autoRotate = true;
+		controls.autoRotateSpeed = params.orbitSpeed;
+		controls.enableZoom = true;
+		controls.enablePan = true;
 
-		const squircleTexture = createSquircleTexture();
-		const nodeMaterial = new THREE.SpriteMaterial({
-			map: squircleTexture,
-			color: 0x050505,
-			transparent: true
-		});
+		const nodes: THREE.Sprite[] = [];
 
-		for (let i = 0; i < params.nodeCount; i++) {
-			const sprite = new THREE.Sprite(nodeMaterial);
-
-			sprite.position.set(
-				(Math.random() - 0.5) * params.areaWidth,
-				(Math.random() - 0.5) * params.areaHeight,
-				(Math.random() - 0.5) * params.areaDepth
-			);
-
-			sprite.scale.set(params.nodeSize, params.nodeSize, 1);
-			cloudGroup.add(sprite);
-		}
-
+		// helper function: create squircle
 		function createSquircleTexture() {
-			const size = 64;
+			const size = 128;
 			const canvas = document.createElement('canvas');
 			canvas.width = size;
 			canvas.height = size;
 			const ctx = canvas.getContext('2d')!;
 			const r = size * 0.45;
 			const n = 4.5;
+			const steps = 64;
 			const center = size / 2;
-			ctx.fillStyle = '#ffffff';
+			ctx.fillStyle = '#000';
 			ctx.beginPath();
-			for (let i = 0; i <= 64; i++) {
-				const t = (Math.PI * 2 * i) / 64;
+			for (let i = 0; i <= steps; i++) {
+				const t = (Math.PI * 2 * i) / steps;
 				const ct = Math.cos(t);
 				const st = Math.sin(t);
 				const x = center + r * Math.sign(ct) * Math.pow(Math.abs(ct), 2 / n);
@@ -119,12 +71,44 @@
 			return new THREE.CanvasTexture(canvas);
 		}
 
+		function randomizeNode(sprite: THREE.Sprite) {
+			sprite.position.set(
+				(Math.random() - 0.5) * params.width,
+				(Math.random() - 0.5) * params.height,
+				(Math.random() - 0.5) * params.depth
+			);
+			sprite.userData.velocity = new THREE.Vector3(
+				(Math.random() - 0.5) * params.moveSpeed,
+				(Math.random() - 0.5) * params.moveSpeed,
+				(Math.random() - 0.5) * params.moveSpeed
+			);
+		}
+
+		// component construction
+		const squircleTexture = createSquircleTexture();
+		const nodeMaterial = new THREE.SpriteMaterial({ map: squircleTexture, transparent: true });
+
+		for (let i = 0; i < params.nodeCount; i++) {
+			const sprite = new THREE.Sprite(nodeMaterial);
+			randomizeNode(sprite);
+			sprite.scale.set(params.nodeSize, params.nodeSize, 1);
+			scene.add(sprite);
+			nodes.push(sprite);
+		}
+
+		// animation loop
 		const animate = () => {
 			frameId = requestAnimationFrame(animate);
 
-			// rotate around the vertical axis from top to bottom edge of screen
-			cloudGroup.rotation.y += params.rotationSpeed;
+			const bounds = { x: params.width / 2, y: params.height / 2, z: params.depth / 2 };
+			nodes.forEach((node) => {
+				node.position.add(node.userData.velocity);
+				if (Math.abs(node.position.x) > bounds.x) node.userData.velocity.x *= -1;
+				if (Math.abs(node.position.y) > bounds.y) node.userData.velocity.y *= -1;
+				if (Math.abs(node.position.z) > bounds.z) node.userData.velocity.z *= -1;
+			});
 
+			controls.update();
 			renderer.render(scene, camera);
 		};
 
@@ -145,78 +129,4 @@
 	});
 </script>
 
-<!-- TODO: fix vertical button positioning without extra div after each -->
-<div class="outer-wrapper">
-	<div class="wrapper">
-		<div class="canvas-container" bind:this={container}></div>
-
-		<div class="button-layer">
-			{#each buttons as button}
-				<div class="button-w">
-					<Button
-						label={button.label}
-						alignment={button.align}
-						marginValue={button.pos}
-						section_ref={button.sectionRef ?? ''}
-					/>
-				</div>
-			{/each}
-			<div class="button-w"></div>
-		</div>
-	</div>
-	<div class="aid-description">
-		<span style:font-size="0.9rem">What is aiD?</span>
-		<p class="mt-2 text-xl font-extrabold">
-			The Norwegian Centre on AI for Decisions (aiD) is a premier research hub dedicated to
-			advancing the role of artificial intelligence in complex decision-making processes. As a
-			cornerstone of the Research Council of Norway's (RCN) AI portfolio, aiD bridges technological,
-			organizational, and human-centric gaps to foster a society where AI-driven value creation is
-			safe and ethical.
-		</p>
-	</div>
-</div>
-
-<style>
-	.outer-wrapper {
-		position: relative;
-		width: 100%;
-		height: 100vh;
-		margin-bottom: -3rem;
-	}
-	.aid-description {
-		width: 58%;
-		margin-left: 2rem;
-	}
-	.wrapper {
-		position: relative;
-		width: 100%;
-		height: 60vh;
-		overflow: hidden;
-	}
-
-	.canvas-container {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: 1;
-	}
-
-	.button-layer {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		display: flex;
-		flex-direction: column;
-		padding-top: 4rem;
-		z-index: 2;
-	}
-	.button-w {
-		display: block;
-		width: 100%;
-		height: 20%;
-	}
-</style>
+<div class="fixed inset-0 flex-col items-center justify-center" bind:this={container}></div>

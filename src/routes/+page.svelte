@@ -1,99 +1,22 @@
 <script>
-	import { SvelteFlow, Background, BackgroundVariant } from '@xyflow/svelte';
-	import TextNode from '$lib/ui/TextNode.svelte';
-	import ImageNode from '$lib/ui/ImageNode.svelte';
-	import NavNode from '$lib/ui/NavNode.svelte';
+	import HomeHeader from '$lib/ui/HomeHeader.svelte';
 	import SearchBar from '$lib/ui/SearchBar.svelte';
-	import '@xyflow/svelte/dist/style.css';
-	import Header from '$lib/ui/Header.svelte';
-
-	let nodeTypes = {
-		textNode: TextNode,
-		imageNode: ImageNode,
-		navNode: NavNode
-	};
-
-	let nodes = $state.raw([
-		{
-			id: '1',
-			width: 400,
-			draggable: false,
-			data: {
-				text: 'aiD is building a scientific and technological foundation that makes reliable, real-world AI possible.'
-			},
-			type: 'textNode',
-			position: { x: 0, y: -100 }
-		},
-		{
-			id: '2',
-			draggable: false,
-			data: { text: 'What is aiD?', pageName: 'about' },
-			type: 'navNode',
-			position: { x: 550, y: 420 }
-		},
-		{
-			id: '3',
-			width: 400,
-			draggable: false,
-			data: {
-				text: 'THIS IS AN IMAGE NODE!',
-				fileName: 'image'
-			},
-			type: 'imageNode',
-			position: { x: 0, y: 300 }
-		},
-		{
-			id: '4',
-			draggable: false,
-			data: { text: 'About & contact', pageName: 'contact' },
-			type: 'navNode',
-			position: { x: 1100, y: 380 }
-		},
-		{
-			id: '5',
-			width: 300,
-			draggable: false,
-			data: {
-				text: "We're building something great here. Watch this space."
-			},
-			type: 'textNode',
-			position: { x: 1000, y: 20 }
-		}
-	]);
+	import Tornado from '$lib/ui/Tornado.svelte';
 </script>
 
 <svelte:head>
 	<title>AID Home</title>
 </svelte:head>
 
-<Header lastCommit="2 days" author="CamillaS" />
+<!-- TODO: allow right-clicks even on tornado. currently not possible due to pointer events none -->
+<Tornado />
 
-<div class="sf-bg">
-	<SvelteFlow
-		bind:nodes
-		{nodeTypes}
-		minZoom={1}
-		maxZoom={1}
-		fitView
-		proOptions={{ hideAttribution: true }}
-	>
-		<Background
-			id="1"
-			bgColor="var(--off-black)"
-			patternColor="var(--dark-grey)"
-			variant={BackgroundVariant.Dots}
-			size={1.5}
-			gap={20}
-		/>
-	</SvelteFlow>
-</div>
-
-<SearchBar />
-
-<style>
-	.sf-bg {
-		position: fixed;
-		inset: 0;
-		z-index: -1;
-	}
-</style>
+<main class="pointer-events-none relative flex min-h-dvh flex-col items-center">
+	<HomeHeader />
+	<SearchBar />
+	<footer class="w-2/3 self-start px-3 pb-3">
+		The Norwegian Center on AI for Decisions is building a scientific and technological foundation
+		that makes reliable, real-world AI possible. We're building something great here. Watch this
+		space.
+	</footer>
+</main>
