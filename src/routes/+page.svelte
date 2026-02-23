@@ -1,13 +1,16 @@
 <script>
 	import HomeHeader from '$lib/ui/HomeHeader.svelte';
 	import SearchBar from '$lib/ui/SearchBar.svelte';
+	import Tornado from '$lib/ui/Tornado.svelte';
 </script>
 
 <svelte:head>
 	<title>AID Home</title>
 </svelte:head>
 
-<main class="flex min-h-dvh flex-col items-center">
+<Tornado />
+
+<main class="relative z-10 flex min-h-dvh flex-col items-center">
 	<HomeHeader />
 	<SearchBar />
 	<footer class="w-2/3 self-start px-3 pb-3">

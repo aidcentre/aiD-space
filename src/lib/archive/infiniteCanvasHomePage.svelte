@@ -3,9 +3,9 @@
 	import TextNode from '$lib/ui/TextNode.svelte';
 	import ImageNode from '$lib/ui/ImageNode.svelte';
 	import NavNode from '$lib/ui/NavNode.svelte';
-	import SearchBar from '$lib/ui/SearchBar.svelte';
+	import SearchBar from '$lib/archive/SearchBar.svelte';
 	import '@xyflow/svelte/dist/style.css';
-	import Header from '$lib/ui/Header.svelte';
+	import Header from '$lib/archive/Header.svelte';
 
 	let nodeTypes = {
 		textNode: TextNode,
