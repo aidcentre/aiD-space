@@ -13,7 +13,7 @@
 			height="200rem"
 		/>
 	</div>
-	<div class="mr-2 navbar-end gap-2 text-xs">
+	<div class="pointer-events-auto mr-2 navbar-end gap-2 text-xs">
 		<a class="section-title drop-shadow-none" href="/about">What is aiD</a>
 		<a class="section-title drop-shadow-none" href="/contact">Contact</a>
 	</div>

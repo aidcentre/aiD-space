@@ -8,9 +8,10 @@
 	<title>AID Home</title>
 </svelte:head>
 
+<!-- TODO: allow right-clicks even on tornado. currently not possible due to pointer events none -->
 <Tornado />
 
-<main class="pointer-events-none relative z-10 flex min-h-dvh flex-col items-center">
+<main class="pointer-events-none relative flex min-h-dvh flex-col items-center">
 	<HomeHeader />
 	<SearchBar />
 	<footer class="w-2/3 self-start px-3 pb-3">
