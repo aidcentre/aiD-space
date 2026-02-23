@@ -1,48 +1,47 @@
 <script>
 	let query = $state('');
-
-	import enterIcon from '$lib/assets/enter_icon.svg';
 </script>
 
 <!-- note: make text in input box wrap? if so, where does the extra go? -->
 <div class="search-box">
+	<div class="textbox-label">
+		<span>Find a scientist</span><span class="textbox-label-search"
+			>Search for a research topic, name or anything else</span
+		>
+	</div>
 	<label class="text-box input">
-		<input
-			class="form-control text-(--mid-dark-grey)"
-			value={query}
-			type="text"
-			required
-			placeholder="Your query"
-		/>
+		<input class="form-control" value={query} type="text" required placeholder="Your query" />
 		<div class="search-icon">
-			<img src={enterIcon} alt="Arrow to click after entering query." />
+			<svg class="h-[1em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 26" stroke="#050505">
+				<g stroke-linejoin="round" stroke-linecap="round" stroke-width="3.5" fill="none">
+					<circle cx="11" cy="11" r="8"></circle>
+					<path d="m24 24-7-7"></path>
+				</g>
+			</svg>
 		</div>
 	</label>
-	<div class="textbox-label">
-		<span class="textbox-label-search">Search for a research topic, name or anything else</span>
-	</div>
 </div>
 
 <!-- <h1 style:color="red">Hello {query}!!!</h1> -->
 
 <style>
+	/* prevent blue outline around input text box */
+	.form-control:focus {
+		box-shadow: none !important;
+		-moz-box-shadow: none !important;
+		-webkit-box-shadow: none !important;
+	}
 	.search-box {
 		display: flex;
 		flex-direction: column;
 		gap: 0.7rem;
 		width: 36rem;
 		max-width: 1000px;
-		/* to account for the width of the component (top left corner is placed in the middle): */
-		/* position: fixed;
+		position: fixed;
 		top: 50%;
 		left: 50%;
-		transform: translate(-50%, -50%); */
-	}
-	/* prevent blue outline around input text box */
-	.form-control:focus {
-		box-shadow: none !important;
-		-moz-box-shadow: none !important;
-		-webkit-box-shadow: none !important;
+		/* to account for the width of the component (top left corner is placed in the middle): */
+		transform: translate(-50%, -50%);
 	}
 	.textbox-label {
 		display: flex;
@@ -58,14 +57,14 @@
 		font-size: 0.7rem;
 	}
 	.text-box {
-		background: white;
+		background: var(--off-black);
 		color: var(--medium-grey);
 		display: flex;
 		padding: 0.5rem 0.5rem 0.5rem 1rem;
 		align-items: center;
 		gap: 1.5rem;
 		border-radius: 0.5rem;
-		border: none;
+		border: 1px solid var(--dark-grey);
 		height: 3rem;
 		width: auto;
 	}
