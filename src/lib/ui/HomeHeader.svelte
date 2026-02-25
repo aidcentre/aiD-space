@@ -1,4 +1,5 @@
 <script lang="ts">
+	import SmallButton from './SmallButton.svelte';
 	import aiDLogo from '/src/lib/assets/aiD_lockup_black_RGB.svg';
 </script>
 
@@ -14,20 +15,7 @@
 		/>
 	</div>
 	<div class="pointer-events-auto mr-2 navbar-end gap-2 text-xs">
-		<a class="section-title drop-shadow-none" href="/about">What is aiD</a>
-		<a class="section-title drop-shadow-none" href="/contact">Contact</a>
+		<SmallButton label="What is aiD?" link="about" colourMode="light" />
+		<SmallButton label="Contact" link="contact" colourMode="light" />
 	</div>
 </div>
-
-<style>
-	.section-title {
-		display: inline-flex;
-		background: white;
-		color: var(--off-black);
-		border-radius: 0.4rem;
-		padding: 0.5rem 1rem;
-		font-weight: 800;
-		font-size: 0.8rem;
-		width: max-content;
-	}
-</style>
