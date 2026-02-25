@@ -8,9 +8,14 @@
 	<div class="navbar-start pl-3 text-xs">
 		<!-- TODO: consider using <object> instead for accessibility -->
 		<img
+			src={aidLogo}
+			alt="aiD logo and description, Norwegian Centre on AI for Decisions"
+			class="max-h-[32px] sm:hidden"
+		/>
+		<img
 			src={aidLogoWithText}
 			alt="aiD logo and description, Norwegian Centre on AI for Decisions"
-			class="max-h-[30px]"
+			class="max-h-[30px] max-sm:hidden"
 		/>
 	</div>
 	<div class="pointer-events-auto mr-2 navbar-end gap-2 text-xs">
