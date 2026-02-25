@@ -74,6 +74,7 @@
 }
 
 @theme {
+	/* adding custom colors */
 	--color-off-black: rgb(5, 5, 5);
 	--color-light-grey: rgb(232, 232, 232);
 	--font-family-sans: 'Milling', Roboto, system-ui, sans-serif;
