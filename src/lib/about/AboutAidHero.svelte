@@ -3,12 +3,12 @@
 	import Button from '$lib/ui/Button.svelte';
 </script>
 
-<section class="section">
+<section class="flex flex-col text-off-black sm:flex-row sm:gap-50">
 	<div class="title-area">
 		<Button label="What is aiD?" section_id="what-is-aid" section_ref="what-is-aid" />
 	</div>
 	<div class="section-content">
-		<div class="org-stats">
+		<div class="flex w-full flex-col gap-4 sm:grid sm:grid-cols-3 sm:gap-6">
 			<PartnerStats orgType="Academic Institutions" orgAmount="3" />
 			<PartnerStats orgType="Research Organizations" orgAmount="6" />
 			<PartnerStats orgType="Professional Organizations (POs)" orgAmount="50" />
@@ -53,7 +53,7 @@
 		color: var(--off-black);
 		display: flex;
 		flex-direction: column;
-		align-items: flex-end;
+		align-items: center;
 		gap: 3rem;
 	}
 	.title-area {
