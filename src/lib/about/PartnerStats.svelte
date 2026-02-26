@@ -5,30 +5,22 @@
 	let { orgType, orgAmount } = $props();
 </script>
 
-<div class="stat-box">
-	<div class="amount-container">
+<div class="flex items-center gap-8">
+	<div class="relative">
 		<img
 			src={roundsquareFrame}
 			alt="square dotted frame surrounding the number of ${orgType}"
-			class="dotted-box"
+			class="size-10 sm:size-20 sm:min-w-fit"
 		/>
-		<span class="amount">{orgAmount}</span>
+		<span
+			class="amount text-[1rem] leading-4 font-bold text-off-black sm:text-[1.5rem] sm:leading-8"
+			>{orgAmount}</span
+		>
 	</div>
-	<Scramble class="org-type text-[1.15rem] font-extrabold tracking-wide" text={orgType} />
+	<Scramble class="org-type flex items-center text-[1.5rem] leading-8 font-bold" text={orgType} />
 </div>
 
 <style>
-	.stat-box {
-		color: var(--off-black);
-		display: flex;
-		gap: 1.8rem;
-		align-items: center;
-	}
-	.amount-container {
-		position: relative;
-		text-align: center;
-		font-size: 1.4rem;
-	}
 	.amount {
 		position: absolute;
 		top: 50%;
