@@ -10,39 +10,20 @@
 	];
 </script>
 
-<section class="section">
-	<div class="title-area">
-		<SectionLabel label="Sustainablity and Ethics" />
-	</div>
-	<div class="flex w-full items-center justify-center">
-		<div
-			class="flex w-5/6 flex-col items-center justify-center gap-12 rounded-3xl bg-white px-45 py-30"
+<section class="grid grid-cols-1 gap-10 px-4 text-off-black xl:grid-cols-[1fr_5fr] xl:gap-0">
+	<SectionLabel label="Sustainablity and Ethics" />
+	<div
+		class="flex flex-col items-center justify-center gap-[3.5rem] rounded-3xl bg-white px-[1.5rem] py-[4rem] xl:w-5/6 xl:p-[7.5rem]"
+	>
+		<img class="w-[130px]" src={UNLogo} alt="Logo of the United Nations in black and white" />
+		<p
+			class="max-w-200 text-center font-[Montagu_Slab] text-[1rem] leading-[1.5rem] font-normal text-(--off-black) sm:text-[1.5rem] sm:leading-[2rem]"
 		>
-			<img class="w-28" src={UNLogo} alt="Logo of the United Nations in black and white" />
-			<p
-				class=" text-center font-[Montagu_Slab] text-[1.1rem]/6.5 font-thin tracking-tight text-(--off-black)"
-			>
-				Our research is fundamentally aligned with the UN Sustainable Development Goals (SDGs),
-				specifically contributing to affordable and clean energy (SDG 7), good health and well-being
-				(SDG 3), and sustainable industry and infrastructure (SDG 9). We strictly adhere to
-				principles of Fairness, Accountability, Transparency, and Explainability (FATE) to ensure
-				our solutions comply with the EU AI Act and OECD recommendations for trustworthy AI.
-			</p>
-		</div>
+			Our research is fundamentally aligned with the UN Sustainable Development Goals (SDGs),
+			specifically contributing to affordable and clean energy (SDG 7), good health and well-being
+			(SDG 3), and sustainable industry and infrastructure (SDG 9). We strictly adhere to principles
+			of Fairness, Accountability, Transparency, and Explainability (FATE) to ensure our solutions
+			comply with the EU AI Act and OECD recommendations for trustworthy AI.
+		</p>
 	</div>
 </section>
-
-<style>
-	.section {
-		display: flex;
-		justify-content: space-between;
-		margin-top: 3rem;
-		margin-inline: 1rem;
-		color: var(--off-black);
-	}
-	.title-area {
-		display: flex;
-		margin-right: 2rem;
-		margin-left: 1.2rem;
-	}
-</style>
