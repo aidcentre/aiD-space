@@ -4,17 +4,15 @@
 	import SectionLabel from '$lib/about/SectionLabel.svelte';
 </script>
 
-<section class="flex flex-col px-4 text-off-black sm:flex-row sm:gap-20">
-	<div class="mb-4 ml-[1.2rem] flex">
-		<SectionLabel label="What is aiD?" />
-	</div>
-	<div class="section-content">
+<section class="flex flex-col gap-10 px-4 text-off-black sm:flex-row sm:gap-20">
+	<SectionLabel label="What is aiD?" />
+	<div class="flex flex-col items-center gap-10 sm:gap-[4rem]">
 		<div class="flex w-full flex-col gap-4 sm:grid sm:grid-cols-3 sm:gap-6">
 			<PartnerStats orgType="Academic Institutions" orgAmount="3" />
 			<PartnerStats orgType="Research Organizations" orgAmount="6" />
 			<PartnerStats orgType="Professional Organizations (POs)" orgAmount="50" />
 		</div>
-		<div class="paragraph-area columns-2 gap-16">
+		<div class="font-[Montagu_Slab] text-[1rem] leading-6 font-normal sm:columns-2 sm:gap-16">
 			<p class="mb-4">
 				aiD is an interdisciplinary collaboration involving 3 academic institutions, 6 research
 				organizations, and over 50 professional organizations (POs). The center is led by Director
