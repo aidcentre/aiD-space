@@ -1,6 +1,5 @@
 <script lang="ts">
 	import PartnerStats from './PartnerStats.svelte';
-	import Button from '$lib/ui/Button.svelte';
 	import SectionLabel from '$lib/about/SectionLabel.svelte';
 </script>
 
@@ -40,20 +39,3 @@
 		</div>
 	</div>
 </section>
-
-<style>
-	.section-content {
-		color: var(--off-black);
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 3rem;
-	}
-	.paragraph-area {
-		font-family: 'Montagu Slab';
-		font-size: 1.1rem;
-		font-weight: 400;
-		line-height: 1.6rem;
-		letter-spacing: -0.02rem;
-	}
-</style>
