@@ -17,7 +17,10 @@
 			>{orgAmount}</span
 		>
 	</div>
-	<Scramble class="org-type flex items-center text-[1.5rem] leading-8 font-bold" text={orgType} />
+	<Scramble
+		class="org-type flex items-center text-[1.25rem] leading-8 font-bold sm:text-[1.5rem]"
+		text={orgType}
+	/>
 </div>
 
 <style>
