@@ -5,20 +5,20 @@
 	let { orgType, orgAmount } = $props();
 </script>
 
-<div class="flex items-center gap-[1rem] sm:gap-8">
+<div class="flex items-center gap-[1rem] lg:gap-8">
 	<div class="relative">
 		<img
 			src={roundsquareFrame}
 			alt="square dotted frame surrounding the number of ${orgType}"
-			class="size-10 min-w-fit sm:size-20 sm:min-w-fit"
+			class="size-10 min-w-fit lg:size-20 lg:min-w-fit"
 		/>
 		<span
-			class="amount text-[1rem] leading-4 font-bold text-off-black sm:text-[1.5rem] sm:leading-8"
+			class="amount text-[1rem] leading-4 font-bold text-off-black lg:text-[1.5rem] lg:leading-8"
 			>{orgAmount}</span
 		>
 	</div>
 	<Scramble
-		class="org-type flex items-center text-[1.25rem] leading-8 font-bold sm:text-[1.5rem]"
+		class="org-type flex items-center text-[1.25rem] leading-8 font-bold lg:text-[1.5rem]"
 		text={orgType}
 	/>
 </div>

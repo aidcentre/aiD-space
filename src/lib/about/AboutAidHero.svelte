@@ -4,10 +4,10 @@
 	import SectionLabel from '$lib/about/SectionLabel.svelte';
 </script>
 
-<section class="flex flex-col gap-10 px-4 text-off-black lg:flex-row lg:gap-20">
+<section class="grid grid-cols-1 gap-10 px-4 text-off-black lg:grid-cols-[1fr_5fr] lg:gap-0">
 	<SectionLabel label="What is aiD?" />
 	<div class="flex flex-col items-center gap-10 lg:gap-[4rem]">
-		<div class="flex w-full flex-col gap-4 lg:grid lg:grid-cols-3 lg:gap-6">
+		<div class="flex w-full flex-col flex-wrap gap-4 sm:grid sm:grid-cols-3 sm:gap-6">
 			<PartnerStats orgType="Academic Institutions" orgAmount="3" />
 			<PartnerStats orgType="Research Organizations" orgAmount="6" />
 			<PartnerStats orgType="Professional Organizations (POs)" orgAmount="50" />
