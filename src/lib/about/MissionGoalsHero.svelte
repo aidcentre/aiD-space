@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from '$lib/ui/Button.svelte';
+	import SectionLabel from './SectionLabel.svelte';
 
 	let milestones = [
 		'400 MSc students educated',
@@ -10,11 +10,7 @@
 
 <section class="section">
 	<div class="title-area">
-		<Button
-			label="Mission and Goals"
-			section_id="mission-and-goals"
-			section_ref="mission-and-goals"
-		/>
+		<SectionLabel label="Mission and Goals" />
 	</div>
 	<div class="section-content">
 		<div>

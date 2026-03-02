@@ -17,11 +17,10 @@
 
 		if (isInViewport) {
 			gsap.to(element, {
-				duration: 5,
+				duration: 1.5,
 				scrambleText: {
 					text: text,
 					chars: '0123456789',
-					revealDelay: 4,
 					speed: 0.5
 				}
 			});

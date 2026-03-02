@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from '$lib/ui/Button.svelte';
+	import SectionLabel from './SectionLabel.svelte';
 
 	let researchAreas = [
 		{
@@ -51,7 +51,7 @@
 
 <section class="section">
 	<div class="title-area">
-		<Button label="Research areas" section_id="research-areas" section_ref="research-areas" />
+		<SectionLabel label="Research areas" />
 	</div>
 	<div class="section-content">
 		<h2 class="mb-6 w-full text-4xl font-extrabold">

@@ -1,11 +1,12 @@
 <script lang="ts">
 	import PartnerStats from './PartnerStats.svelte';
 	import Button from '$lib/ui/Button.svelte';
+	import SectionLabel from '$lib/about/SectionLabel.svelte';
 </script>
 
-<section class="flex flex-col text-off-black sm:flex-row sm:gap-50">
-	<div class="title-area">
-		<Button label="What is aiD?" section_id="what-is-aid" section_ref="what-is-aid" />
+<section class="flex flex-col px-4 text-off-black sm:flex-row sm:gap-20">
+	<div class="mb-4 ml-[1.2rem] flex">
+		<SectionLabel label="What is aiD?" />
 	</div>
 	<div class="section-content">
 		<div class="flex w-full flex-col gap-4 sm:grid sm:grid-cols-3 sm:gap-6">
@@ -43,12 +44,6 @@
 </section>
 
 <style>
-	.section {
-		display: flex;
-		justify-content: space-between;
-		margin-right: 3rem;
-		color: var(--off-black);
-	}
 	.section-content {
 		color: var(--off-black);
 		display: flex;
@@ -56,22 +51,11 @@
 		align-items: center;
 		gap: 3rem;
 	}
-	.title-area {
-		display: flex;
-		margin-right: 10rem;
-		margin-left: 1.2rem;
-	}
 	.paragraph-area {
 		font-family: 'Montagu Slab';
 		font-size: 1.1rem;
 		font-weight: 400;
 		line-height: 1.6rem;
 		letter-spacing: -0.02rem;
-	}
-	.org-stats {
-		display: flex;
-		width: 100%;
-		justify-content: space-between;
-		gap: 4rem;
 	}
 </style>

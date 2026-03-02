@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Button from '$lib/ui/Button.svelte';
 	import UNLogo from '$lib/assets/UN_logo_bw.svg';
+	import SectionLabel from './SectionLabel.svelte';
 
 	let milestones = [
 		'400 MSc students educated',
@@ -11,11 +12,7 @@
 
 <section class="section">
 	<div class="title-area">
-		<Button
-			label="Sustainability and Ethics"
-			section_id="sustainability-and-ethics"
-			section_ref="sustainability-and-ethics"
-		/>
+		<SectionLabel label="Sustainablity and Ethics" />
 	</div>
 	<div class="flex w-full items-center justify-center">
 		<div
@@ -40,6 +37,7 @@
 		display: flex;
 		justify-content: space-between;
 		margin-top: 3rem;
+		margin-inline: 1rem;
 		color: var(--off-black);
 	}
 	.title-area {
