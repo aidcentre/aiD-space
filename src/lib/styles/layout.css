@@ -30,30 +30,20 @@
 @font-face {
 	font-family: 'Montagu Slab';
 	src:
-		url('/fonts/Montagu_Slab/MontaguSlab_48pt-Regular.ttf') format('truetype'),
-		url('/fonts/Milling/Milling-Triplex1mm.woff2') format('woff2');
-	font-style: normal;
-	font-weight: 40;
-	font-display: swap;
-}
-
-@font-face {
-	font-family: 'Montagu Slab';
-	src:
-		url('/fonts/Montagu_Slab/MontaguSlab_24pt-Light.ttf') format('truetype'),
-		url('/fonts/Milling/Milling-Triplex1mm.woff2') format('woff2');
-	font-style: normal;
-	font-weight: 300;
-	font-display: swap;
-}
-
-@font-face {
-	font-family: 'Montagu Slab';
-	src:
-		url('/fonts/Montagu_Slab/MontaguSlab_24pt-Regular.ttf') format('truetype'),
+		url('/fonts/Montagu_Slab/MontaguSlab_120pt-Regular.ttf') format('truetype'),
 		url('/fonts/Milling/Milling-Triplex1mm.woff2') format('woff2');
 	font-style: normal;
 	font-weight: 400;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Montagu Slab';
+	src:
+		url('/fonts/Montagu_Slab/MontaguSlab_120pt-Light.ttf') format('truetype'),
+		url('/fonts/Milling/Milling-Triplex1mm.woff2') format('woff2');
+	font-style: normal;
+	font-weight: 300;
 	font-display: swap;
 }
 
