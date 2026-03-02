@@ -30,8 +30,4 @@
 		left: 50%;
 		transform: translate(-50%, -50%);
 	}
-	.dotted-box {
-		height: 4rem;
-		min-width: fit-content;
-	}
 </style>
