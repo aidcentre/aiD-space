@@ -50,7 +50,7 @@
 	];
 </script>
 
-<section class="grid grid-cols-1 gap-10 px-6 text-off-black xl:grid-cols-[1fr_5fr] xl:gap-0">
+<section class="grid grid-cols-1 gap-10 px-4 text-off-black xl:grid-cols-[1fr_5fr] xl:gap-0">
 	<SectionLabel label="Research areas" />
 	<div class="flex flex-col gap-10 sm:grid sm:grid-cols-2 sm:gap-20">
 		<h2
