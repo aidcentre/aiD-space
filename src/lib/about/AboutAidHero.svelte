@@ -3,7 +3,7 @@
 	import SectionLabel from '$lib/about/SectionLabel.svelte';
 </script>
 
-<section class="grid grid-cols-1 gap-10 px-4 text-off-black lg:grid-cols-[1fr_5fr] lg:gap-0">
+<section class="grid grid-cols-1 gap-10 px-6 text-off-black xl:grid-cols-[1fr_5fr] xl:gap-0">
 	<SectionLabel label="What is aiD?" />
 	<div class="flex flex-col items-center gap-10 lg:gap-[4rem]">
 		<div class="flex w-full flex-col flex-wrap gap-4 sm:grid sm:grid-cols-3 sm:gap-6">
