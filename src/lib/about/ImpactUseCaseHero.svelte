@@ -28,7 +28,7 @@
 </script>
 
 <section
-	class="grid grid-cols-1 gap-60 bg-off-black px-4 py-16 text-off-black xl:grid-cols-[1fr_5fr] xl:gap-0"
+	class="grid grid-cols-1 gap-20 bg-off-black px-4 py-16 text-off-black xl:grid-cols-[1fr_5fr] xl:gap-0"
 >
 	<div class="sticky top-12 flex flex-col gap-0">
 		<div class="flex flex-col gap-10 bg-off-black">
@@ -49,17 +49,19 @@
 			class="row-start-4 row-end-5 h-[8rem] w-full bg-linear-to-b from-black to-transparent"
 		></div>
 	</div>
-	{#each useCases as uc}
-		<div>
-			<p class="mb-[0.75rem] font-[Milling] text-[1rem] leading-[1.5rem] font-bold text-white">
-				{uc.title}
-			</p>
+	<div class="grid grid-cols-1 gap-60">
+		{#each useCases as uc}
+			<div>
+				<p class="mb-[0.75rem] font-[Milling] text-[1rem] leading-[1.5rem] font-bold text-white">
+					{uc.title}
+				</p>
 
-			<p class="font-[Montagu_Slab] text-[1rem] leading-[1.5rem] tracking-tight text-white">
-				{uc.content}
-			</p>
-		</div>
-	{/each}
+				<p class="font-[Montagu_Slab] text-[1rem] leading-[1.5rem] tracking-tight text-white">
+					{uc.content}
+				</p>
+			</div>
+		{/each}
+	</div>
 </section>
 
 <style>
