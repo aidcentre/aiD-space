@@ -6,7 +6,7 @@
 </script>
 
 <section class="mt-16 mb-10 flex w-full flex-col items-center justify-center">
-	<div class="flex w-6/13 flex-col justify-start gap-8">
+	<div class="flex w-full flex-col justify-start gap-8 px-[1rem] md:w-6/13 md:px-0">
 		<p class="text-4xl font-extrabold">About & contact</p>
 		<p class="font-[Montagu_Slab] text-lg font-normal tracking-tight">
 			aiD is headquartered at the Norwegian University of Science and Technology in Trondheim,
