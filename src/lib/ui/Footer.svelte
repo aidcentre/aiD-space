@@ -109,17 +109,21 @@
 </script>
 
 <footer
-	class="footer grid w-full grid-cols-4 bg-(--off-black) p-3 text-(--light-grey) sm:footer-horizontal"
+	class="flex flex-col bg-(--off-black) p-[1rem] text-(--light-grey) max-md:gap-4 md:footer md:grid md:grid-cols-4"
 >
-	<aside class="font-[Montagu_Slab] font-light">
-		<p class="mb-2">
+	<aside
+		class="flex w-9/10 flex-col gap-[1.5rem] font-[Montagu_Slab] text-[1.125rem] leading-[1.375rem] font-light"
+	>
+		<p class="">
 			aiD is headquartered at the Norwegian University of Science and Technology in Trondheim,
 			Norway and at SINTEF, Norway.
 		</p>
-		<p class="-mb-2">info@aid-research.com</p>
-		<p>+47 22 22 55 55</p>
+		<div class="flex flex-col">
+			<p>info@aid-research.com</p>
+			<p>+47 22 22 55 55</p>
+		</div>
 	</aside>
-	<div class="z-2 col-span-2 h-[60vh] w-full" bind:this={container}></div>
+	<div class="z-2 col-span-2 h-[40vh] w-full md:h-[60vh]" bind:this={container}></div>
 	<nav class="justify-self-end md:justify-self-end">
 		<a href="#top" class="inline-flex items-center text-xs" style:gap="0.5rem">
 			<div class="up-arrow">←</div>
