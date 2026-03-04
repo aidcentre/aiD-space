@@ -67,7 +67,9 @@
 		></div>
 	</div>
 	<!-- list of use cases -->
-	<div class="grid grid-cols-1 gap-60 sm:grid-cols-2 sm:gap-x-[8rem] xl:-mt-[7rem]">
+	<div
+		class="grid grid-cols-1 gap-60 lg:max-xl:px-[18rem] xl:-mt-[7rem] xl:grid-cols-2 xl:gap-x-[8rem]"
+	>
 		<div class="grid gap-y-60 xl:col-start-2 xl:col-end-3 xl:grid-cols-subgrid xl:px-[9rem]">
 			{#each useCases as uc}
 				<div>
@@ -81,7 +83,7 @@
 						{uc.content}
 					</p>
 				</div>
-			{/each}
+			{/each}s
 		</div>
 	</div>
 </section>
