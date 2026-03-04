@@ -12,7 +12,7 @@
 	<SectionLabel label="Mission and Goals" />
 	<div class="flex flex-col gap-10">
 		<p
-			class="w-full font-[Montagu_Slab] leading-[1.5rem] font-[1rem] font-normal lg:w-3/5 lg:text-[1.44rem] lg:leading-[2rem]"
+			class="w-full font-[Montagu_Slab] leading-[1.5rem] font-[1rem] font-normal sm:w-4/5 xl:w-3/5 xl:text-[1.44rem] xl:leading-[2rem]"
 		>
 			A core mission of AID is to develop the next generation of AI experts. We aim to educate 400
 			MSc students and 30 PhDs/postdocs, while strengthening the expertise of over 50 existing

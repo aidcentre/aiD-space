@@ -5,14 +5,14 @@
 
 <section class="grid grid-cols-1 gap-10 px-4 text-off-black xl:grid-cols-[1fr_5fr] xl:gap-0">
 	<SectionLabel label="What is aiD?" />
-	<div class="flex flex-col items-center gap-10 lg:gap-[4rem]">
+	<div class="flex flex-col items-center gap-10 xl:gap-[4rem]">
 		<div class="flex w-full flex-col flex-wrap gap-4 sm:grid sm:grid-cols-3 sm:gap-6">
 			<PartnerStats orgType="Academic Institutions" orgAmount="3" />
 			<PartnerStats orgType="Research Organizations" orgAmount="6" />
 			<PartnerStats orgType="Professional Organizations (POs)" orgAmount="50" />
 		</div>
 		<div
-			class="font-normAL font-[Montagu_Slab] text-[1rem] leading-6 lg:columns-2 lg:gap-16 lg:text-[1.44rem] lg:leading-[2rem]"
+			class="font-[Montagu_Slab] text-[1rem] leading-6 font-normal md:columns-2 md:gap-16 xl:text-[1.44rem] xl:leading-[2rem]"
 		>
 			<p class="mb-[2rem]">
 				aiD is an interdisciplinary collaboration involving 3 academic institutions, 6 research

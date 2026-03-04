@@ -21,7 +21,7 @@
 		>
 			<img class="w-[130px]" src={UNLogo} alt="Logo of the United Nations in black and white" />
 			<p
-				class="text-center font-[Montagu_Slab] text-[1rem] leading-[1.5rem] font-normal text-(--off-black) sm:max-w-200 md:text-[1.5rem] md:leading-[2rem]"
+				class="text-center font-[Montagu_Slab] text-[1rem] leading-[1.5rem] font-normal text-(--off-black) sm:max-w-200 lg:text-[1.5rem] lg:leading-[2rem]"
 			>
 				Our research is fundamentally aligned with the UN Sustainable Development Goals (SDGs),
 				specifically contributing to affordable and clean energy (SDG 7), good health and well-being

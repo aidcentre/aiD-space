@@ -54,7 +54,7 @@
 	<SectionLabel label="Research areas" />
 	<div class="flex flex-col gap-10 sm:grid sm:grid-cols-2 sm:gap-20">
 		<h2
-			class="col-span-2 text-[1.5rem] leading-[2rem] font-extrabold lg:text-[3rem] lg:leading-[4rem]"
+			class="col-span-2 text-[1.5rem] leading-[2rem] font-extrabold xl:text-[3rem] xl:leading-[4rem]"
 		>
 			To achieve its goals, aiD operates across nine specialized Research Areas (RAs):
 		</h2>
@@ -62,12 +62,12 @@
 		{#each researchAreas as area}
 			<div class="break-inside-avoid">
 				<p
-					class="mb-3.5 font-[Milling] text-[1rem] leading-[1.5rem] font-bold lg:text-[1.5rem] lg:leading-[2rem]"
+					class="mb-3.5 font-[Milling] text-[1rem] leading-[1.5rem] font-bold xl:text-[1.5rem] xl:leading-[2rem]"
 				>
 					{area.title}
 				</p>
 				<p
-					class="font-[Montagu_Slab] text-[1rem] leading-[1.5rem] font-normal lg:text-[1.44rem] lg:leading-[2rem]"
+					class="font-[Montagu_Slab] text-[1rem] leading-[1.5rem] font-normal xl:text-[1.44rem] xl:leading-[2rem]"
 				>
 					{area.content}
 				</p>
