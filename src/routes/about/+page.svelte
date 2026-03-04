@@ -13,7 +13,7 @@
 <NavHeader version={0.1} nodeNum={2} />
 
 <main>
-	<section class="flex h-[50vh] items-center px-2 sm:px-4">
+	<section class="mt-[15rem] flex h-fit items-center px-2 sm:px-4">
 		<p
 			class="mr-1 text-[1rem] leading-6 font-bold text-off-black sm:ml-2 sm:w-54/100 sm:text-[1.5rem] sm:leading-8"
 		>
@@ -37,6 +37,6 @@
 	main {
 		display: flex;
 		flex-direction: column;
-		gap: 7rem;
+		gap: 15rem;
 	}
 </style>
