@@ -4,9 +4,8 @@
 
 <!-- TODO: add prop to pass in nav link once they've been decided -->
 <a
-	class="nav-button flex w-max items-center gap-3 bg-white text-[0.8rem] font-bold text-(--off-black) drop-shadow-none hover:bg-(--light-grey)"
-	id="impact-and-use-cases"
-	href="https://ecmiindmath.org/2025/02/07/aid-ai-for-decisions/"
+	class="flex w-fit cursor-pointer flex-nowrap items-center gap-1 border-b border-solid border-off-black font-[Montagu_Slab] text-[1rem] leading-[1.5rem] font-normal tracking-[0.32px] text-(--off-black)"
+	href="https://www.forskningsradet.no/en/research-policy-strategy/ltp/artificial-intelligence/"
 	target="_blank"
 	>{label}
 	<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -24,10 +23,3 @@
 		/></svg
 	>
 </a>
-
-<style>
-	.nav-button {
-		border-radius: 0.5rem;
-		padding: 0.6rem 1rem;
-	}
-</style>
