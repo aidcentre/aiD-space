@@ -1,6 +1,6 @@
 <script lang="ts">
 	import './style.css';
-	import favicon from '$lib/assets/aiD_profile_picture_black.png';
+	import favicon from '$lib/assets/favicon.png';
 
 	let { children } = $props();
 </script>
