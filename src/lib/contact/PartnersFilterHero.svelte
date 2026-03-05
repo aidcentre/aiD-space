@@ -43,9 +43,9 @@
 	<div class="flex flex-wrap gap-1">
 		{#each filteredPartners as partner (partner.name)}
 			<div
-				in:fade={{ duration: 300, delay: 200 }}
-				out:fade={{ duration: 200 }}
-				class="flex w-fit items-center rounded-xl border border-transparent bg-white p-10 transition-all hover:border-blue-100"
+				in:fade={{ duration: 100, delay: 100 }}
+				out:fade={{ duration: 100 }}
+				class="flex w-fit items-center rounded-xl bg-white p-8 transition-all sm:p-8 sm:p-10"
 			>
 				<Logo name={partner.logo} />
 			</div>
