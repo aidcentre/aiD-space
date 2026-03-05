@@ -3,10 +3,14 @@
 	let { version, nodeNum } = $props();
 </script>
 
-<div class="header-main sticky top-0 mb-8 items-start pt-4 pb-4 text-xs shadow-sm">
+<div class="header-main sticky top-0 items-start pt-4 pb-4 text-xs shadow-sm">
 	<div class="navbar-start overflow-hidden pl-3">
 		<span>aiD v{version}</span>
-		<img class="logo pl-18" src={aiDLogo} alt="AID logo without AID centre description" />
+		<img
+			src={aiDLogo}
+			alt="aiD logo and description, Norwegian Centre on AI for Decisions"
+			class="max-h-[20px] pl-40"
+		/>
 	</div>
 	<a href="/" class="navbar-center" style:gap="0.5rem">
 		<div class="back-arrow">←</div>
@@ -30,10 +34,6 @@
 		background-color: var(--off-black);
 		height: fit-content;
 		z-index: 10;
-	}
-	.logo {
-		height: 1.2rem;
-		padding-left: 12rem;
 	}
 	.back-arrow {
 		display: flex;
