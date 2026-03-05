@@ -18,9 +18,9 @@
 </script>
 
 <div class="mt-12 mb-16 px-4 sm:mt-22">
-	<h2 class="mb-6 text-xl font-extrabold">Our partners</h2>
+	<h2 class="mb-6 text-[1.5rem] leading-[2rem] font-bold">Our partners</h2>
 
-	<nav class="filter-nav">
+	<nav class="filter-nav pb-1">
 		<button class:active={activeCategory === 'Core'} onclick={() => (activeCategory = 'Core')}>
 			Core partners ({counts.Core})
 		</button>
@@ -56,8 +56,10 @@
 <style>
 	.filter-nav {
 		display: flex;
+		flex-wrap: nowrap;
 		gap: 1.5rem;
 		margin-bottom: 1rem;
+		overflow-x: auto;
 	}
 
 	.filter-nav button {
@@ -65,10 +67,11 @@
 		border: none;
 		font-size: 0.8rem;
 		font-weight: 600;
-		color: var(--greyed-out);
+		color: var(--grey);
 		cursor: pointer;
 		padding: 0;
 		transition: color 0.2s;
+		text-wrap: nowrap;
 	}
 
 	.filter-nav button.active {
