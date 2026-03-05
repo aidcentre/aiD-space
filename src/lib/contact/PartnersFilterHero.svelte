@@ -17,7 +17,7 @@
 	const filteredPartners = $derived(partners_data.filter((p) => p.category === activeCategory));
 </script>
 
-<div class="mb-12 px-4">
+<div class="mt-12 mb-16 px-4 sm:mt-22">
 	<h2 class="mb-6 text-xl font-extrabold">Our partners</h2>
 
 	<nav class="filter-nav">

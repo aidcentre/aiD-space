@@ -7,9 +7,9 @@
 
 <NavHeader version={0.1} nodeNum={4} />
 
-<main class=" flex flex-col gap-16">
+<main class="flex flex-col gap-0">
 	<ContactInfoHero />
-	<div class="dot-bg mx-4 pt-8"></div>
+	<div class="dot-bg mx-4 pt-7"></div>
 	<PartnersFilterHero />
 	<Footer />
 </main>

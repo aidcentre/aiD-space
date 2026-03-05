@@ -5,7 +5,7 @@
 	let projectBy = ['ntnu_logo', 'sintef_logo', 'norway_research_council_logo'];
 </script>
 
-<section class="mt-10 mb-12 flex w-full flex-col items-center justify-center md:mt-30">
+<section class="mt-10 mb-12 flex w-full flex-col items-center justify-center md:mt-40 md:mb-30">
 	<div class="flex w-full flex-col justify-start px-[1rem] md:w-6/13 md:px-0">
 		<p class="mb-6 text-[2rem] leading-[3rem] font-bold md:text-[3rem] md:leading-[4rem]">
 			About & contact
