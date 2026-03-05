@@ -1,4 +1,5 @@
 <script lang="ts">
+	import LinkWithArrow from '$lib/contact/LinkWithArrow.svelte';
 	import { onMount } from 'svelte';
 	import * as THREE from 'three';
 
@@ -123,6 +124,9 @@
 			<p>+47 22 22 55 55</p>
 		</div>
 	</aside>
+	<div class="py-4 sm:hidden">
+		<LinkWithArrow label="aiD at The Research Council of Norway" white={true} />
+	</div>
 	<div class="z-2 col-span-2 h-[40vh] w-full md:h-[60vh]" bind:this={container}></div>
 	<nav class="justify-self-end md:justify-self-end">
 		<a href="#top" class="inline-flex items-center text-xs" style:gap="0.5rem">
@@ -130,6 +134,9 @@
 			<span>Back to top</span>
 		</a>
 	</nav>
+	<div class="relative bottom-0 left-0 max-sm:hidden">
+		<LinkWithArrow label="aiD at The Research Council of Norway" white={true} />
+	</div>
 </footer>
 
 <style>
