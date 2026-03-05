@@ -113,9 +113,9 @@
 	class="flex flex-col bg-(--off-black) p-[1rem] text-(--light-grey) max-md:gap-4 md:footer md:grid md:grid-cols-4"
 >
 	<aside
-		class="flex w-9/10 flex-col gap-[1.5rem] font-[Montagu_Slab] text-[1.125rem] leading-[1.375rem] font-light"
+		class="flex w-9/10 flex-col gap-[1.5rem] font-[Montagu_Slab] text-[1.125rem] leading-[1.375rem] font-normal text-light-grey"
 	>
-		<p class="">
+		<p>
 			aiD is headquartered at the Norwegian University of Science and Technology in Trondheim,
 			Norway and at SINTEF, Norway.
 		</p>

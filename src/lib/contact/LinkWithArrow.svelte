@@ -7,7 +7,7 @@
 
 <!-- TODO: add prop to pass in nav link once they've been decided -->
 <a
-	class="flex w-fit cursor-pointer flex-nowrap items-center gap-1 border-b border-solid {borderColor} font-[Montagu_Slab] text-[1rem] leading-[1.5rem] font-light tracking-[0.32px]"
+	class="flex w-fit cursor-pointer flex-nowrap items-center gap-1 border-b border-solid {borderColor} font-[Montagu_Slab] text-[1rem] leading-[1.5rem] font-normal tracking-[0.32px]"
 	class:text-(--light-grey)={white}
 	class:text-(--off-black)={!white}
 	href="https://www.forskningsradet.no/en/research-policy-strategy/ltp/artificial-intelligence/"
