@@ -10,6 +10,10 @@
 	import Footer from '$lib/ui/Footer.svelte';
 </script>
 
+<svelte:head>
+	<title>What is aiD? | aiD</title>
+</svelte:head>
+
 <NavHeader version={0.1} nodeNum={2} />
 
 <main>

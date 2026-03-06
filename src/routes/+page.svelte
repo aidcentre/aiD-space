@@ -9,7 +9,7 @@
 </script>
 
 <svelte:head>
-	<title>AID Home</title>
+	<title>Norwegian Centre on AI for Decisions | aiD</title>
 </svelte:head>
 
 <!-- TODO: allow right-clicks even on tornado. currently not possible due to pointer events none -->

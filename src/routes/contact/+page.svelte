@@ -5,6 +5,10 @@
 	import PartnersFilterHero from '$lib/contact/PartnersFilterHero.svelte';
 </script>
 
+<svelte:head>
+	<title>Contact | aiD</title>
+</svelte:head>
+
 <NavHeader version={0.1} nodeNum={4} />
 
 <main class="flex flex-col gap-0">
