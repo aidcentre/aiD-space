@@ -1,13 +1,21 @@
 <script>
 	let searchQuery = '';
 	import enterIcon from '$lib/assets/enter_icon.svg';
+	import { tooltip } from 'svooltip';
+	import 'svooltip/styles.css'; // include default styling
 </script>
 
 <!-- note: make text in input box wrap? if so, where does the extra go? -->
 <div
 	class="pointer-events-auto mx-8 flex w-full max-w-[700px] flex-1 flex-col items-start justify-center gap-3 px-4 py-2"
 >
-	<div class="relative flex w-full items-center">
+	<div
+		class="relative flex w-full items-center"
+		use:tooltip={{
+			content: 'Click to be redirected to the aiD Expertise Search page.',
+			offset: 16
+		}}
+	>
 		<input
 			type="text"
 			bind:value={searchQuery}

@@ -15,7 +15,7 @@
 <!-- TODO: allow right-clicks even on tornado. currently not possible due to pointer events none -->
 <Tornado />
 
-<main class="pointer-events-none relative flex min-h-dvh flex-col items-center">
+<main class="relative flex min-h-dvh flex-col items-center">
 	<HomeHeader />
 	<SearchBar />
 	<footer
