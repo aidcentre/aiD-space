@@ -1,5 +1,5 @@
 <script lang="ts">
-	import BackToAid from './BackToAid.svelte';
+	import BackToAid from './NavArrowButton.svelte';
 	import aiDLogo from '/src/lib/assets/aiD_logotype_white_RGB.svg';
 	let { version, nodeNum } = $props();
 </script>
@@ -16,7 +16,7 @@
 		/>
 	</div>
 	<div class="max-md:navbar-end">
-		<BackToAid />
+		<BackToAid label="Back to aiD" direction="left" />
 	</div>
 	<div class="navbar-end flex items-center gap-2 pr-3 max-md:hidden">
 		<div class="node-text">

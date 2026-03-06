@@ -1,7 +1,9 @@
 <script lang="ts">
 	let { label, white = false } = $props();
 
+	// svelte-ignore non_reactive_update
 	let borderColor: string;
+	// svelte-ignore state_referenced_locally
 	white ? (borderColor = 'border-(--light-grey)') : (borderColor = 'border-off-black');
 </script>
 

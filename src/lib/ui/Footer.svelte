@@ -1,4 +1,5 @@
 <script lang="ts">
+	import NavArrowButton from './NavArrowButton.svelte';
 	import LinkWithArrow from '$lib/contact/LinkWithArrow.svelte';
 	import { onMount } from 'svelte';
 	import * as THREE from 'three';
@@ -128,28 +129,10 @@
 		<LinkWithArrow label="aiD at The Research Council of Norway" white={true} />
 	</div>
 	<div class="z-2 col-span-2 h-[40vh] w-full md:h-[60vh]" bind:this={container}></div>
-	<nav class="justify-self-end md:justify-self-end">
-		<a href="#top" class="inline-flex items-center text-xs" style:gap="0.5rem">
-			<div class="up-arrow">←</div>
-			<span>Back to top</span>
-		</a>
-	</nav>
+	<div class="md:justify-self-end">
+		<NavArrowButton direction="up" label="Back to top" />
+	</div>
 	<div class="relative bottom-0 left-0 max-sm:hidden">
 		<LinkWithArrow label="aiD at The Research Council of Norway" white={true} />
 	</div>
 </footer>
-
-<style>
-	.up-arrow {
-		rotate: 90deg;
-		display: flex;
-		padding: 0.25rem;
-		line-height: 0.75rem;
-		justify-content: center;
-		align-items: center;
-		border-radius: 0.25rem;
-		border: 2px solid var(--light-grey, #e8e8e8);
-		height: fit-content;
-		aspect-ratio: 1/1;
-	}
-</style>
