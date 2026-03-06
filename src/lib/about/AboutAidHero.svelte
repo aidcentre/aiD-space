@@ -1,32 +1,32 @@
 <script lang="ts">
 	import PartnerStats from './PartnerStats.svelte';
-	import Button from '$lib/ui/Button.svelte';
+	import SectionLabel from '$lib/about/SectionLabel.svelte';
 </script>
 
-<section class="section">
-	<div class="title-area">
-		<Button label="What is aiD?" section_id="what-is-aid" section_ref="what-is-aid" />
-	</div>
-	<div class="section-content">
-		<div class="org-stats">
+<section class="grid grid-cols-1 gap-10 px-4 text-off-black xl:grid-cols-[1fr_5fr] xl:gap-0">
+	<SectionLabel label="What is aiD?" />
+	<div class="flex flex-col items-center gap-10 xl:gap-[4rem]">
+		<div class="flex w-full flex-col flex-wrap gap-4 sm:grid sm:grid-cols-3 sm:gap-6">
 			<PartnerStats orgType="Academic Institutions" orgAmount="3" />
 			<PartnerStats orgType="Research Organizations" orgAmount="6" />
 			<PartnerStats orgType="Professional Organizations (POs)" orgAmount="50" />
 		</div>
-		<div class="paragraph-area columns-2 gap-16">
-			<p class="mb-4">
+		<div
+			class="font-[Montagu_Slab] text-[1rem] leading-6 font-normal md:columns-2 md:gap-16 xl:text-[1.44rem] xl:leading-[2rem]"
+		>
+			<p class="mb-[2rem]">
 				aiD is an interdisciplinary collaboration involving 3 academic institutions, 6 research
 				organizations, and over 50 professional organizations (POs). The center is led by Director
 				Prof. Sebastien Gros (NTNU) and Co-Director Dr. Signe Riemer-Sørensen (SINTEF Digital),
 				supported by a management team with responsibility for fundamental research,
 				operationalization, and innovation.
 			</p>
-			<p class="mb-4">
+			<p class="mb-[2rem]">
 				Our primary objective is to advance AI for decision-making through fundamental research and
 				real-world use cases, ensuring that AI-enhanced human decisions or fully autonomous systems
 				are effective, safe, and trustworthy in sectors critical to society.
 			</p>
-			<p class="mb-4">
+			<p class="mb-[2rem]">
 				aiD moves beyond traditional AI models that are purely descriptive. Instead, we employ a
 				holistic framework where the primary learning objective is the decision outcome itself. This
 				involves backpropagating learning through the entire decision process, from converting raw
@@ -41,37 +41,3 @@
 		</div>
 	</div>
 </section>
-
-<style>
-	.section {
-		display: flex;
-		justify-content: space-between;
-		margin-right: 3rem;
-		color: var(--off-black);
-	}
-	.section-content {
-		color: var(--off-black);
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		gap: 3rem;
-	}
-	.title-area {
-		display: flex;
-		margin-right: 10rem;
-		margin-left: 1.2rem;
-	}
-	.paragraph-area {
-		font-family: 'Montagu Slab';
-		font-size: 1.1rem;
-		font-weight: 400;
-		line-height: 1.6rem;
-		letter-spacing: -0.02rem;
-	}
-	.org-stats {
-		display: flex;
-		width: 100%;
-		justify-content: space-between;
-		gap: 4rem;
-	}
-</style>

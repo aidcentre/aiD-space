@@ -14,10 +14,17 @@
 	const svgContent = logos[logoPath];
 </script>
 
-<div class="flex h-8 w-auto items-center fill-current">
+<div class="logo-container flex h-5 w-auto items-center fill-current sm:h-8">
 	{#if svgContent}
 		{@html svgContent}
 	{:else}
 		<span class="text-sm">Logo not found</span>
 	{/if}
 </div>
+
+<style>
+	:global(.logo-container svg) {
+		height: 100%;
+		width: auto;
+	}
+</style>

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Button from '$lib/ui/Button.svelte';
 	import UNLogo from '$lib/assets/UN_logo_bw.svg';
+	import SectionLabel from './SectionLabel.svelte';
 
 	let milestones = [
 		'400 MSc students educated',
@@ -9,21 +9,19 @@
 	];
 </script>
 
-<section class="section">
-	<div class="title-area">
-		<Button
-			label="Sustainability and Ethics"
-			section_id="sustainability-and-ethics"
-			section_ref="sustainability-and-ethics"
-		/>
+<section
+	class="grid grid-cols-1 gap-10 px-0 text-off-black sm:px-4 2xl:grid-cols-[1fr_5fr] 2xl:gap-0"
+>
+	<div class="max-sm:hidden">
+		<SectionLabel label="Sustainablity and Ethics" />
 	</div>
-	<div class="flex w-full items-center justify-center">
+	<div class="flex w-screen items-center justify-center sm:w-full 2xl:w-9/10 2xl:justify-start">
 		<div
-			class="flex w-5/6 flex-col items-center justify-center gap-12 rounded-3xl bg-white px-45 py-30"
+			class="flex flex-col items-center justify-center gap-[3.5rem] rounded-[24px] bg-white px-[1.5rem] py-[4rem] sm:px-[7.5rem] 2xl:px-[18.875rem] 2xl:py-[7.5rem]"
 		>
-			<img class="w-28" src={UNLogo} alt="Logo of the United Nations in black and white" />
+			<img class="w-[130px]" src={UNLogo} alt="Logo of the United Nations in black and white" />
 			<p
-				class=" text-center font-[Montagu_Slab] text-[1.1rem]/6.5 font-thin tracking-tight text-(--off-black)"
+				class="text-center font-[Montagu_Slab] text-[1rem] leading-[1.5rem] font-normal text-(--off-black) sm:max-w-200 lg:text-[1.5rem] lg:leading-[2rem]"
 			>
 				Our research is fundamentally aligned with the UN Sustainable Development Goals (SDGs),
 				specifically contributing to affordable and clean energy (SDG 7), good health and well-being
@@ -34,17 +32,3 @@
 		</div>
 	</div>
 </section>
-
-<style>
-	.section {
-		display: flex;
-		justify-content: space-between;
-		margin-top: 3rem;
-		color: var(--off-black);
-	}
-	.title-area {
-		display: flex;
-		margin-right: 2rem;
-		margin-left: 1.2rem;
-	}
-</style>

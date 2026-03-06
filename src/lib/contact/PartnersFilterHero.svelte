@@ -17,10 +17,10 @@
 	const filteredPartners = $derived(partners_data.filter((p) => p.category === activeCategory));
 </script>
 
-<div class="mb-12 px-4">
-	<h2 class="mb-6 text-xl font-extrabold">Our partners</h2>
+<div class="mt-12 mb-16 px-4 sm:mt-22">
+	<h2 class="mb-6 text-[1.5rem] leading-[2rem] font-bold">Our partners</h2>
 
-	<nav class="filter-nav">
+	<nav class="filter-nav pb-1">
 		<button class:active={activeCategory === 'Core'} onclick={() => (activeCategory = 'Core')}>
 			Core partners ({counts.Core})
 		</button>
@@ -43,9 +43,9 @@
 	<div class="flex flex-wrap gap-1">
 		{#each filteredPartners as partner (partner.name)}
 			<div
-				in:fade={{ duration: 300, delay: 200 }}
-				out:fade={{ duration: 200 }}
-				class="flex w-fit items-center rounded-xl border border-transparent bg-white p-10 transition-all hover:border-blue-100"
+				in:fade={{ duration: 100, delay: 100 }}
+				out:fade={{ duration: 100 }}
+				class="flex w-fit items-center rounded-xl bg-white p-8 transition-all sm:p-8 sm:p-10"
 			>
 				<Logo name={partner.logo} />
 			</div>
@@ -56,8 +56,10 @@
 <style>
 	.filter-nav {
 		display: flex;
+		flex-wrap: nowrap;
 		gap: 1.5rem;
 		margin-bottom: 1rem;
+		overflow-x: auto;
 	}
 
 	.filter-nav button {
@@ -65,10 +67,11 @@
 		border: none;
 		font-size: 0.8rem;
 		font-weight: 600;
-		color: var(--greyed-out);
+		color: var(--grey);
 		cursor: pointer;
 		padding: 0;
 		transition: color 0.2s;
+		text-wrap: nowrap;
 	}
 
 	.filter-nav button.active {
