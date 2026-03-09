@@ -23,7 +23,7 @@
 			</div>
 		</div>
 		<div class="mt-6">
-			<LinkWithArrow label="aiD at The Research Council of Norway" />
+			<LinkWithArrow label="aiD is part of the AI Initiative from the Research Council of Norway" />
 		</div>
 		<p class="mt-12 text-[1rem] leading-[1.5rem] font-bold sm:mt-16">A project by</p>
 		<div class="mt-[1rem] flex flex-wrap gap-6">
