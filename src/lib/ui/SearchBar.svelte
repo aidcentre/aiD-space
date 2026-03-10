@@ -7,10 +7,10 @@
 
 <!-- note: make text in input box wrap? if so, where does the extra go? -->
 <div
-	class="pointer-events-auto mx-8 flex w-full max-w-[700px] flex-1 flex-col items-start justify-center gap-3 px-4 py-2"
+	class="mx-8 flex w-full max-w-[700px] flex-1 flex-col items-start justify-center gap-3 px-4 py-2"
 >
 	<a
-		class="relative flex w-full items-center"
+		class="pointer-events-auto relative flex w-full items-center"
 		href="https://aidexpertisesearch-nrmdnyesl7oppreljp2epb.streamlit.app/"
 		target="_blank"
 		use:tooltip={{
