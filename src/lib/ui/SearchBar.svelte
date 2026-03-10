@@ -14,7 +14,7 @@
 		href="https://aidexpertisesearch-nrmdnyesl7oppreljp2epb.streamlit.app/"
 		target="_blank"
 		use:tooltip={{
-			content: 'Click to be redirected to the aiD Expertise Search page.',
+			content: 'Click to open the aiD Expertise Search in a new tab.',
 			offset: 16
 		}}
 	>
