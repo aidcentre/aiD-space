@@ -3,9 +3,11 @@
 
 	// svelte-ignore non_reactive_update
 	let textColor: string;
+	// svelte-ignore non_reactive_update
 	let arrowClass: string;
 	// svelte-ignore state_referenced_locally
 	white ? (textColor = 'var(--light-grey)') : (textColor = 'var(--off-black)');
+	// svelte-ignore state_referenced_locally
 	white ? (arrowClass = 'link-with-arrow-white') : (arrowClass = 'link-with-arrow-black');
 </script>
 
