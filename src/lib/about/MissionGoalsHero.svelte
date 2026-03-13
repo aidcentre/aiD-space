@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Scramble from '$lib/actions/Scramble.svelte';
 	import SectionLabel from './SectionLabel.svelte';
 
 	let milestones = [
@@ -28,11 +29,10 @@
 				{#each milestones as ms}
 					<div class="flex items-center gap-4">
 						<div class="squircle"></div>
-						<p
+						<Scramble
+							text={ms}
 							class="font-[Milling] text-[1rem] leading-[1.5rem] font-bold xl:text-[1.5rem] xl:leading-[2rem]"
-						>
-							{ms}
-						</p>
+						/>
 					</div>
 				{/each}
 			</div>
