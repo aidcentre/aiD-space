@@ -43,6 +43,11 @@
 						text: char.textContent,
 						chars: '!@#$%^&*()_+:"1234567890',
 						speed: 1
+					},
+					scrollTrigger: {
+						trigger: element,
+						start: '-1',
+						toggleActions: 'restart none restart none'
 					}
 				});
 			});
@@ -61,7 +66,7 @@
 					scrollTrigger: {
 						trigger: element,
 						start: 'bottom 75%',
-						toggleActions: 'restart none none none'
+						toggleActions: 'restart none restart none'
 					}
 				});
 			});
