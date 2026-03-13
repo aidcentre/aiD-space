@@ -21,6 +21,6 @@
 <style>
 	.dot-bg {
 		background-image: url('/src/lib/assets/diagonal_squares_black.svg');
-		background-repeat: repeat-x;
+		background-repeat: round;
 	}
 </style>

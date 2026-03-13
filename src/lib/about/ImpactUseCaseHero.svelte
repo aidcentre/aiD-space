@@ -47,8 +47,8 @@
 				into five topical areas and driven by industrial partners:
 			</p>
 		</div>
-		<!-- hide sticky part for small screen sizes -->
-		<div class="sticky top-12 flex flex-col gap-0 xl:hidden">
+		<!-- hide sticky part for large screen sizes -->
+		<div class="sticky top-10 flex flex-col gap-0 xl:hidden">
 			<div class="flex flex-col gap-10 bg-off-black">
 				<div class="dot-bg row-start-1 row-end-2 pt-8"></div>
 				<div
