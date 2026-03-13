@@ -2,6 +2,7 @@
 	import { partners_data } from '$lib/data/partners';
 	import { fade } from 'svelte/transition';
 	import Logo from './LogoTemplate.svelte';
+	import Scramble from '$lib/actions/Scramble.svelte';
 
 	// use svelte 5 runes to get reactive state for the current filter, default to Core
 	let activeCategory = $state('Core');
@@ -18,7 +19,7 @@
 </script>
 
 <div class="mt-12 mb-16 px-4 sm:mt-22">
-	<h2 class="mb-6 text-[1.5rem] leading-[2rem] font-bold">Our partners</h2>
+	<Scramble text="Our partners" class="mb-6 text-[1.5rem] leading-[2rem] font-bold" />
 
 	<nav class="filter-nav pb-1">
 		<button class:active={activeCategory === 'Core'} onclick={() => (activeCategory = 'Core')}>

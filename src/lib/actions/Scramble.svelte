@@ -30,7 +30,7 @@
 
 		// make scramble faster for longer texts
 		let scrambleSpeed: number;
-		chars.length < 100 ? (scrambleSpeed = 0.04) : (scrambleSpeed = 0.005);
+		chars.length < 100 ? (scrambleSpeed = 0.03) : (scrambleSpeed = 0.005);
 
 		if (isInViewport) {
 			// for each character, animate it with scrambletext and a delay based on the index so that the scramble is staggered
