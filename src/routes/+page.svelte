@@ -18,6 +18,8 @@
 	<footer
 		class="w-full self-start px-3 pb-3 text-[1rem] leading-6 font-extrabold wrap-anywhere text-off-black sm:w-2/3 sm:text-[1.5rem] sm:leading-8"
 	>
-		<Scramble text={footerText} />
+		<h1>
+			<Scramble text={footerText} />
+		</h1>
 	</footer>
 </main>
