@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { PUBLIC_BASE_URL } from '$env/static/public';
-	import { noDeprecation } from 'process';
 
 	let title = 'Norwegian Centre on AI for Decisions';
 
