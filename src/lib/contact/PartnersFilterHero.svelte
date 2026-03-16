@@ -1,52 +1,67 @@
-<script>
+<script lang="ts">
+	import { gsap } from 'gsap';
+	import { tick } from 'svelte';
 	import { partners_data } from '$lib/data/partners';
-	import { fade } from 'svelte/transition';
 	import Logo from './LogoTemplate.svelte';
+	import Scramble from '$lib/actions/Scramble.svelte';
 
-	// use svelte 5 runes to get reactive state for the current filter, default to Core
 	let activeCategory = $state('Core');
+	let displayedPartners = $state(partners_data.filter((p) => p.category === 'Core'));
+	let container: HTMLElement = $state()!;
 
-	// calculate how many partners are in each category
 	const counts = $derived({
 		Core: partners_data.filter((p) => p.category === 'Core').length,
 		Standard: partners_data.filter((p) => p.category === 'Standard').length,
 		Networking: partners_data.filter((p) => p.category === 'Networking').length
 	});
 
-	// filter the list whenever activeCategory changes
-	const filteredPartners = $derived(partners_data.filter((p) => p.category === activeCategory));
+	async function switchCategory(category: string) {
+		if (category === activeCategory) return;
+		activeCategory = category;
+
+		// animate tiles out
+		const tiles = container.querySelectorAll('.partner-tile');
+		if (tiles.length) {
+			await gsap.to(tiles, { opacity: 0, duration: 0.15, ease: 'power2.in' });
+		}
+
+		// swap the data and wait for svelte to render new tiles
+		displayedPartners = partners_data.filter((p) => p.category === category);
+		await tick();
+
+		// animate in new tiles with stagger
+		const newTiles = container.querySelectorAll('.partner-tile');
+		gsap.fromTo(
+			newTiles,
+			{ opacity: 0, y: 10 },
+			{ opacity: 1, y: 0, duration: 0.4, ease: 'power3.out', stagger: 0.03 }
+		);
+	}
 </script>
 
 <div class="mt-12 mb-16 px-4 sm:mt-22">
-	<h2 class="mb-6 text-[1.5rem] leading-[2rem] font-bold">Our partners</h2>
+	<Scramble text="Our partners" class="mb-6 text-[1.5rem] leading-[2rem] font-bold" />
 
 	<nav class="filter-nav pb-1">
-		<button class:active={activeCategory === 'Core'} onclick={() => (activeCategory = 'Core')}>
+		<button class:active={activeCategory === 'Core'} onclick={() => switchCategory('Core')}>
 			Core partners ({counts.Core})
 		</button>
 
-		<button
-			class:active={activeCategory === 'Standard'}
-			onclick={() => (activeCategory = 'Standard')}
-		>
+		<button class:active={activeCategory === 'Standard'} onclick={() => switchCategory('Standard')}>
 			Standard partners ({counts.Standard})
 		</button>
 
 		<button
 			class:active={activeCategory === 'Networking'}
-			onclick={() => (activeCategory = 'Networking')}
+			onclick={() => switchCategory('Networking')}
 		>
 			Networking partners ({counts.Networking})
 		</button>
 	</nav>
 
-	<div class="flex flex-wrap gap-1">
-		{#each filteredPartners as partner (partner.name)}
-			<div
-				in:fade={{ duration: 100, delay: 100 }}
-				out:fade={{ duration: 100 }}
-				class="flex w-fit items-center rounded-xl bg-white p-8 transition-all sm:p-8 sm:p-10"
-			>
+	<div bind:this={container} class="flex flex-wrap gap-1">
+		{#each displayedPartners as partner (partner.name)}
+			<div class="partner-tile flex w-fit items-center rounded-xl bg-white p-8 sm:p-10">
 				<Logo name={partner.logo} />
 			</div>
 		{/each}

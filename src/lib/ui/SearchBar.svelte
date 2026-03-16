@@ -1,13 +1,23 @@
 <script>
 	let searchQuery = '';
 	import enterIcon from '$lib/assets/enter_icon.svg';
+	import { tooltip } from 'svooltip';
+	import 'svooltip/styles.css'; // include default styling
 </script>
 
 <!-- note: make text in input box wrap? if so, where does the extra go? -->
 <div
-	class="pointer-events-auto mx-8 flex w-full max-w-[700px] flex-1 flex-col items-start justify-center gap-3 px-4 py-2"
+	class="mx-8 flex w-full max-w-[700px] flex-1 flex-col items-start justify-center gap-3 px-4 py-2"
 >
-	<div class="relative flex w-full items-center">
+	<a
+		class="pointer-events-auto relative flex w-full items-center"
+		href="https://aidexpertisesearch-nrmdnyesl7oppreljp2epb.streamlit.app/"
+		target="_blank"
+		use:tooltip={{
+			content: 'Click to open the aiD Expertise Search in a new tab.',
+			offset: 16
+		}}
+	>
 		<input
 			type="text"
 			bind:value={searchQuery}
@@ -21,7 +31,7 @@
 		>
 			<img src={enterIcon} alt="Arrow to click after entering query." />
 		</button>
-	</div>
+	</a>
 
 	<p class="text-[0.75rem] font-bold text-(--off-black)">
 		Search for a research topic, name or anything else.

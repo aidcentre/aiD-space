@@ -1,6 +1,6 @@
 <script lang="ts">
 	import roundsquareFrame from '$lib/assets/roundsquare_frame.svg';
-	// import Scramble from '$lib/actions/Scramble.svelte';
+	import Scramble from '$lib/actions/Scramble.svelte';
 
 	let { orgType, orgAmount } = $props();
 </script>
@@ -17,9 +17,9 @@
 			>{orgAmount}</span
 		>
 	</div>
-	<p class="org-type flex items-center text-[1.25rem] leading-8 font-bold xl:text-[1.5rem]">
-		{orgType}
-	</p>
+	<div class="flex items-center">
+		<Scramble text={orgType} class="org-type text-[1.25rem] leading-8 font-bold xl:text-[1.5rem]" />
+	</div>
 </div>
 
 <style>

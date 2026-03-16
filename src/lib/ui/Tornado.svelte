@@ -129,4 +129,7 @@
 	});
 </script>
 
-<div class="fixed inset-0 flex-col items-center justify-center" bind:this={container}></div>
+<div
+	class="pointer-events-auto fixed inset-0 flex-col items-center justify-center"
+	bind:this={container}
+></div>

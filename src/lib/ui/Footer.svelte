@@ -110,29 +110,40 @@
 	});
 </script>
 
-<footer
-	class="flex flex-col bg-(--off-black) p-[1rem] text-(--light-grey) max-md:gap-4 md:footer md:grid md:grid-cols-4"
->
-	<aside
-		class="flex w-9/10 flex-col gap-[1.5rem] font-[Montagu_Slab] text-[1.125rem] leading-[1.375rem] font-normal text-light-grey"
+<footer class="viewport-width bg-off-black">
+	<div
+		class="flex h-[750px] max-w-[1920px] flex-col p-[1rem] text-(--light-grey) max-md:gap-4 md:footer md:grid md:grid-cols-4"
 	>
-		<p>
-			aiD is headquartered at the Norwegian University of Science and Technology in Trondheim,
-			Norway and at SINTEF, Norway.
-		</p>
-		<div class="flex flex-col">
-			<p>info@aid-research.com</p>
-			<p>+47 22 22 55 55</p>
+		<aside
+			class="flex w-9/10 flex-col gap-[1.5rem] font-[Montagu_Slab] text-[1.125rem] leading-[1.375rem] font-normal text-light-grey"
+		>
+			<p>
+				aiD is headquartered at the Norwegian University of Science and Technology in Trondheim,
+				Norway and at SINTEF, Norway.
+			</p>
+			<div class="flex flex-col">
+				<p>info@aid-research.com</p>
+				<p>+47 22 22 55 55</p>
+			</div>
+		</aside>
+		<div class="py-4 sm:hidden">
+			<LinkWithArrow
+				label="aiD is part of the AI Initiative from the Research Council of Norway"
+				white={true}
+			/>
 		</div>
-	</aside>
-	<div class="py-4 sm:hidden">
-		<LinkWithArrow label="aiD at The Research Council of Norway" white={true} />
-	</div>
-	<div class="z-2 col-span-2 h-[40vh] w-full md:h-[60vh]" bind:this={container}></div>
-	<div class="md:justify-self-end">
-		<NavArrowButton direction="up" label="Back to top" />
-	</div>
-	<div class="relative bottom-0 left-0 max-sm:hidden">
-		<LinkWithArrow label="aiD at The Research Council of Norway" white={true} />
+		<div
+			class="z-2 col-span-2 flex h-full min-h-72 w-full items-end sm:min-h-92 md:min-h-140"
+			bind:this={container}
+		></div>
+		<div class="sm:justify-self-end">
+			<NavArrowButton direction="up" label="Back to top" />
+		</div>
+		<div class=" relative bottom-0 left-0 col-span-4 flex h-full items-end max-sm:hidden">
+			<LinkWithArrow
+				label="aiD is part of the AI Initiative from the Research Council of Norway"
+				white={true}
+			/>
+		</div>
 	</div>
 </footer>
