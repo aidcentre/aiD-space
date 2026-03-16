@@ -6,12 +6,8 @@
 	import Scramble from '$lib/actions/Scramble.svelte';
 
 	let footerText =
-		"The Norwegian Center on AI for Decisions is building a scientific and technological foundation that makes reliable, real-world AI possible. We\'re building something great here. Watch this space.";
+		"The Norwegian Centre on AI for Decisions is building a scientific and technological foundation that makes reliable, real-world AI possible. We\'re building something great here. Watch this space.";
 </script>
-
-<svelte:head>
-	<title>Norwegian Centre on AI for Decisions | aiD</title>
-</svelte:head>
 
 <!-- TODO: allow right-clicks even on tornado. currently not possible due to pointer events none -->
 
