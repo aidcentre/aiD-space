@@ -24,5 +24,5 @@
 	<!-- many links (e.g. https://aid-centre.no, https://www.aid-centre.no, https://aid-center.no) can access the content of this set. Below, we set the canonical url.-->
 	<link rel="canonical" href={`${PUBLIC_BASE_URL}${page.url.pathname}`} />
 	<!-- for SEO, add an apple touch icon -->
-	<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 </svelte:head>
