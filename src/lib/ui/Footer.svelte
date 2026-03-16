@@ -139,7 +139,7 @@
 		<div class="sm:justify-self-end">
 			<NavArrowButton direction="up" label="Back to top" />
 		</div>
-		<div class="relative bottom-0 left-0 col-span-4 flex h-fit items-end max-sm:hidden">
+		<div class=" relative bottom-0 left-0 col-span-4 flex h-full items-end max-sm:hidden">
 			<LinkWithArrow
 				label="aiD is part of the AI Initiative from the Research Council of Norway"
 				white={true}
