@@ -8,9 +8,9 @@
 	let meta = $derived({
 		// default values
 		description:
-			'The aiD centre, or the Norwegian Centre on AI for Decisions, is an initiative led by SINTEF and NTNU.',
+			'The aiD centre, or the Norwegian Centre on AI for Decisions, is an initiative led by the Research Council of Norway, SINTEF, and NTNU.',
 		title,
-		// per-page customizations
+		// per-page customizations, defined in the +page.ts files
 		...page.data.meta
 	});
 
