@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { gsap } from 'gsap';
-	import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+	import ScrambleTextPlugin from 'gsap/ScrambleTextPlugin';
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
 	import { SplitText } from 'gsap/SplitText';
 	import { onMount } from 'svelte';
-	import Page from '../../routes/+page.svelte';
 	const { text = '', class: className = '' } = $props();
 
 	// scrolltrigger plugin makes animation run when user scrolls to it
