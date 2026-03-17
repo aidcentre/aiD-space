@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { gsap } from 'gsap';
 	import ScrambleTextPlugin from 'gsap/ScrambleTextPlugin';
-	import { ScrollTrigger } from 'gsap/ScrollTrigger';
-	import { SplitText } from 'gsap/SplitText';
+	import ScrollTrigger from 'gsap/ScrollTrigger';
+	import SplitText from 'gsap/SplitText';
 	import { onMount } from 'svelte';
 	const { text = '', class: className = '' } = $props();
 
