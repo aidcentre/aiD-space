@@ -1,8 +1,9 @@
 import { json } from '@sveltejs/kit';
 
 export async function POST({ request }) {
-	const { userQuery } = await request.json();
-	const llmResponse = 'concat test ' + userQuery;
+	const { q } = await request.json();
+	console.log('4. query successfully sent to endpoint!', q);
+	const llmResponse = 'concat test!!! :) ' + q;
 
 	return json(llmResponse);
 }
