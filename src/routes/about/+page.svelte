@@ -15,7 +15,7 @@
 <Header />
 <Menu />
 
-<main class="dark:bg-off-black transition-colors duration-800 ease-out-expo">
+<main>
 	<section>
 		<div class="pt-40 md:pt-50 lg:pt-70 mb-30 md:mb-40 lg:mb-60 max-w-[1920px] px-4 mx-auto">
 			<Scramble

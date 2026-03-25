@@ -63,18 +63,14 @@
 
 @layer base {
 	body {
-		@apply font-family-sans bg-light-grey text-off-black antialiased;
+		@apply antialiased font-family-sans bg-light-grey dark:bg-off-black transition-colors duration-800;
+		transition-timing-function: cubic-bezier(.16, 1, .3, 1);
 	}
 
 	.font-family-mono {
 		font-family: var(--font-family-mono);
 		letter-spacing: 0.025em;
 	}
-}
-
-* {
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
 }
 
 .ease-out-expo {
