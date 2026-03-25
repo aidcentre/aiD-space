@@ -44,7 +44,7 @@
 		<div class="flex flex-col gap-6">
 			<SectionLabel label="Our partners" />
 
-			<div class="flex flex-wrap gap-4 mb-1.5">
+			<div class="flex flex-wrap gap-y-2 gap-x-4 mb-1.5">
 				{#each categories as category (category)}
 					<button
 						class="flex items-center gap-2 cursor-pointer whitespace-nowrap border-0 bg-transparent p-0 text-[0.8rem] font-bold transition-colors duration-200 {activeCategory === category ? 'text-off-black' : 'text-grey'}"

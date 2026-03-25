@@ -23,7 +23,7 @@
 <section bind:this={sectionEl}>
 	<div class="flex min-h-screen flex-wrap px-4 my-30 md:my-40 lg:my-60">
 		<div class="sticky top-0 h-56 w-full pointer-events-none bg-linear-to-b from-light-grey via-light-grey dark:from-off-black dark:via-off-black dark:to-transparent transition-colors duration-800 ease-out-expo">
-			<div class="bg-size-auto mt-32 h-8 invert dark:invert-0 bg-[url('/src/lib/assets/diagonal_squares_white.svg')] bg-repeat-x pointer-events-none transition-colors duration-800 ease-out-expo"></div>
+			<div class="mt-32 h-8 invert dark:invert-0 bg-[url('/src/lib/assets/diagonal_squares_white.svg')] bg-size-auto bg-repeat-x pointer-events-none transition-colors duration-800 ease-out-expo"></div>
 		</div>
 		<div class="-mt-6 grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12 max-w-[1920px] mx-auto">
 			<div class="col-span-5">

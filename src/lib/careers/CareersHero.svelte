@@ -9,6 +9,7 @@
 		<div class="col-span-12 md:col-span-5">
 			<Scramble
 				text="Careers"
+				speed="slow"
 				class="font-bold text-2xl md:text-3xl lg:text-4xl xl:text-5xl leading-tight"
 			/>
 		</div>

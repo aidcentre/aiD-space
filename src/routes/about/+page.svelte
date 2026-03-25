@@ -1,10 +1,10 @@
 <script lang="ts">
 	import Scramble from '$lib/actions/Scramble.svelte';
-	import WhatIsAid from '$lib/about/AboutAidHero.svelte';
-	import ResearchAreasHero from '$lib/about/ResearchAreasHero.svelte';
-	import MissionGoalsHero from '$lib/about/MissionGoalsHero.svelte';
+	import WhatIsAid from '$lib/about/AboutAid.svelte';
+	import ResearchAreas from '$lib/about/ResearchAreas.svelte';
+	import MissionGoals from '$lib/about/MissionGoals.svelte';
 	import UseCases from '$lib/about/UseCases.svelte';
-	import EthicsHero from '$lib/about/EthicsHero.svelte';
+	import Sustainability from '$lib/about/Sustainability.svelte';
 	import Footer from '$lib/ui/Footer.svelte';
 	import Header from '$lib/ui/Header.svelte';
 	import Menu from '$lib/ui/Menu.svelte';
@@ -26,10 +26,10 @@
 		</div>
 	</section>
 	<WhatIsAid />
-	<ResearchAreasHero />
+	<ResearchAreas />
 	<UseCases />
-	<MissionGoalsHero />
-	<EthicsHero />
+	<MissionGoals />
+	<Sustainability />
 </main>
 
 <Footer />

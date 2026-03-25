@@ -7,6 +7,7 @@
 	import HomeText from '$lib/home/HomeText.svelte';
 </script>
 
+
 <div class="fixed inset-0 -mt-24">
 	<NodeSphere paused={$menuOpen} />
 </div>

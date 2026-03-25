@@ -12,16 +12,16 @@
 				<p class="font-family-serif text-sm md:text-base text-white">aiD is headquartered at the Norwegian University of Science and Technology in Trondheim, Norway and at SINTEF, Norway.</p>
 				<div class="flex flex-col gap-1">
 					<Link 
-						href="mailto:info@aid-research.com" 
+						href="mailto:iben.nesset@sintef.no" 
 						theme="dark"
 					>
-						info@aid-research.com
+						iben.nesset@sintef.no
 					</Link>
 					<Link 
-						href="tel:+47 22 22 55 55" 
+						href="tel:+47 91 71 31 84" 
 						theme="dark"
 					>
-						+47 22 22 55 55
+						+47 91 71 31 84
 					</Link>
 				</div>
 			</div>

@@ -12,6 +12,7 @@
 		<div class="col-span-12 md:col-span-5">
 			<Scramble
 				text="About & contact"
+				speed="slow"
 				class="font-bold text-2xl md:text-3xl lg:text-4xl xl:text-5xl leading-tight"
 			/>
 		</div>
@@ -22,7 +23,8 @@
 					<div class="flex gap-2 mb-2">
 						<div class="w-3.75 h-3.75 aspect-square rounded translate-y-1 md:translate-y-1 bg-off-black"></div>
 						<Scramble 
-							text="Contact" 
+							text="Contact"
+							speed="slow"
 							class="font-bold text-off-black" 
 						/>
 					</div>

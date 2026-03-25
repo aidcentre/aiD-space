@@ -23,10 +23,14 @@
 			<div class="flex flex-col gap-4">
 				<div class="text-sm lg:text-md font-bold text-greyed-out">Key milestones</div>
 				<div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-8">
-						{#each milestones as ms}
+						{#each milestones as item}
 							<div class="flex gap-2 md:gap-3">
 								<div class="w-4.5 h-4.5 aspect-square rounded translate-y-1 md:translate-y-1.25 bg-off-black"></div>
-								<Scramble text={ms} class="text-lg lg:text-xl font-bold text-off-black dark:text-white transition-colors duration-800 ease-out-expo" />
+								<Scramble 
+									text={item} 
+									speed="slow"
+									class="text-lg lg:text-xl font-bold text-off-black dark:text-white transition-colors duration-800 ease-out-expo" 
+								/>
 							</div>
 						{/each}
 					</div>
