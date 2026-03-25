@@ -13,7 +13,7 @@
 </div>
 
 <Header />
-<Menu />
+<Menu /> 
 
 <main>
 	<SearchBar />
