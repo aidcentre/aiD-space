@@ -31,7 +31,7 @@
 				border={true}
 				trailing={true}
 			>
-				aiD at The Resarch Council of Norway
+				aiD at the Research Council of Norway
 			</Link>
 		</div>
 		<ToTheTopButton onclick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} />

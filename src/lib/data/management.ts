@@ -9,20 +9,20 @@ export type ManagementMember = {
 
 export const management_data: ManagementMember[] = [
 	{
-		name: 'Signe Riemer-Sørensen',
-		title: 'Research Director',
-		role: 'aiD Co-director',
-		affiliation: 'SINTEF',
-		affiliationUrl: 'https://www.sintef.no',
-		image: '/images/management/signe-riemer-sorensen.jpg'
-	},
-	{
 		name: 'Sebastien Nicolas Gros',
 		title: 'Professor',
-		role: 'aiD Co-director',
+		role: 'Director',
 		affiliation: 'NTNU',
 		affiliationUrl: 'https://www.ntnu.no',
 		image: '/images/management/sebastien-nicolas-gros.jpg'
+	},
+	{
+		name: 'Signe Riemer-Sørensen',
+		title: 'Research Director',
+		role: 'Co-director',
+		affiliation: 'SINTEF',
+		affiliationUrl: 'https://www.sintef.no',
+		image: '/images/management/signe-riemer-sorensen.jpg'
 	},
 	{
 		name: 'Verner Hølleland',

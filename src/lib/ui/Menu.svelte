@@ -42,7 +42,7 @@
 						border={true}
 						trailing={true}
 					>
-						aiD at The Resarch Council of Norway
+						aiD at the Research Council of Norway
 					</Link>
 				</div>
 			</div>
