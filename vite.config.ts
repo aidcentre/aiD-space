@@ -6,5 +6,8 @@ export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
 	ssr: {
 		noExternal: ['gsap']
-	}
+	},
+	build: {
+		chunkSizeWarningLimit: 1000
+	},
 });
