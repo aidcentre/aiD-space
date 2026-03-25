@@ -21,7 +21,6 @@
 	let renderer: THREE.WebGLRenderer;
 	let frameId: number;
 
-	// adjustable parameters
 	const params = {
 		width: 70,
 		height: 50,
