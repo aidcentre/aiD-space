@@ -51,25 +51,21 @@
 </script>
 
 <section>
-	<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-4 max-w-[1920px] px-4 mx-auto my-30 md:my-40 lg:my-60">
-		<div class="col-span-2">
+	<div class="grid grid-cols-12 gap-8 lg:gap-12 max-w-[1920px] px-4 mx-auto my-30 md:my-40 lg:my-60">
+		<div class="col-span-12 lg:col-span-2">
 			<SectionLabel 
 				label="Research areas"
 				class="text-off-black dark:text-white transition-colors duration-800 ease-out-expo" 
 			/>
 		</div>
-		<div class="col-span-10">
+		<div class="col-span-12 lg:col-span-10">
 			<div class="flex flex-col gap-8 lg:gap-12 xl:gap-16">
 				<h2 class="font-bold text-2xl md:text-3xl lg:text-4xl xl:text-5xl leading-tight text-off-black dark:text-white transition-colors duration-800 ease-out-expo">To achieve its goals, aiD operates across nine specialized Research Areas (RAs):</h2>
-				<div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-8 lg:gap-x-12 gap-y-4 lg:gap-y-8">
+				<div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-8 lg:gap-x-12 gap-y-6 lg:gap-y-8">
 					{#each researchAreas as area}
-						<div class="flex flex-col gap-0 lg:gap-4">
-							<h3 class="font-bold text-lg lg:text-xl xl:text-2xl text-off-black dark:text-white transition-colors duration-800 ease-out-expo">
-								{area.title}
-							</h3>
-							<p class="text-md lg:text-lg font-family-serif text-off-black dark:text-white transition-colors duration-800 ease-out-expo">
-								{area.content}
-							</p>
+						<div class="flex flex-col gap-2 md:gap-4">
+							<h3 class="text-md md:text-lg lg:text-xl font-bold text-off-black dark:text-white transition-colors duration-800 ease-out-expo">{area.title}</h3>
+							<p class="text-sm md:text-md lg:text-lg font-family-serif text-off-black dark:text-white transition-colors duration-800 ease-out-expo">{area.content}</p>
 						</div>
 					{/each}
 				</div>

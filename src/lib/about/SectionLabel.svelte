@@ -2,4 +2,4 @@
 	let { label, class: className = '' } = $props();
 </script>
 
-<h2 class="font-bold text-lg lg:text-xl {className}">{label}</h2>
+<h2 class="font-bold text-md md:text-lg lg:text-xl text-off-black {className}">{label}</h2>

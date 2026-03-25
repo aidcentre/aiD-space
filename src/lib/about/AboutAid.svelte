@@ -4,11 +4,11 @@
 </script>
 
 <section>
-	<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 max-w-[1920px] px-4 mx-auto my-30 md:my-40 lg:my-60">
-		<div class="col-span-2">
+	<div class="grid grid-cols-12 gap-8 lg:gap-12 max-w-[1920px] px-4 mx-auto my-30 md:my-40 lg:my-60">
+		<div class="col-span-12 lg:col-span-2">
 			<SectionLabel label="What is aiD?" />
 		</div>
-		<div class="col-span-10 flex flex-col gap-8 lg:gap-12 xl:gap-16">
+		<div class="col-span-12 lg:col-span-10 flex flex-col gap-8 lg:gap-12 xl:gap-16">
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-8">
 				<PartnerStats orgType="Academic Institutions" orgAmount="3" />
 				<PartnerStats orgType="Research Organizations" orgAmount="6" />
