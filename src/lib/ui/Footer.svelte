@@ -26,7 +26,7 @@
 				</div>
 			</div>
 			<Link 
-				href="https://aid-center.no/" 
+				href="https://www.forskningsradet.no/en/research-policy-strategy/ltp/artificial-intelligence/" 
 				theme="dark"
 				border={true}
 				trailing={true}

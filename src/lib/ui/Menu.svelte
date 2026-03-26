@@ -37,7 +37,7 @@
 						+47 91 71 31 84
 					</Link>
 					<Link 
-						href="https://aid-center.no/" 
+						href="https://www.forskningsradet.no/en/research-policy-strategy/ltp/artificial-intelligence/" 
 						theme="dark"
 						border={true}
 						trailing={true}

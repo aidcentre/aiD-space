@@ -11,7 +11,11 @@
 </script>
 
 <header>
-	<div class="fixed top-4 left-4 right-4 z-40 flex items-center justify-between py-2 pl-4 pr-2 w-[calc(100%-2rem)] rounded-xl pointer-events-auto transition-colors duration-800 ease-out-expo {open ? 'bg-off-black' : 'bg-white'}">
+	<div
+		class="ease-out-expo pointer-events-auto fixed top-4 right-4 left-4 z-40 flex w-[calc(100%-2rem)] items-center justify-between rounded-xl py-2 pr-2 pl-4 transition-colors duration-800 {open
+			? 'bg-off-black'
+			: 'bg-white'}"
+	>
 		<a href="/">
 			<Logo theme={open ? 'light' : 'dark'} />
 		</a>

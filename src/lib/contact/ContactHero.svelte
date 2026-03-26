@@ -41,7 +41,7 @@
 						+47 22 22 55 55
 					</Link>
 					<Link 
-						href="https://aid-center.no/" 
+						href="https://www.forskningsradet.no/en/research-policy-strategy/ltp/artificial-intelligence/" 
 						theme="light"
 						border={true}
 						trailing={true}
@@ -58,12 +58,12 @@
 						/>
 					</div>
 					<Link 
-						href="https://aid-center.no/" 
+						href="https://teams.microsoft.com/l/team/19%3AOTSSrCNVkGTBJHl_AzocWwTuuV5ZCNEN7mx4ah62ke41%4[…]-198193622f56&tenantId=09a10672-822f-4467-a5ba-5bb375967c05" 
 						theme="light"
 						border={true}
 						trailing={true}
 					>
-						Are you a partner?
+						Join us on Microsoft Teams
 					</Link>
 				</div>
 				<div class="flex flex-col">

@@ -39,9 +39,8 @@
 <a
 	{href}
 	class={[
-		'inline-flex items-center gap-1 md:gap-1.5 w-fit font-family-mono text-xs md:text-sm select-none',
+		'relative inline-flex items-center gap-1 md:gap-1.5 w-fit font-family-mono text-xs md:text-sm select-none',
 		theme === 'light' ? 'text-off-black' : 'text-white',
-		border && 'border-b border-dashed',
 		className
 	]}
 	onmouseenter={() => scrambler?.replay()}
@@ -50,5 +49,8 @@
 	<span bind:this={spanEl}>{@render children()}</span>
 	{#if trailing}
 		<ArrowUpRight class="w-3.25 h-3.25 md:w-4 md:h-4" />
+		{#if border}
+			<div class="h-[2px] absolute -bottom-0.5 {theme === 'dark' ? 'invert' : ''} left-0 right-0 bg-[url('/src/lib/assets/dotted-line.svg')] bg-auto"></div>
+		{/if}
 	{/if}
 </a>
