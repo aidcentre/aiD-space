@@ -44,7 +44,7 @@
 						href="https://aid-center.no/" 
 						theme="light"
 						border={true}
-						trailing={true}
+						trailing={true} 
 					>
 						aiD at The Resarch Council of Norway
 					</Link>
