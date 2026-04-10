@@ -29,16 +29,16 @@
 						/>
 					</div>
 					<Link 
-						href="mailto:info@aid-research.com" 
+						href="mailto:iben.nesset@sintef.no" 
 						theme="light"
 					>
-						info@aid-research.com
+						iben.nesset@sintef.no
 					</Link>
 					<Link 
-						href="tel:+47 22 22 55 55" 
+						href="tel:+47 91 71 31 84" 
 						theme="light"
 					>
-						+47 22 22 55 55
+						+47 91 71 31 84
 					</Link>
 					<Link 
 						href="https://www.forskningsradet.no/en/research-policy-strategy/ltp/artificial-intelligence/" 
