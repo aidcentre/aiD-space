@@ -1,9 +1,20 @@
 import { json } from '@sveltejs/kit';
+import { PRIVATE_BACKEND_URL } from '$env/static/private';
 
 export async function POST({ request }) {
-	const { q } = await request.json();
-	console.log('4. query successfully sent to endpoint!', q);
-	const llmResponse = 'concat test!!! :) ' + q;
+	const { messages } = await request.json();
+	console.log('4. query successfully sent to +server.ts: ', messages);
 
-	return json(llmResponse);
+	try {
+		const backendResponse = await fetch(`${PRIVATE_BACKEND_URL}/`, {
+			method: 'POST',
+			body: JSON.stringify({ messages }),
+			headers: { 'Content-Type': 'application/json' }
+		});
+		const data = await backendResponse.json();
+		return json(data);
+	} catch (err) {
+		console.error('error communicating with backend:', err);
+		throw err;
+	}
 }
