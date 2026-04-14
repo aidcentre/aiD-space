@@ -5,28 +5,24 @@
 	let { orgType, orgAmount } = $props();
 </script>
 
-<div class="flex items-center gap-[1rem] xl:gap-8">
-	<div class="relative">
+<div class="flex items-center gap-3 md:gap-6 lg:gap-9">
+	<div class="relative size-10 min-w-fit md:size-12 lg:size-16">
 		<img
 			src={roundsquareFrame}
 			alt="square dotted frame surrounding the number of ${orgType}"
-			class="size-10 min-w-fit xl:size-20 xl:min-w-fit"
+			class="h-full w-full"
 		/>
-		<span
-			class="amount text-[1rem] leading-4 font-bold text-off-black xl:text-[1.5rem] xl:leading-8"
-			>{orgAmount}</span
+		<div
+			class="text-md absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-off-black md:text-lg lg:text-xl"
 		>
+			{orgAmount}
+		</div>
 	</div>
 	<div class="flex items-center">
-		<Scramble text={orgType} class="org-type text-[1.25rem] leading-8 font-bold xl:text-[1.5rem]" />
+		<Scramble
+			text={orgType}
+			speed="slow"
+			class="text-md font-bold text-off-black md:text-lg lg:text-xl"
+		/>
 	</div>
 </div>
-
-<style>
-	.amount {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-	}
-</style>

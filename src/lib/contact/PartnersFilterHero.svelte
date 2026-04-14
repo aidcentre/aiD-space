@@ -3,9 +3,12 @@
 	import { tick } from 'svelte';
 	import { partners_data } from '$lib/data/partners';
 	import Logo from './LogoTemplate.svelte';
-	import Scramble from '$lib/actions/Scramble.svelte';
+	import SectionLabel from '$lib/about/SectionLabel.svelte';
 
-	let activeCategory = $state('Core');
+	const categories = ['Core', 'Standard', 'Networking'] as const;
+	type Category = (typeof categories)[number];
+
+	let activeCategory: Category = $state('Core');
 	let displayedPartners = $state(partners_data.filter((p) => p.category === 'Core'));
 	let container: HTMLElement = $state()!;
 
@@ -15,21 +18,18 @@
 		Networking: partners_data.filter((p) => p.category === 'Networking').length
 	});
 
-	async function switchCategory(category: string) {
+	async function switchCategory(category: Category) {
 		if (category === activeCategory) return;
 		activeCategory = category;
 
-		// animate tiles out
 		const tiles = container.querySelectorAll('.partner-tile');
 		if (tiles.length) {
 			await gsap.to(tiles, { opacity: 0, duration: 0.15, ease: 'power2.in' });
 		}
 
-		// swap the data and wait for svelte to render new tiles
 		displayedPartners = partners_data.filter((p) => p.category === category);
 		await tick();
 
-		// animate in new tiles with stagger
 		const newTiles = container.querySelectorAll('.partner-tile');
 		gsap.fromTo(
 			newTiles,
@@ -39,57 +39,37 @@
 	}
 </script>
 
-<div class="mt-12 mb-16 px-4 sm:mt-22">
-	<Scramble text="Our partners" class="mb-6 text-[1.5rem] leading-[2rem] font-bold" />
+<section>
+	<div class="mx-auto my-30 max-w-[1920px] px-4 md:my-40 lg:my-60">
+		<div class="flex flex-col gap-6">
+			<SectionLabel label="Our partners" />
 
-	<nav class="filter-nav pb-1">
-		<button class:active={activeCategory === 'Core'} onclick={() => switchCategory('Core')}>
-			Core partners ({counts.Core})
-		</button>
-
-		<button class:active={activeCategory === 'Standard'} onclick={() => switchCategory('Standard')}>
-			Standard partners ({counts.Standard})
-		</button>
-
-		<button
-			class:active={activeCategory === 'Networking'}
-			onclick={() => switchCategory('Networking')}
-		>
-			Networking partners ({counts.Networking})
-		</button>
-	</nav>
-
-	<div bind:this={container} class="flex flex-wrap gap-1">
-		{#each displayedPartners as partner (partner.name)}
-			<div class="partner-tile flex w-fit items-center rounded-xl bg-white p-8 sm:p-10">
-				<Logo name={partner.logo} />
+			<div class="mb-1.5 flex flex-wrap gap-x-4 gap-y-2">
+				{#each categories as category (category)}
+					<button
+						class="flex cursor-pointer items-center gap-2 border-0 bg-transparent p-0 text-[0.8rem] font-bold whitespace-nowrap transition-colors duration-200 {activeCategory ===
+						category
+							? 'text-off-black'
+							: 'text-grey'}"
+						onclick={() => switchCategory(category)}
+					>
+						<div
+							class="aspect-square size-3.25 rounded {activeCategory === category
+								? 'bg-off-black'
+								: 'border-grey border-2'}"
+						></div>
+						{category} partners ({counts[category]})
+					</button>
+				{/each}
 			</div>
-		{/each}
+
+			<div bind:this={container} class="flex flex-wrap gap-1">
+				{#each displayedPartners as partner (partner.name)}
+					<div class="partner-tile flex w-fit items-center rounded-xl bg-white p-8 sm:p-10">
+						<Logo name={partner.logo} />
+					</div>
+				{/each}
+			</div>
+		</div>
 	</div>
-</div>
-
-<style>
-	.filter-nav {
-		display: flex;
-		flex-wrap: nowrap;
-		gap: 1.5rem;
-		margin-bottom: 1rem;
-		overflow-x: auto;
-	}
-
-	.filter-nav button {
-		background: none;
-		border: none;
-		font-size: 0.8rem;
-		font-weight: 600;
-		color: var(--grey);
-		cursor: pointer;
-		padding: 0;
-		transition: color 0.2s;
-		text-wrap: nowrap;
-	}
-
-	.filter-nav button.active {
-		color: var(--off-black);
-	}
-</style>
+</section>

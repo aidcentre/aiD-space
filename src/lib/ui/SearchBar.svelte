@@ -1,52 +1,37 @@
-<script>
-	let searchQuery = '';
-	import enterIcon from '$lib/assets/enter_icon.svg';
-	import { tooltip } from 'svooltip';
-	import 'svooltip/styles.css'; // include default styling
+<script lang="ts">
+	import Tooltip from './Tooltip.svelte';
+	import ArrowRight from 'phosphor-svelte/lib/ArrowRight';
 </script>
 
-<!-- note: make text in input box wrap? if so, where does the extra go? -->
 <div
-	class="mx-8 flex w-full max-w-[700px] flex-1 flex-col items-start justify-center gap-3 px-4 py-2"
+	class="group absolute top-1/2 left-1/2 -mt-8 flex w-full max-w-200 -translate-x-1/2 -translate-y-1/2 flex-col gap-3 px-4"
 >
-	<a
-		class="pointer-events-auto relative flex w-full items-center"
-		href="https://aidexpertisesearch-nrmdnyesl7oppreljp2epb.streamlit.app/"
-		target="_blank"
-		use:tooltip={{
-			content: 'Click to open the aiD Expertise Search in a new tab.',
-			offset: 16
-		}}
-	>
-		<input
-			type="text"
-			bind:value={searchQuery}
-			placeholder="Find a scientist"
-			class="w-full cursor-text rounded-lg border-none bg-white py-3 pr-14 pl-4 focus:outline-none"
-		/>
-
-		<button
-			class="absolute top-1/2 right-2 flex -translate-y-1/2 cursor-pointer items-center justify-center rounded-md bg-(--light-grey) p-2"
-			aria-label="Find a scientist"
+	<Tooltip content="Click to open the aiD Expertise Search in a new tab" position="bottom">
+		<a
+			class="relative flex w-full cursor-pointer flex-col rounded-xl bg-white"
+			href="https://aidexpertisesearch-nrmdnyesl7oppreljp2epb.streamlit.app/"
+			target="_blank"
 		>
-			<img src={enterIcon} alt="Arrow to click after entering query." />
-		</button>
-	</a>
-
-	<p class="text-[0.75rem] font-bold text-(--off-black)">
-		Search for a research topic, name or anything else.
-	</p>
+			<div
+				class="font-family-mono border-b border-light-grey px-3 py-3 text-xs select-none md:px-4 md:py-3 md:text-sm lg:text-base"
+			>
+				Search scientists // <span class="text-dark-grey"
+					>Research topics, names or anything else</span
+				>
+			</div>
+			<div
+				class="font-family-mono text-grey relative flex items-center justify-between px-3 py-3 text-xs select-none md:px-4 md:py-3 md:text-sm lg:text-base"
+			>
+				Your query
+				<button
+					class="ease-out-expo pointer-events-auto absolute top-1/2 right-2 flex aspect-square -translate-y-1/2 cursor-pointer items-center justify-center rounded-lg bg-off-black p-1.5 leading-0 text-white transition-colors duration-800 group-hover:bg-light-grey md:p-2"
+					aria-label="Search scientists // Research topics, names or anything else"
+				>
+					<ArrowRight
+						class="ease-out-expo h-3 w-3 transition-colors duration-800 group-hover:fill-off-black lg:h-4 lg:w-4"
+					/>
+				</button>
+			</div>
+		</a>
+	</Tooltip>
 </div>
-
-<style>
-	input::placeholder {
-		color: var(--mid-dark-grey);
-		font-weight: 700;
-		font-size: 1rem;
-	}
-
-	input:focus {
-		box-shadow: none !important;
-		outline: none;
-	}
-</style>

@@ -1,9 +1,5 @@
 <script>
-	let { label } = $props();
+	let { label, class: className = '' } = $props();
 </script>
 
-<h2
-	class="flex size-fit items-center rounded-[8px] bg-off-black px-4 py-3 text-[1rem] leading-[17.6px] font-semibold text-nowrap text-white"
->
-	{label}
-</h2>
+<h2 class="text-md font-bold text-off-black md:text-lg lg:text-xl {className}">{label}</h2>

@@ -1,6 +1,4 @@
 <script lang="ts">
-	// combines all svgs in the /logos directory as strings at build time. a Vite capability
-	// only one HTTP request rather than a GET request for each logo
 	const logos = import.meta.glob('$lib/assets/logos/*.svg', {
 		query: '?raw',
 		import: 'default',
@@ -9,22 +7,14 @@
 
 	let { name } = $props();
 
-	// svelte-ignore state_referenced_locally
-	const logoPath = `/src/lib/assets/logos/${name}.svg`;
-	const svgContent = logos[logoPath];
+	const logoPath = $derived(`/src/lib/assets/logos/${name}.svg`);
+	const svgContent = $derived(logos[logoPath]);
 </script>
 
-<div class="logo-container flex h-5 w-auto items-center fill-current sm:h-8">
+<div
+	class="*:h-auto *:max-h-5 *:w-full *:max-w-24 lg:*:max-h-6 lg:*:max-w-32 xl:*:max-h-7 xl:*:max-w-40"
+>
 	{#if svgContent}
 		{@html svgContent}
-	{:else}
-		<span class="text-sm">Logo not found</span>
 	{/if}
 </div>
-
-<style>
-	:global(.logo-container svg) {
-		height: 100%;
-		width: auto;
-	}
-</style>

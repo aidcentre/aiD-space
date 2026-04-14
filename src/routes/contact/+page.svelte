@@ -1,22 +1,19 @@
 <script lang="ts">
-	import NavHeader from '$lib/ui/NavHeader.svelte';
-	import ContactInfoHero from '$lib/contact/ContactInfoHero.svelte';
+	import Header from '$lib/ui/Header.svelte';
+	import Menu from '$lib/ui/Menu.svelte';
+	import ContactHero from '$lib/contact/ContactHero.svelte';
 	import Footer from '$lib/ui/Footer.svelte';
 	import PartnersFilterHero from '$lib/contact/PartnersFilterHero.svelte';
+	import Management from '$lib/contact/Management.svelte';
 </script>
 
-<NavHeader version={0.1} nodeNum={4} />
+<Header />
+<Menu />
 
-<main class="flex flex-col gap-0">
-	<ContactInfoHero />
-	<div class="dot-bg mx-4 pt-7"></div>
+<main>
+	<ContactHero />
+	<Management />
 	<PartnersFilterHero />
-	<Footer />
 </main>
 
-<style>
-	.dot-bg {
-		background-image: url('/src/lib/assets/diagonal_squares_black.svg');
-		background-repeat: round;
-	}
-</style>
+<Footer />

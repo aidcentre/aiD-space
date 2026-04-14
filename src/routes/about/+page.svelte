@@ -1,41 +1,36 @@
 <script lang="ts">
-	import NavHeader from '$lib/ui/NavHeader.svelte';
-	// retire tornado component. reincorporate later when we build a more complete version of the site
-	// import Tornado from '$lib/archive/Tornado.svelte';
 	import Scramble from '$lib/actions/Scramble.svelte';
-	import WhatIsAid from '$lib/about/AboutAidHero.svelte';
-	import ResearchAreasHero from '$lib/about/ResearchAreasHero.svelte';
-	import MissionGoalsHero from '$lib/about/MissionGoalsHero.svelte';
-	import ImpactUseCaseHero from '$lib/about/ImpactUseCaseHero.svelte';
-	import EthicsHero from '$lib/about/EthicsHero.svelte';
+	import WhatIsAid from '$lib/about/AboutAid.svelte';
+	import ResearchAreas from '$lib/about/ResearchAreas.svelte';
+	import MissionGoals from '$lib/about/MissionGoals.svelte';
+	import UseCases from '$lib/about/UseCases.svelte';
+	import Sustainability from '$lib/about/Sustainability.svelte';
 	import Footer from '$lib/ui/Footer.svelte';
+	import Header from '$lib/ui/Header.svelte';
+	import Menu from '$lib/ui/Menu.svelte';
 
-	let scrambleText =
+	let text =
 		"The Norwegian Centre on AI for Decisions (aiD) is a premier research hub dedicated to advancing the role of artificial intelligence in complex decision-making processes. As a cornerstone of the Research Council of Norway's (RCN) AI portfolio, aiD bridges technological, organizational, and human-centric gaps to foster a society where AI-driven value creation is safe and ethical.";
 </script>
 
-<NavHeader version={0.1} nodeNum={2} />
+<Header />
+<Menu />
 
 <main>
-	<section class="mt-[15rem] flex h-fit max-h-[20vh] items-center px-2 sm:px-4">
-		<Scramble
-			text={scrambleText}
-			class="mr-1 text-[1rem] leading-6 font-bold text-off-black sm:ml-2 sm:w-54/100 sm:text-[1.5rem] sm:leading-8"
-		/>
+	<section>
+		<div class="mx-auto mb-30 max-w-[1920px] px-4 pt-40 md:mb-40 md:pt-50 lg:mb-60 lg:pt-70">
+			<Scramble
+				{text}
+				speed="fast"
+				class="w-full text-lg leading-tight font-bold text-off-black md:w-150 lg:w-200 lg:text-xl xl:w-250 xl:text-2xl"
+			/>
+		</div>
 	</section>
-	<!-- <Tornado /> , uncomment when ready-->
 	<WhatIsAid />
-	<ResearchAreasHero />
-	<ImpactUseCaseHero />
-	<MissionGoalsHero />
-	<EthicsHero />
-	<Footer />
+	<ResearchAreas />
+	<UseCases />
+	<MissionGoals />
+	<Sustainability />
 </main>
 
-<style>
-	main {
-		display: flex;
-		flex-direction: column;
-		gap: 15rem;
-	}
-</style>
+<Footer />
