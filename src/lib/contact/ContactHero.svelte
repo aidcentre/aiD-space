@@ -58,10 +58,11 @@
 						/>
 					</div>
 					<Link 
-						href="https://aid-center.no/" 
+						href="https://teams.microsoft.com/l/team/19%3AOTSSrCNVkGTBJHl_AzocWwTuuV5ZCNEN7mx4ah62ke41%40thread.tacv2/conversations?groupId=9721146a-0c5c-49cb-a900-198193622f56&tenantId=09a10672-822f-4467-a5ba-5bb375967c05" 
 						theme="light"
 						border={true}
 						trailing={true}
+						target="_blank"
 					>
 						Are you a partner?
 					</Link>

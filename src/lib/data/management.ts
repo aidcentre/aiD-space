@@ -13,7 +13,7 @@ export const management_data: ManagementMember[] = [
 		title: 'Professor',
 		role: 'Director',
 		affiliation: 'NTNU',
-		affiliationUrl: 'https://www.ntnu.no',
+		affiliationUrl: 'https://www.ntnu.no/ansatte/sebastien.gros',
 		image: '/images/management/sebastien-nicolas-gros.jpg'
 	},
 	{
@@ -21,7 +21,7 @@ export const management_data: ManagementMember[] = [
 		title: 'Research Director',
 		role: 'Co-director',
 		affiliation: 'SINTEF',
-		affiliationUrl: 'https://www.sintef.no',
+		affiliationUrl: 'https://www.sintef.no/alle-ansatte/ansatt/signe.riemer-sorensen/',
 		image: '/images/management/signe-riemer-sorensen.jpg'
 	},
 	{
@@ -29,7 +29,7 @@ export const management_data: ManagementMember[] = [
 		title: 'Project Manager',
 		role: '',
 		affiliation: 'NTNU',
-		affiliationUrl: 'https://www.ntnu.no',
+		affiliationUrl: 'https://www.ntnu.no/ansatte/verner.holleland',
 		image: '/images/management/verner-holleland.jpg'
 	},
 	{
@@ -37,7 +37,7 @@ export const management_data: ManagementMember[] = [
 		title: 'Professor',
 		role: '',
 		affiliation: 'NTNU',
-		affiliationUrl: 'https://www.ntnu.no',
+		affiliationUrl: 'https://www.ntnu.edu/employees/stefan.werner',
 		image: '/images/management/stefan-werner.jpg'
 	},
 	{
@@ -45,7 +45,7 @@ export const management_data: ManagementMember[] = [
 		title: 'Research Director',
 		role: '',
 		affiliation: 'SINTEF',
-		affiliationUrl: 'https://www.sintef.no',
+		affiliationUrl: 'https://www.sintef.no/alle-ansatte/ansatt/odd.are.svensen/',
 		image: '/images/management/odd-are-svensen.jpg'
 	},
 	{
@@ -53,7 +53,7 @@ export const management_data: ManagementMember[] = [
 		title: 'Manager NORCE Analytics',
 		role: '',
 		affiliation: 'Norce',
-		affiliationUrl: 'https://www.norceresearch.no',
+		affiliationUrl: 'https://www.norceresearch.no/personer/anders-sleire/38858218',
 		image: ''
 	},
 	{
@@ -61,7 +61,7 @@ export const management_data: ManagementMember[] = [
 		title: 'Forskningskoordinator',
 		role: '',
 		affiliation: 'SINTEF',
-		affiliationUrl: 'https://www.sintef.no',
+		affiliationUrl: 'https://www.sintef.no/alle-ansatte/ansatt/iben.nesset/',
 		image: '/images/management/iben-alexander-eikrem-nesset.jpg'
 	}
 ];

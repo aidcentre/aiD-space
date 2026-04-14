@@ -27,6 +27,7 @@
             theme="light"
             border={true}
             trailing={true}
+            target="_blank"
         >
             {item.affiliation}
         </Link>
