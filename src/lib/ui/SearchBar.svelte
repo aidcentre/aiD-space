@@ -1,8 +1,5 @@
 <script lang="ts">
-	import Tooltip from './Tooltip.svelte';
 	import ArrowRightIcon from 'phosphor-svelte/lib/ArrowRightIcon';
-
-	let userQuery = $state('');
 </script>
 
 <div
