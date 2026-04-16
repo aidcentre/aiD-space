@@ -12,8 +12,11 @@
 	}
 </script>
 
-<div class="sticky bottom-4 flex w-full justify-center px-4">
-	<div class="group flex w-full max-w-214 flex-col gap-3">
+<div class="sticky bottom-0 flex w-full justify-center px-4">
+	<div
+		class="pointer-events-none absolute bottom-0 left-0 h-40 w-full bg-linear-to-t from-light-grey via-[#e8e8e8c4] via-65% to-transparent"
+	></div>
+	<div class="group flex w-full max-w-214 flex-col gap-3 pb-4">
 		<form
 			method="POST"
 			action="/"
