@@ -1,17 +1,21 @@
 <script lang="ts">
-	import UNLogo from '$lib/assets/UN_logo_bw.svg';
 	import Link from '$lib/ui/Link.svelte';
 
-	let { pfp = '', name, description, score, link1 = '', link2 = '' } = $props();
+	let {
+		pfp = 'aiD_profile_picture_black.png',
+		name,
+		description,
+		score,
+		link1 = '',
+		link2 = ''
+	} = $props();
+
+	const imagePath = $derived(`src/lib/assets/${pfp}`);
 </script>
 
 <div class="mb-24 divide-solid divide-off-black overflow-hidden rounded-lg bg-white">
 	<div class="flex flex-col gap-3 p-3 md:flex-row md:items-center">
-		<img
-			src={UNLogo}
-			alt="Logo of the United Nations in black and white"
-			class="w-12 select-none md:w-32"
-		/>
+		<img src={imagePath} alt="Researcher {name}" class="w-20 rounded-lg select-none" />
 		<div>
 			<p class="mb-1 font-[Milling] leading-6 font-bold">{name}</p>
 			<p class="font-[IBM_Mono] text-[14px] leading-4.5 font-normal tracking-[0.28px]">
@@ -22,7 +26,7 @@
 	<div
 		class="flex flex-row items-center gap-0 divide-x divide-solid divide-light-grey border-t border-light-grey bg-white"
 	>
-		<div class="flex-1 rounded-bl-lg px-2 py-2">
+		<div class="flex-1 rounded-bl-lg px-3 py-2">
 			<p class="text-grey font-[IBM_Mono] text-xs leading-4 font-bold">
 				Relevance score: {score}
 			</p>
