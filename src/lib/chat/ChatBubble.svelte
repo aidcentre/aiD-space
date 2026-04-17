@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ResearcherCard from './ResearcherCard.svelte';
+	import chatSymbol from '$lib/assets/chat_symbol.svg';
 	let { role, content, researchers = [] } = $props();
 </script>
 
@@ -12,10 +13,11 @@
 {/if}
 
 {#if role === 'ai'}
-	<div
-		class="mb-2 w-fit max-w-175.5 rounded-[46px] font-[IBM_Mono] text-[1rem] leading-6 font-normal tracking-[0.32px] text-black md:mb-6"
-	>
-		{content}
+	<div class="mb-2 flex w-fit max-w-175.5 flex-col gap-4 rounded-[46px] md:mb-6 md:flex-row">
+		<img src={chatSymbol} alt="AID's chat symbol" class="mt-1 size-5 rounded-sm bg-off-black" />
+		<p class="font-[IBM_Mono] text-[1rem] leading-6 font-normal tracking-[0.32px] text-black">
+			{content}
+		</p>
 	</div>
 	{#if researchers.length > 0}
 		<div class="flex flex-col gap-2">
