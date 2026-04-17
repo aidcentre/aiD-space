@@ -4,10 +4,15 @@
 	const {
 		text = '',
 		speed = 'fast',
+		typeOn = false,
+		onDone = undefined,
 		class: className = ''
 	} = $props<{
 		text?: string;
 		speed?: 'fast' | 'slow';
+		/** start with empty string? */
+		typeOn?: boolean;
+		onDone?: () => void;
 		class?: string;
 	}>();
 
@@ -24,10 +29,12 @@
 			tick: 1,
 			step: 4,
 			scramble: 4,
-			overflow: true,
+			overflow: !typeOn,
+			scrollIntoView: !typeOn,
 			range: [48, 57],
 			seed: 0,
-			overdrive: 9617.0
+			overdrive: 9617.0,
+			onAnimationEnd: onDone
 		});
 	});
 </script>
