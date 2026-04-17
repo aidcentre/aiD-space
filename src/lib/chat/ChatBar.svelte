@@ -18,8 +18,10 @@
 	></div>
 	<div class="group flex w-full max-w-214 flex-col gap-3 pb-4">
 		<form
-			method="POST"
-			action="/"
+			onsubmit={(event) => {
+				event.preventDefault();
+				handleSubmit();
+			}}
 			class="relative flex w-full cursor-pointer flex-col rounded-xl bg-white"
 		>
 			<div

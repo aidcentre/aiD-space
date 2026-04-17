@@ -13,7 +13,7 @@
 	const imagePath = $derived(`src/lib/assets/${pfp}`);
 </script>
 
-<div class="mb-24 divide-solid divide-off-black overflow-hidden rounded-lg bg-white">
+<div class="divide-solid divide-off-black overflow-hidden rounded-lg bg-white">
 	<div class="flex flex-col gap-3 p-3 md:flex-row md:items-center">
 		<img src={imagePath} alt="Researcher {name}" class="w-20 rounded-lg select-none" />
 		<div>
