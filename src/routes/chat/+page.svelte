@@ -79,11 +79,11 @@
 				score="9.28"
 			/> -->
 
-		{#each messages as msg}
-			<div class="mt-20 flex flex-col">
+		<div class="mt-20 flex flex-col">
+			{#each messages as msg}
 				<ChatBubble role={msg.role} content={msg.content} researchers={msg.researchers} />
-			</div>
-		{/each}
+			{/each}
+		</div>
 		<!-- </div> -->
 	</section>
 </main>
