@@ -55,7 +55,7 @@
 <Header />
 
 <main class="flex min-h-screen flex-col">
-	<section class="mx-auto max-w-230 flex-1 p-4">
+	<section class="mx-auto w-screen max-w-230 flex-1 p-4">
 		<div class="mt-20 flex flex-col">
 			{#each messages as msg}
 				<ChatBubble role={msg.role} content={msg.content} researchers={msg.researchers} />
