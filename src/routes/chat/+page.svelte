@@ -4,7 +4,6 @@
 	import ChatBubble from '$lib/chat/ChatBubble.svelte';
 	import { onMount } from 'svelte';
 	import Header from '$lib/ui/Header.svelte';
-	import ResearcherCard from '$lib/chat/ResearcherCard.svelte';
 
 	interface Message {
 		role: 'user' | 'ai';
@@ -57,34 +56,14 @@
 
 <main class="flex min-h-screen flex-col">
 	<section class="mx-auto max-w-230 flex-1 p-4">
-		<!-- <div class="mt-20 flex flex-col gap-12 md:gap-20">
-			<ChatBubble role={'user'} content={'Show me mathematicians'} />
-			<ChatBubble
-				role={'ai'}
-				content={'For queries related to mathematics, Mark Haring would be the most relevant researcher. His work on the stability bounds of Kalman filters and input-to-state stability provides a strong mathematical foundation in these areas. If your math question pertains to these topics or related systems theory, he would be well suited to assist.'}
-			/>
-			<ChatBubble role={'user'} content={'Show me mathematicians'} />
-			<ChatBubble
-				role={'ai'}
-				content={'For queries related to mathematics, Mark Haring would be the most relevant researcher. His work on the stability bounds of Kalman filters and input-to-state stability provides a strong mathematical foundation in these areas. If your math question pertains to these topics or related systems theory, he would be well suited to assist.'}
-			/>
-			<ChatBubble role={'user'} content={'Show me mathematicians'} />
-			<ChatBubble
-				role={'ai'}
-				content={'For queries related to mathematics, Mark Haring would be the most relevant researcher. His work on the stability bounds of Kalman filters and input-to-state stability provides a strong mathematical foundation in these areas. If your math question pertains to these topics or related systems theory, he would be well suited to assist.'}
-			/>
-			<ResearcherCard
-				name="Magnus Stalhane"
-				description="Professor, Department of Industrial Economics and Technology Management"
-				score="9.28"
-			/> -->
-
 		<div class="mt-20 flex flex-col">
 			{#each messages as msg}
 				<ChatBubble role={msg.role} content={msg.content} researchers={msg.researchers} />
 			{/each}
 		</div>
-		<!-- </div> -->
+		{#if messages[messages.length - 1] && messages[messages.length - 1].role === 'user'}
+			<p>please wait! getting your response.</p>
+		{/if}
 	</section>
 </main>
 

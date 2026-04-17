@@ -1,7 +1,10 @@
 <script lang="ts">
 	import ResearcherCard from './ResearcherCard.svelte';
 	import chatSymbol from '$lib/assets/chat_symbol.svg';
+	import Scramble from '$lib/actions/Scramble.svelte';
+	import { fly } from 'svelte/transition';
 	let { role, content, researchers = [] } = $props();
+	let animationDone = $state(false);
 </script>
 
 {#if role === 'user'}
@@ -17,17 +20,19 @@
 		<div class="mb-2 flex w-fit max-w-175.5 flex-col gap-4 md:mb-6 md:flex-row">
 			<img src={chatSymbol} alt="AID's chat symbol" class="mt-1 size-5 rounded-sm bg-off-black" />
 			<p class="font-[IBM_Mono] text-[1rem] leading-6 font-normal tracking-[0.32px] text-black">
-				{content}
+				<Scramble text={content} speed="fast" typeOn onDone={() => (animationDone = true)} />
 			</p>
 		</div>
-		{#if researchers.length > 0}
+		{#if animationDone && researchers.length > 0}
 			<li class="flex flex-col gap-2">
-				{#each researchers as r}
-					<ResearcherCard
-						name={r[0].replace(/_/g, ' ')}
-						description="This is a test description, we're just trying something out"
-						score={r[1].toFixed(2)}
-					/>
+				{#each researchers as r, i}
+					<div in:fly={{ y: 10, duration: 350, delay: i * 100 }}>
+						<ResearcherCard
+							name={r[0].replace(/_/g, ' ')}
+							description="This is a test description, we're just trying something out"
+							score={r[1].toFixed(2)}
+						/>
+					</div>
 				{/each}
 			</li>
 		{/if}
