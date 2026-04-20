@@ -1,21 +1,21 @@
 <script lang="ts">
 	import Link from '$lib/ui/Link.svelte';
+	import { management_data } from '$lib/data/management';
 
-	let {
-		pfp = 'aiD_profile_picture_black.png',
-		name,
-		description,
-		score,
-		link1 = '',
-		link2 = ''
-	} = $props();
+	// need to pass in professional site links
+	let { name, score } = $props();
 
-	const imagePath = $derived(`src/lib/assets/${pfp}`);
+	const researcher_data = management_data.find((p) => p.name.toLowerCase() === name.toLowerCase());
+
+	const imageSrc = researcher_data?.image || 'src/lib/assets/aiD_profile_picture_black.png';
+	const description = researcher_data
+		? `${researcher_data?.title}, ${researcher_data?.affiliation} `
+		: 'Researcher';
 </script>
 
 <div class="divide-solid divide-off-black overflow-hidden rounded-lg bg-white">
 	<div class="flex flex-col gap-3 p-3 md:flex-row md:items-center">
-		<img src={imagePath} alt="Researcher {name}" class="w-20 rounded-lg select-none" />
+		<img src={imageSrc} alt="Researcher {name}" class="w-20 rounded-lg select-none" />
 		<div>
 			<p class="mb-1 font-[Milling] leading-6 font-bold">{name}</p>
 			<p class="font-[IBM_Mono] text-[14px] leading-4.5 font-normal tracking-[0.28px]">
