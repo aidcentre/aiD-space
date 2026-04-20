@@ -6,7 +6,17 @@
 	import { fly } from 'svelte/transition';
 	import { onMount } from 'svelte';
 
-	let { role, content, researchers = [], researcher_info = [] } = $props();
+	let {
+		role,
+		content,
+		researchers = [],
+		onnewchat
+	}: {
+		role: 'user' | 'ai';
+		content: string;
+		researchers?: [string, number][];
+		onnewchat?: () => void;
+	} = $props();
 	let animationDone = $state(false);
 	let userBubble = $state<HTMLDivElement>();
 
@@ -47,7 +57,7 @@
 					</div>
 				{/each}
 			</li>
+			<NewChatButton onclick={onnewchat} />
 		{/if}
-		<NewChatButton />
 	</div>
 {/if}

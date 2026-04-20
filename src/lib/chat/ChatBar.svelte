@@ -37,7 +37,7 @@
 				<button
 					class="ease-out-expo pointer-events-auto absolute top-1/2 right-2 flex aspect-square -translate-y-1/2 cursor-pointer items-center justify-center rounded-lg bg-off-black p-1.5 leading-0 text-white transition-colors duration-800 group-hover:bg-light-grey md:p-2"
 					aria-label="Search scientists // Research topics, names or anything else"
-					onclick={handleSubmit}
+					type="submit"
 				>
 					<ArrowRightIcon
 						class="ease-out-expo h-3 w-3 transition-colors duration-800 group-hover:fill-off-black lg:h-4 lg:w-4"

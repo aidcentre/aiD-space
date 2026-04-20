@@ -3,22 +3,21 @@
 	import ChatBar from '$lib/chat/ChatBar.svelte';
 	import ChatBubble from '$lib/chat/ChatBubble.svelte';
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import Header from '$lib/ui/Header.svelte';
 
 	interface Message {
 		role: 'user' | 'ai';
 		content: string;
-		researchers?: string[];
+		researchers?: [string, number][];
 		researcherInfo?: string[];
 	}
 
 	let messages = $state<Message[]>([]);
-	// data passed in from +page.ts into this directory:
 	let { data }: PageProps = $props();
-
 	async function get_llm_response(query: string) {
 		console.log('messages??!! check that length not equal to 0 -----> ', messages);
-		const q = messages.length === 0 ? data.query : query;
+		const q = query || data.query;
 		console.log('ok so then what is query?', query);
 		if (!q) return;
 
@@ -60,7 +59,15 @@
 	<section class="mx-auto w-screen max-w-230 flex-1 p-4">
 		<div class="mt-20 flex flex-col">
 			{#each messages as msg}
-				<ChatBubble role={msg.role} content={msg.content} researchers={msg.researchers} />
+				<ChatBubble
+					role={msg.role}
+					content={msg.content}
+					researchers={msg.researchers}
+					onnewchat={() => {
+						messages = [];
+						goto('/chat', { replaceState: true });
+					}}
+				/>
 			{/each}
 		</div>
 		{#if messages[messages.length - 1] && messages[messages.length - 1].role === 'user'}
