@@ -3,13 +3,24 @@
 	import chatSymbol from '$lib/assets/chat_symbol.svg';
 	import Scramble from '$lib/actions/Scramble.svelte';
 	import { fly } from 'svelte/transition';
+	import { onMount } from 'svelte';
+
 	let { role, content, researchers = [] } = $props();
 	let animationDone = $state(false);
+	let userBubble = $state<HTMLDivElement>();
+
+	onMount(() => {
+		if (role === 'user') {
+			// TODO: make it scroll higher (to top of screen)
+			userBubble?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		}
+	});
 </script>
 
 {#if role === 'user'}
 	<div
-		class="mb-18 w-fit self-end rounded-3xl bg-white px-4 py-3 font-[IBM_Math] text-[1rem] leading-6 font-normal tracking-[0.32px] text-black md:rounded-[46px]"
+		bind:this={userBubble}
+		class="mb-18 w-fit scroll-mt-24 self-end rounded-3xl bg-white px-4 py-3 font-[IBM_Math] text-[1rem] leading-6 font-normal tracking-[0.32px] text-black md:rounded-[46px]"
 	>
 		{content}
 	</div>
@@ -26,7 +37,7 @@
 		{#if animationDone && researchers.length > 0}
 			<li class="flex flex-col gap-2">
 				{#each researchers as r, i}
-					<div in:fly={{ y: 10, duration: 350, delay: i * 100 }}>
+					<div in:fly={{ y: 10, duration: 350, delay: i * 500 }}>
 						<ResearcherCard
 							name={r[0].replace(/_/g, ' ')}
 							description="This is a test description, we're just trying something out"

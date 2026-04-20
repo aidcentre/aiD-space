@@ -62,7 +62,7 @@
 			{/each}
 		</div>
 		{#if messages[messages.length - 1] && messages[messages.length - 1].role === 'user'}
-			<p>please wait! getting your response.</p>
+			<p class="mb-20">please wait! getting your response.</p>
 		{/if}
 	</section>
 </main>
