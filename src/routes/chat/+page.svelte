@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import Header from '$lib/ui/Header.svelte';
+	import Scramble from '$lib/actions/Scramble.svelte';
 
 	interface Message {
 		role: 'user' | 'ai';
@@ -71,7 +72,12 @@
 			{/each}
 		</div>
 		{#if messages[messages.length - 1] && messages[messages.length - 1].role === 'user'}
-			<p class="animate-waiting mb-20 font-[IBM_Mono]">Please wait! Getting your response.</p>
+			<Scramble
+				text="Please wait! Getting your response."
+				speed="slow"
+				loop={1500}
+				class="mb-20 font-[IBM_Mono]"
+			/>
 		{/if}
 	</section>
 </main>

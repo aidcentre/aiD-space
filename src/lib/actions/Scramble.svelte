@@ -6,6 +6,7 @@
 		speed = 'fast',
 		typeOn = false,
 		onDone = undefined,
+		loop = 0,
 		class: className = ''
 	} = $props<{
 		text?: string;
@@ -13,17 +14,18 @@
 		/** start with empty string? */
 		typeOn?: boolean;
 		onDone?: () => void;
+		/** animation replay delay in ms, 0 means no loop */
+		loop?: number;
 		class?: string;
 	}>();
 
 	const speeds = { fast: 1.2, slow: 0.6 };
 
 	let el = $state<HTMLDivElement | null>(null);
-	let scrambler: ReturnType<typeof useScramble> | null = null;
 
 	$effect(() => {
 		if (!el) return;
-		scrambler = useScramble(el, {
+		const s = useScramble(el, {
 			text,
 			speed: speeds[speed as keyof typeof speeds],
 			tick: 1,
@@ -34,8 +36,12 @@
 			range: [48, 57],
 			seed: 0,
 			overdrive: 9617.0,
-			onAnimationEnd: onDone
+			onAnimationEnd: () => {
+				onDone?.();
+				if (loop > 0) setTimeout(() => s.replay(), loop);
+			}
 		});
+		return () => s.destroy();
 	});
 </script>
 
