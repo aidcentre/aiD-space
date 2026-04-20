@@ -12,6 +12,7 @@ total_retrieved_df = None
 class LLMResponse(BaseModel):
     text_answer: str
     most_relevant_researchers: list[tuple[str, float]]
+    general_researcher_information: list[tuple[str, str]]
 
 
 class ChatMessage(BaseModel):
@@ -41,4 +42,5 @@ async def get_llm_response(body: ChatRequest) -> LLMResponse:
     return LLMResponse(
         text_answer=state.get("text_answer"),
         most_relevant_researchers=state.get("most_relevant_researchers", []),
+        general_researcher_information=state.get("general_researcher_information", []),
     )

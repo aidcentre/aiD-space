@@ -5,7 +5,7 @@
 	import { fly } from 'svelte/transition';
 	import { onMount } from 'svelte';
 
-	let { role, content, researchers = [] } = $props();
+	let { role, content, researchers = [], researcher_info = [] } = $props();
 	let animationDone = $state(false);
 	let userBubble = $state<HTMLDivElement>();
 
@@ -40,8 +40,8 @@
 					<div in:fly={{ y: 10, duration: 350, delay: i * 500 }}>
 						<ResearcherCard
 							name={r[0].replace(/_/g, ' ')}
-							description="This is a test description, we're just trying something out"
 							score={r[1].toFixed(2)}
+							description="Researcher"
 						/>
 					</div>
 				{/each}

@@ -9,6 +9,7 @@
 		role: 'user' | 'ai';
 		content: string;
 		researchers?: string[];
+		researcherInfo?: string[];
 	}
 
 	let messages = $state<Message[]>([]);
@@ -38,7 +39,8 @@
 			messages.push({
 				role: 'ai',
 				content: llmResponse.text_answer,
-				researchers: llmResponse.most_relevant_researchers
+				researchers: llmResponse.most_relevant_researchers,
+				researcherInfo: llmResponse.general_researcher_information
 			});
 			return;
 		} catch (err) {
@@ -62,7 +64,7 @@
 			{/each}
 		</div>
 		{#if messages[messages.length - 1] && messages[messages.length - 1].role === 'user'}
-			<p class="mb-20">please wait! getting your response.</p>
+			<p class="mb-20">Please wait! Getting your response.</p>
 		{/if}
 	</section>
 </main>
