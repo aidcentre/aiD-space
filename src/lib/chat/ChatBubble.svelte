@@ -2,6 +2,7 @@
 	import ResearcherCard from './ResearcherCard.svelte';
 	import chatSymbol from '$lib/assets/chat_symbol.svg';
 	import Scramble from '$lib/actions/Scramble.svelte';
+	import NewChatButton from './NewChatButton.svelte';
 	import { fly } from 'svelte/transition';
 	import { onMount } from 'svelte';
 
@@ -47,5 +48,6 @@
 				{/each}
 			</li>
 		{/if}
+		<NewChatButton />
 	</div>
 {/if}
