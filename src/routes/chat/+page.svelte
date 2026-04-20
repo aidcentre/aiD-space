@@ -64,9 +64,24 @@
 			{/each}
 		</div>
 		{#if messages[messages.length - 1] && messages[messages.length - 1].role === 'user'}
-			<p class="mb-20">Please wait! Getting your response.</p>
+			<p class="animate-waiting mb-20 font-[IBM_Mono]">Please wait! Getting your response.</p>
 		{/if}
 	</section>
 </main>
 
 <ChatBar onsubmit={get_llm_response} />
+
+<style>
+	@keyframes waiting-pulse {
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.2;
+		}
+	}
+	:global(.animate-waiting) {
+		animation: waiting-pulse 3s ease-in-out infinite;
+	}
+</style>
