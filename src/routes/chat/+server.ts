@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
-import { PRIVATE_BACKEND_URL } from '$env/static/private';
+import { env } from '$env/dynamic/private';
+const { PRIVATE_BACKEND_URL } = env;
 
 export async function POST({ request }) {
 	const { messages } = await request.json();
