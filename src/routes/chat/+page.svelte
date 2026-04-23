@@ -17,7 +17,6 @@
 	let messages = $state<Message[]>([]);
 	let { data }: PageProps = $props();
 	async function get_llm_response(query: string) {
-		console.log('messages??!! check that length not equal to 0 -----> ', messages);
 		const q = query || data.query;
 		console.log('ok so then what is query?', query);
 		if (!q) return;
