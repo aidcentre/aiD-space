@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { PUBLIC_BASE_URL } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
+	const { PUBLIC_BASE_URL } = env;
 
 	let title = 'Norwegian Centre on AI for Decisions';
 
