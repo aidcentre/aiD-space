@@ -1,5 +1,8 @@
 {
 	"files.associations": {
 		"*.css": "tailwindcss"
-	}
+	},
+	"python.analysis.extraPaths": [
+		"src/backend/expertise_search/src"
+	]
 }
