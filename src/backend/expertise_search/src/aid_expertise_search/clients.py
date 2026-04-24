@@ -1,9 +1,7 @@
-from sentence_transformers import SentenceTransformer
 from langchain_openai import ChatOpenAI
 from os import getenv
 from dotenv import load_dotenv
 from pydantic import SecretStr
-import bm25s
 
 load_dotenv()
 
@@ -34,5 +32,15 @@ class _Lazy:
         return getattr(self._load(), name)
 
 
-embedding_model = _Lazy(lambda: SentenceTransformer("sentence-transformers/all-mpnet-base-v2"))
-bm25_retriever = _Lazy(lambda: bm25s.BM25.load("src/aid_expertise_search/datasets/bm25"))
+def _load_embedding_model():
+    from sentence_transformers import SentenceTransformer
+    return SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
+
+
+def _load_bm25_retriever():
+    import bm25s
+    return bm25s.BM25.load("src/aid_expertise_search/datasets/bm25")
+
+
+embedding_model = _Lazy(_load_embedding_model)
+bm25_retriever = _Lazy(_load_bm25_retriever)
