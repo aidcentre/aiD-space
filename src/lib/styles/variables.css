@@ -1,0 +1,14 @@
+:root {
+	/* =========== Color System =========== */
+
+	/* Greys */
+	--off-black: rgb(5, 5, 5);
+	--darker-grey: rgb(34, 34, 34);
+	--mid-dark-grey: rgb(51, 51, 51);
+	--dark-grey: rgb(63, 63, 63);
+	--grey: rgb(96, 96, 96);
+	--greyed-out: rgb(102, 102, 102);
+	--medium-grey: rgb(150, 150, 150);
+	--hover-grey: rgb(221, 221, 221);
+	--light-grey: rgb(232, 232, 232);
+}
