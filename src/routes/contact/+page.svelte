@@ -4,9 +4,10 @@
 	import Footer from '$lib/ui/Footer.svelte';
 	import ContactHero from '$lib/ui/ContactHero.svelte';
 	import ContactBlocks from '$lib/blocks/ContactBlocks.svelte';
-	import { page as pageState } from '$app/state';
+	import type { PageData } from './$types';
 
-	const contact = $derived(pageState.data.contact);
+	let { data }: { data: PageData } = $props();
+	const contact = $derived(data.contact);
 	const hasBlocks = $derived((contact?.contentBlocks?.length ?? 0) > 0);
 </script>
 

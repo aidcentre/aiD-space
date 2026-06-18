@@ -4,9 +4,10 @@
 	import Footer from '$lib/ui/Footer.svelte';
 	import Header from '$lib/ui/Header.svelte';
 	import Menu from '$lib/ui/Menu.svelte';
-	import { page as pageState } from '$app/state';
+	import type { PageData } from './$types';
 
-	const pageDoc = $derived(pageState.data.page);
+	let { data }: { data: PageData } = $props();
+	const pageDoc = $derived(data.page);
 </script>
 
 <Header />

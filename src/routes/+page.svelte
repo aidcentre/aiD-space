@@ -5,9 +5,10 @@
 	import NodeSphere from '$lib/ui/NodeSphere.svelte';
 	import { menuOpen } from '$lib/stores/menu';
 	import HomeText from '$lib/ui/HomeText.svelte';
-	import { page } from '$app/state';
+	import type { PageData } from './$types';
 
-	const home = $derived(page.data.home);
+	let { data }: { data: PageData } = $props();
+	const home = $derived(data.home);
 </script>
 
 <div class="fixed inset-0 -mt-24">
