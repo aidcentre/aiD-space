@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Opening } from '$lib/sanity/types';
 	import Scramble from '$lib/actions/Scramble.svelte';
+	import ArrowUpRight from 'phosphor-svelte/lib/ArrowUpRight';
 	import { formatDate } from '$lib/utils';
 
 	let { opening }: { opening: Opening } = $props();
@@ -23,6 +24,9 @@
 			text={opening.title ?? ''}
 			speed="slow"
 			class="text-md md:text-lg lg:text-xl font-bold leading-snug text-off-black group-hover:text-white transition-colors duration-800 ease-out-expo"
+		/>
+		<ArrowUpRight
+			class="ml-auto shrink-0 self-start w-4.5 h-4.5 md:w-5 md:h-5 lg:w-6 lg:h-6 text-off-black group-hover:text-white transition-colors duration-800 ease-out-expo"
 		/>
 	</div>
 	{#if opening.department}
