@@ -54,7 +54,7 @@ export interface PartnerBucketEntry extends Partner {
 
 export interface NavigationItem {
 	_id: string;
-	_type: 'home' | 'contact' | 'page' | 'careers';
+	_type: 'home' | 'contact' | 'page' | 'careers' | 'events';
 	title: string;
 	url: string;
 }
@@ -201,4 +201,42 @@ export interface Opening {
 export interface CareersDocument extends Seo {
 	_id: 'careers';
 	openings?: Opening[];
+}
+
+export type EventType = 'conference' | 'workshop' | 'webinar' | 'talk' | 'meetup';
+
+/** An employee reference or an inline guest speaker — both flatten to the same shape. */
+export interface EventSpeaker {
+	_key: string;
+	name?: string;
+	role?: string;
+	image?: SanityImage;
+}
+
+export interface AidEvent {
+	_id: string;
+	title?: string;
+	slug?: string;
+	excerpt?: string;
+	/** ISO datetime strings from Sanity's `datetime` fields. */
+	startDate?: string;
+	endDate?: string;
+	eventType?: EventType;
+	isOnline?: boolean;
+	location?: {
+		venue?: string;
+		city?: string;
+		country?: string;
+	};
+	image?: SanityImage;
+	body?: PortableTextBlock[];
+	registrationUrl?: string;
+	speakers?: EventSpeaker[];
+	partners?: PartnerBucketEntry[];
+	featured?: boolean;
+}
+
+export interface EventsDocument extends Seo {
+	_id: 'events';
+	introduction?: string;
 }

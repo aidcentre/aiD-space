@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
+	import { dev } from '$app/environment';
 	import { page } from '$app/state';
 	import { menuOpen } from '$lib/stores/menu';
 	import NodeSphere from './NodeSphere.svelte';
@@ -11,7 +12,14 @@
 	const settings = $derived(page.data.settings);
 	const email = $derived(settings?.contactInformation?.email);
 	const phone = $derived(settings?.contactInformation?.phone);
-	const navigation = $derived(settings?.navigation ?? []);
+	// Dev-only fallback: show Events until it's added to Settings → Navigation in the studio.
+	const navigation = $derived.by(() => {
+		const items = settings?.navigation ?? [];
+		if (dev && !items.some((item) => item._type === 'events')) {
+			return [...items, { _id: 'events-dev-preview', _type: 'events' as const, title: 'Events', url: '/events' }];
+		}
+		return items;
+	});
 </script>
 
 {#if $menuOpen}
