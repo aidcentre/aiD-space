@@ -116,8 +116,12 @@
 						{#if cell === null}
 							<div class="w-[0.87890625rem] h-[0.87890625rem]"></div>
 						{:else if cell.events.length}
-							<a
-								href={cell.events[0].slug ? `/events/${cell.events[0].slug}` : '#'}
+							<!-- Only a day with exactly one event links anywhere; a shared day would have to
+							     pick one event arbitrarily, so it stays non-interactive and just shows the tooltip. -->
+							{@const linkable = cell.events.length === 1 && Boolean(cell.events[0].slug)}
+							<svelte:element
+								this={linkable ? 'a' : 'div'}
+								href={linkable ? `/events/${cell.events[0].slug}` : undefined}
 								class="group/day relative flex items-center justify-center"
 							>
 								{#if connectsToPrev}
@@ -144,11 +148,11 @@
 											{#if eventIndex > 0}<span class="font-normal">{' + '}</span>{/if}{event.title}
 										{/each}
 									</div>
-									{#if cell.events.length === 1}
+									{#if linkable}
 										<div class="font-family-mono text-[10.8px] text-white/60">Click to see more info</div>
 									{/if}
 								</div>
-							</a>
+							</svelte:element>
 						{:else}
 							<div class="flex items-center justify-center">
 								<div class="w-[0.87890625rem] h-[0.87890625rem] rounded-sm bg-light-grey"></div>
