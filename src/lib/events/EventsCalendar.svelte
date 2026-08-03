@@ -99,9 +99,9 @@
 </script>
 
 {#if months.length}
-	<div class="grid grid-cols-3 gap-x-4 gap-y-6">
+	<div class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 xl:grid-cols-3">
 		{#each months as grid (`${grid.year}-${grid.month}`)}
-			<div class="flex flex-col rounded-xl bg-white p-3">
+			<div class="flex w-full max-w-[22rem] flex-col rounded-xl bg-white p-3">
 				<div class="font-family-mono text-[12px] font-bold text-off-black mb-1.5">
 					{grid.label}{grid.year !== new Date().getFullYear() ? ` '${String(grid.year).slice(2)}` : ''}
 				</div>

@@ -30,11 +30,11 @@
 				</p>
 			{/if}
 			<div class="mt-12 lg:mt-16">
-				<EventsCalendar events={data.allEvents ?? []} />
+				<EventsList events={data.allEvents ?? []} />
 			</div>
 		</div>
-		<div class="col-span-12 md:col-span-7">
-			<EventsList events={data.allEvents ?? []} />
+		<div class="col-span-12 mt-12 lg:mt-16">
+			<EventsCalendar events={data.allEvents ?? []} />
 		</div>
 	</div>
 </main>
