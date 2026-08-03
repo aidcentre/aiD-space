@@ -14,7 +14,7 @@
 <Menu />
 
 <main>
-	<div class="mx-auto grid max-w-[1920px] grid-cols-12 gap-8 lg:gap-12 px-4 pt-30 md:pt-40 lg:pt-60 mb-30 md:mb-40 lg:mb-60">
+	<div class="mx-auto grid max-w-[1920px] grid-cols-12 gap-4 md:gap-8 lg:gap-12 px-4 pt-30 md:pt-40 lg:pt-60 mb-30 md:mb-40 lg:mb-60">
 		<div class="col-span-12">
 			<div class="w-full h-8 bg-[url('/src/lib/assets/diagonal_squares_black.svg')] bg-center bg-repeat-x pointer-events-none"></div>
 		</div>
