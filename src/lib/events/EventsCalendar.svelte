@@ -99,7 +99,9 @@
 </script>
 
 {#if months.length}
-	<div class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 xl:grid-cols-3">
+	<!-- One column while the calendar sits in the narrow left-hand column; it only has room for
+	     more once the viewport is wide. -->
+	<div class="grid grid-cols-1 gap-x-4 gap-y-6 lg:grid-cols-2 2xl:grid-cols-3">
 		{#each months as grid (`${grid.year}-${grid.month}`)}
 			<div class="flex w-full max-w-[22rem] flex-col rounded-xl bg-white p-3">
 				<div class="font-family-mono text-[12px] font-bold text-off-black mb-1.5">

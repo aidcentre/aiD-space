@@ -18,7 +18,9 @@
 		<div class="col-span-12">
 			<div class="w-full h-8 bg-[url('/src/lib/assets/diagonal_squares_black.svg')] bg-center bg-repeat-x pointer-events-none"></div>
 		</div>
-		<div class="col-span-12 md:col-span-5">
+		<!-- Mobile keeps the DOM order (intro → list → calendar); from md the intro and calendar
+		     stack in the left column with the list alongside them on the right. -->
+		<div class="col-span-12 md:col-span-5 md:col-start-1 md:row-start-2">
 			<Scramble
 				text="Events"
 				speed="slow"
@@ -29,11 +31,11 @@
 					{data.events.introduction}
 				</p>
 			{/if}
-			<div class="mt-12 lg:mt-16">
-				<EventsList events={data.allEvents ?? []} />
-			</div>
 		</div>
-		<div class="col-span-12 mt-12 lg:mt-16">
+		<div class="col-span-12 md:col-span-7 md:col-start-6 md:row-start-2 md:row-span-2 mt-12 md:mt-0">
+			<EventsList events={data.allEvents ?? []} />
+		</div>
+		<div class="col-span-12 md:col-span-5 md:col-start-1 md:row-start-3 mt-12 lg:mt-16">
 			<EventsCalendar events={data.allEvents ?? []} />
 		</div>
 	</div>
