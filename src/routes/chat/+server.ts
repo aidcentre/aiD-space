@@ -24,8 +24,45 @@ interface ChatMessage {
 	content: string;
 }
 
-export const POST: RequestHandler = async ({ request }) => {
-	const PRIVATE_BACKEND_URL = env.PRIVATE_BACKEND_URL || DEMO_BACKEND_URL;
+/**
+ * Resolve the backend origin from config, falling back to the demo backend when
+ * the configured value cannot possibly work.
+ *
+ * A misconfigured PRIVATE_BACKEND_URL used to fail in a way that pointed
+ * diagnosis in completely the wrong direction: if it named this site's own
+ * origin, the route proxied to itself, the homepage answered POST with 405, and
+ * that 405 was passed straight back to the browser — which reads as "POST isn't
+ * allowed on /chat", i.e. a routing bug, rather than a bad environment variable.
+ * Catching it here keeps the misconfiguration visible in the function logs
+ * instead of disguising it as a broken endpoint.
+ */
+function resolveBackendUrl(raw: string | undefined, selfOrigin: string): string {
+	const candidate = raw?.trim();
+	if (!candidate) return DEMO_BACKEND_URL;
+
+	let parsed: URL;
+	try {
+		parsed = new URL(candidate);
+	} catch {
+		console.error(
+			`PRIVATE_BACKEND_URL is not an absolute URL (${candidate}); falling back to the demo backend`
+		);
+		return DEMO_BACKEND_URL;
+	}
+
+	if (parsed.origin === selfOrigin) {
+		console.error(
+			`PRIVATE_BACKEND_URL points back at this site (${parsed.origin}); falling back to the demo backend`
+		);
+		return DEMO_BACKEND_URL;
+	}
+
+	// Tolerate a trailing slash so the caller can append the path segment.
+	return (parsed.origin + parsed.pathname).replace(/\/+$/, '');
+}
+
+export const POST: RequestHandler = async ({ request, url }) => {
+	const PRIVATE_BACKEND_URL = resolveBackendUrl(env.PRIVATE_BACKEND_URL, url.origin);
 	const BACKEND_API_KEY = env.BACKEND_API_KEY || DEMO_BACKEND_API_KEY;
 
 	const { messages } = (await request.json()) as { messages: ChatMessage[] };
@@ -55,8 +92,14 @@ export const POST: RequestHandler = async ({ request }) => {
 		});
 
 		if (!backendResponse.ok) {
-			console.error('backend returned error status:', backendResponse.status);
-			return json({ error: true }, { status: backendResponse.status });
+			// Deliberately not mirroring the upstream status: this route being
+			// reachable and the backend being healthy are separate facts, and
+			// forwarding e.g. a 405 from upstream makes /chat itself look broken.
+			// 502 says what actually happened — the gateway hop failed.
+			console.error(
+				`backend ${PRIVATE_BACKEND_URL} returned ${backendResponse.status} ${backendResponse.statusText}`
+			);
+			return json({ error: true }, { status: 502 });
 		}
 
 		return json(await backendResponse.json());
