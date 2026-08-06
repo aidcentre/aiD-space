@@ -80,7 +80,7 @@
 <main class="relative z-[1]">
 	<div
 		class="mx-auto flex w-full max-w-200 flex-col px-4 {active
-			? 'min-h-screen pt-28 pb-16'
+			? 'min-h-screen pt-28 pb-4'
 			: 'min-h-screen justify-center'}"
 	>
 		<SearchBar onsubmit={search} {loading} />
@@ -151,6 +151,14 @@
 						/>
 					</div>
 				{/if}
+			</div>
+			<div class="mt-auto pt-12">
+				<p
+					class="mx-auto w-fit max-w-full bg-white px-1 text-center font-family-mono text-[10px] font-light text-off-black md:text-xs"
+					style="box-shadow: 0 0 60px 30px rgba(255, 255, 255, 1);"
+				>
+					You are interacting with an AI system. Responses are AI-generated and may be inaccurate.
+				</p>
 			</div>
 			<div bind:this={bottomAnchor}></div>
 		{/if}

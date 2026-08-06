@@ -53,9 +53,6 @@
 			</button>
 		</div>
 	</form>
-	<p class="px-1 text-center font-family-mono text-[10px] font-light text-grey md:text-xs">
-		You are interacting with an AI system. Responses are AI-generated and may be inaccurate.
-	</p>
 </div>
 
 <style>
