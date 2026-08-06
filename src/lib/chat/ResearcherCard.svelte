@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { management_data } from '$lib/data/management';
+	import profile_placeholder from '$lib/assets/aiD_profile_picture_black.png';
 
 	let { name, score } = $props();
 
 	const researcher_data = management_data.find((p) => p.name.toLowerCase() === name.toLowerCase());
 
-	const imageSrc = researcher_data?.image || 'src/lib/assets/aiD_profile_picture_black.png';
+	const imageSrc = profile_placeholder;
 	const description = researcher_data
 		? `${researcher_data?.title}, ${researcher_data?.affiliation} `
 		: 'Researcher';
