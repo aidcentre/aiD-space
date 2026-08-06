@@ -1,34 +1,66 @@
 <script lang="ts">
-	import Tooltip from './Tooltip.svelte';
-	import ArrowRight from "phosphor-svelte/lib/ArrowRight"; 
-	import { page } from '$app/state';
+	import ArrowRight from 'phosphor-svelte/lib/ArrowRight';
 
-	const home = $derived(page.data.home);
+	let { onsubmit, loading = false }: { onsubmit: (query: string) => void; loading?: boolean } =
+		$props();
+
+	let userQuery = $state('');
+
+	function handleSubmit() {
+		const q = userQuery.trim();
+		if (!q || loading) return;
+		userQuery = '';
+		onsubmit(q);
+	}
 </script>
 
-<div
-	class="group absolute top-1/2 left-1/2 -mt-8 flex w-full px-4 max-w-200 -translate-x-1/2 -translate-y-1/2 flex-col gap-3"
->
-	{#if home?.externalUrl}
-		<Tooltip content="Click to open the aiD Expertise Search in a new tab" position="bottom">
-	<a
-		class="relative flex w-full flex-col bg-white rounded-xl cursor-pointer"
-		href={home?.externalUrl}
-		target="_blank"
+<div class="group flex w-full flex-col gap-3">
+	<form
+		onsubmit={(event) => {
+			event.preventDefault();
+			handleSubmit();
+		}}
+		class="relative flex w-full flex-col rounded-xl bg-white"
 	>
-		<div class="font-family-mono text-xs md:text-sm lg:text-base border-b border-light-grey px-3 py-3 md:px-4 md:py-3 select-none">
-			Search scientists // <span class="text-dark-grey">Research topics, names, or anything else</span>
-		</div>
-		<div class="relative font-family-mono text-xs md:text-sm lg:text-base text-grey px-3 py-3 md:px-4 md:py-3 flex items-center justify-between select-none">
-			Your query
-			<button
-				class="absolute top-1/2 right-2 flex -translate-y-1/2 cursor-pointer items-center justify-center rounded-lg bg-off-black text-white p-1.5 md:p-2 leading-0 aspect-square pointer-events-auto group-hover:bg-light-grey transition-colors duration-800 ease-out-expo"
-				aria-label="Search scientists // Research topics, names, or anything else"
+		<div
+			class="border-b border-light-grey px-3 py-3 font-family-mono text-xs select-none md:px-4 md:py-3 md:text-sm lg:text-base"
+		>
+			Search scientists // <span class="text-dark-grey"
+				>Research topics, names, or anything else</span
 			>
-				<ArrowRight class="w-3 h-3 lg:w-4 lg:h-4 group-hover:fill-off-black transition-colors duration-800 ease-out-expo" />
+		</div>
+		<div
+			class="relative flex items-center justify-between px-3 py-3 font-family-mono text-xs text-grey md:px-4 md:py-3 md:text-sm lg:text-base"
+		>
+			<input
+				bind:value={userQuery}
+				name="userQuery"
+				type="text"
+				placeholder="Your query"
+				autocomplete="off"
+				disabled={loading}
+				class="w-full cursor-text rounded-lg border-none bg-white p-0 pr-10 font-family-mono text-xs font-light text-grey focus:outline-none disabled:cursor-not-allowed md:text-sm lg:text-base"
+			/>
+			<button
+				class="ease-out-expo pointer-events-auto absolute top-1/2 right-2 flex aspect-square -translate-y-1/2 cursor-pointer items-center justify-center rounded-lg bg-off-black p-1.5 leading-0 text-white transition-colors duration-800 group-hover:bg-light-grey disabled:cursor-not-allowed disabled:opacity-60 md:p-2"
+				aria-label="Search scientists // Research topics, names, or anything else"
+				type="submit"
+				disabled={loading}
+			>
+				<ArrowRight
+					class="ease-out-expo h-3 w-3 transition-colors duration-800 group-hover:fill-off-black lg:h-4 lg:w-4"
+				/>
 			</button>
 		</div>
-		</a>
-		</Tooltip>
-	{/if}
+	</form>
+	<p class="px-1 text-center font-family-mono text-[10px] font-light text-grey md:text-xs">
+		You are interacting with an AI system. Responses are AI-generated and may be inaccurate.
+	</p>
 </div>
+
+<style>
+	input:focus {
+		box-shadow: none !important;
+		outline: none;
+	}
+</style>

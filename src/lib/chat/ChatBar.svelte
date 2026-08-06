@@ -25,14 +25,14 @@
 			class="relative flex w-full cursor-pointer flex-col rounded-xl bg-white"
 		>
 			<div
-				class="font-family-mono text-grey relative flex items-center justify-between px-3 py-3 text-xs select-none md:px-4 md:py-3 md:text-sm lg:text-base"
+				class="relative flex items-center justify-between px-3 py-3 font-family-mono text-xs text-grey select-none md:px-4 md:py-3 md:text-sm lg:text-base"
 			>
 				<input
 					bind:value={userQuery}
 					name="userQuery"
 					type="text"
 					placeholder="Your query"
-					class="font-family-mono text-grey w-full cursor-text rounded-lg border-none bg-white p-0 text-xs font-light focus:outline-none md:text-sm lg:text-base"
+					class="w-full cursor-text rounded-lg border-none bg-white p-0 font-family-mono text-xs font-light text-grey focus:outline-none md:text-sm lg:text-base"
 				/>
 				<button
 					class="ease-out-expo pointer-events-auto absolute top-1/2 right-2 flex aspect-square -translate-y-1/2 cursor-pointer items-center justify-center rounded-lg bg-off-black p-1.5 leading-0 text-white transition-colors duration-800 group-hover:bg-light-grey md:p-2"
@@ -45,6 +45,9 @@
 				</button>
 			</div>
 		</form>
+		<p class="px-1 text-center font-family-mono text-[10px] font-light text-grey md:text-xs">
+			You are interacting with an AI system. Responses are AI-generated and may be inaccurate.
+		</p>
 	</div>
 </div>
 
