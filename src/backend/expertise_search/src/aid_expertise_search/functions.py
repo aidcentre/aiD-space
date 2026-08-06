@@ -1,25 +1,23 @@
+from functools import lru_cache
 from typing import List, Union
-import numpy as np
-import pandas as pd
-from importlib import resources
-from aid_expertise_search.classes import AreaOfQuery, Authors, State, MemoryState
-from aid_expertise_search.clients import strong_client
-import aid_expertise_search.clients as _clients
-import bm25s
-import pymupdf.layout  # this line is important even if the code interface shows that we don't use it
-import pymupdf4llm
 import collections
 import re
-from nltk.corpus import stopwords
-from nltk import download as nltk_download
 
-nltk_download("stopwords", quiet=True)
-stop_words = set(stopwords.words("english") + ["et", "al", "picture", "text", "x"])
+import pandas as pd
+from importlib import resources
+
+from aid_expertise_search import azure_store
+from aid_expertise_search.classes import AreaOfQuery, Authors, State, MemoryState
+from aid_expertise_search.clients import strong_client
 
 
 def load_dataframe(filename: str) -> pd.DataFrame:
     """
-    Returns pandas Dataframe from pickle file
+    Returns pandas Dataframe from pickle file.
+
+    Only used by the legacy local Streamlit path (graph.py, app.py). The
+    deployed FastAPI backend reads from Cosmos instead, so the pickles are not
+    shipped in the container image.
     """
     with (
         resources.files("aid_expertise_search.datasets")
@@ -29,7 +27,22 @@ def load_dataframe(filename: str) -> pd.DataFrame:
         return pd.read_pickle(f)
 
 
-list_of_aid_researchers = load_dataframe("researcher_information.pkl")["name"].to_list()
+@lru_cache(maxsize=1)
+def aid_researchers() -> List[str]:
+    """
+    The AID researcher roster.
+
+    Reads from Cosmos when it is configured, and falls back to the pickle
+    otherwise so the offline Streamlit tools keep working without Azure
+    credentials. Cached for the life of the process: the roster is static and
+    this is on the path of every request.
+    """
+    from aid_expertise_search.config import settings
+
+    if settings.cosmos_endpoint:
+        return azure_store.list_researchers()
+    return load_dataframe("researcher_information.pkl")["name"].to_list()
+
 
 """
 Specific Language Model Calls
@@ -52,7 +65,7 @@ def get_scientific_area(query: Union[str, List[tuple[str, str]]]) -> AreaOfQuery
         }
     ]
 
-    if type(query) == str:
+    if isinstance(query, str):
         prompt.extend([{"role": "user", "content": query}])
     else:
         prompt.extend(
@@ -86,7 +99,7 @@ def get_authors_name(query: Union[str, List[tuple[str, str]]]) -> Authors:
         }
     ]
 
-    if type(query) == str:
+    if isinstance(query, str):
         prompt.extend([{"role": "user", "content": query}])
     else:
         prompt.extend(
@@ -108,7 +121,14 @@ def read_pdf_to_chunks(filename: str, chunk_lim: int = -1) -> tuple[str, List[st
     If chunk_lim is set to a different number, it has to be larger than or equal to 100,
     then this is the minimum number of characters in a chunk
     returns (full_text: str, chunks: List[str])
+
+    PyMuPDF is imported lazily so the deployed container does not need it: the
+    backend only ever queries an already-built index.
     """
+    import pymupdf
+    import pymupdf.layout  # noqa: F401  needed for layout-aware extraction
+    import pymupdf4llm
+
     if chunk_lim == -1:
         pages = [
             page["text"]
@@ -182,47 +202,14 @@ def filter_AID_authors(authors: List[str]) -> List[str]:
     """
 
     return_list = []
+    roster = aid_researchers()
 
     for a in authors:
-        possible_name, check = name_in(a, name_list=list_of_aid_researchers)
+        possible_name, check = name_in(a, name_list=roster)
         if check:
             return_list.append(possible_name)
 
     return return_list
-
-
-def max_cosine_for_document(embedded_chunks, vector) -> Union[np.ndarray, np.float64]:
-    """
-    Computes the maximum cosine similarity between a vector and a set of embedded chunks for each article.
-    """
-    similarities = np.dot(embedded_chunks, vector)
-    norm_product = np.linalg.norm(embedded_chunks, axis=-1) * np.linalg.norm(vector)
-    return np.max(similarities / norm_product, axis=-1)
-
-
-def retrieval(df, vector, n_min=3, n_max=-1) -> pd.DataFrame:
-    """
-    Retrieves the most relevant documents from the dataframe based on cosine similarity to the given vector
-    """
-
-    df["cosine"] = df["chunk_embeddings"].apply(
-        lambda x: max_cosine_for_document(x, vector)
-    )
-
-    n_docs = len(df)
-
-    closest_cosines = np.sort(df["cosine"])[::-1][: min(n_min, n_docs - 1)]
-    threshold = min([0.5, np.mean(closest_cosines) - 0.1, np.min(closest_cosines)])
-    if n_max != -1:
-        smallest_cosine_allowed = np.sort(df["cosine"])[::-1][
-            min(n_max - 1, n_docs - 1)
-        ]
-        if threshold < smallest_cosine_allowed:
-            threshold = smallest_cosine_allowed
-    if threshold < 0.2:
-        threshold = 0.2
-
-    return df[df["cosine"] >= threshold]
 
 
 def find_mentioned_researchers(
@@ -233,7 +220,7 @@ def find_mentioned_researchers(
     """
     Returns List of most relevant researchers to generate individual texts about their relevance.
     If mode == 'mentioned_most_relevant'  -> then return the researchers in 'most_relevant_researchers' that are also mentioned in the ai text answer,
-    If mode == 'mentioned_aid_list'       -> then return the researchers in 'list_of_aid_researchers' that are also mentioned in the ai text answer
+    If mode == 'mentioned_aid_list'       -> then return the researchers in the AID roster that are also mentioned in the ai text answer
     If mode == 'most_relevant'            -> then return the researchers in 'most_relevant_researchers'
     """
 
@@ -257,7 +244,7 @@ def find_mentioned_researchers(
                 if existence:
                     mentioned_researchers.append(researcher)
         else:
-            for researcher in list_of_aid_researchers:
+            for researcher in aid_researchers():
                 name, existence = name_in(researcher, n_grams)
                 if existence:
                     mentioned_researchers.append(researcher)
@@ -270,76 +257,20 @@ def find_mentioned_researchers(
 def get_most_frequent_n_grams(text, n=2, top_n=10):
     """
     Returns the top bigrams in a text as List[tuple(bigram, times)]
+
+    NLTK is imported lazily so the container does not need the stopwords corpus.
     """
+    from nltk.corpus import stopwords
+    from nltk import download as nltk_download
+
+    nltk_download("stopwords", quiet=True)
+    stop_words = set(stopwords.words("english") + ["et", "al", "picture", "text", "x"])
 
     clean_text = re.sub(r"[^a-zA-ZæøåÆØÅ\s]", "", text)
     words = [word for word in clean_text.split() if word not in stop_words]
     bigrams = zip(*[words[i:] for i in range(n)])
     bigram_counts = collections.Counter(bigrams)
     return bigram_counts.most_common(top_n)
-
-
-def bm25_retrieval(df, query, k=0):
-    """
-    Returns a dataframe of documents, scored after relevance, based on the BM25 algorithm.
-
-    if k == 0: (default)
-        then returns full df, with each document scored
-    else:
-        then returns the k most relevant documents, with each document scored
-    """
-
-    query_tokens = bm25s.tokenize(query)
-
-    if k == 0:
-        num_docs = _clients.bm25_retriever.scores["num_docs"]
-    else:
-        num_docs = k
-
-    docs, scores = _clients.bm25_retriever.retrieve(query_tokens, sorted=True, k=num_docs)
-    doc_numbers, doc_scores = docs[0], scores[0]
-    index_to_score = {}
-
-    for i, s in zip(doc_numbers, doc_scores):
-        index_to_score[i] = s
-
-    df["bm25"] = df["index"].apply(lambda x: index_to_score.get(x, 0))
-    relevant_df = df[df["index"].isin(doc_numbers)]
-    return relevant_df
-
-
-def gather_relevance_score(df, square=True, gamma=0.2):
-
-    authors_article_score = {}
-    authors_total_n_papers = {}
-    authors_relevance_score = {}
-    authors_set = set()
-
-    for a in df["name"]:
-        authors_total_n_papers[a] = authors_total_n_papers.get(a, 0) + 1
-
-    for a, score in zip(df["name"], df["score"]):
-        authors_set.add(a)
-        if square:
-            authors_article_score[a] = (
-                authors_article_score.get(a, 0) + (1 + score) ** 2 - 1
-            )
-        else:
-            authors_article_score[a] = authors_article_score.get(a, 0) + score
-
-    max_n_papers = 0
-    for a in authors_set:
-        if authors_total_n_papers[a] > max_n_papers:
-            max_n_papers = authors_total_n_papers[a]
-
-    for a in authors_set:
-        authors_relevance_score[a] = (
-            100
-            * authors_article_score[a]
-            / (authors_total_n_papers[a] * max_n_papers) ** gamma
-        )
-
-    return authors_relevance_score
 
 
 """
@@ -354,5 +285,5 @@ def information_node(state: Union[State, MemoryState]) -> Union[State, MemorySta
     query = state.get("query")
     scientific_area = get_scientific_area(query)
     authors = get_authors_name(query)
-    aid_researchers = filter_AID_authors(authors.name_of_employees)
-    return {"researchers": aid_researchers, "scientific_area": scientific_area}
+    aid_matched = filter_AID_authors(authors.name_of_employees)
+    return {"researchers": aid_matched, "scientific_area": scientific_area}

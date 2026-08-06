@@ -1,8 +1,6 @@
 <script lang="ts">
-	import Link from '$lib/ui/Link.svelte';
 	import { management_data } from '$lib/data/management';
 
-	// need to pass in professional site links
 	let { name, score } = $props();
 
 	const researcher_data = management_data.find((p) => p.name.toLowerCase() === name.toLowerCase());
@@ -23,33 +21,11 @@
 			</p>
 		</div>
 	</div>
-	<div
-		class="flex flex-row items-center gap-0 divide-x divide-solid divide-light-grey border-t border-light-grey bg-white"
-	>
-		<div class="flex-1 rounded-bl-lg px-3 py-2">
+	<div class="flex flex-row items-center border-t border-light-grey bg-white">
+		<div class="flex-1 rounded-b-lg px-3 py-2">
 			<p class="text-grey font-[IBM_Mono] text-xs leading-4 font-bold">
 				Relevance score: {score}
 			</p>
 		</div>
-		<Link
-			class="shrink-0 px-3 py-2 text-[14px]"
-			href="https://teams.microsoft.com/l/team/19%3AOTSSrCNVkGTBJHl_AzocWwTuuV5ZCNEN7mx4ah62ke41%40thread.tacv2/conversations?groupId=9721146a-0c5c-49cb-a900-198193622f56&tenantId=09a10672-822f-4467-a5ba-5bb375967c05"
-			theme="light"
-			border={false}
-			trailing={true}
-			target="_blank"
-		>
-			NTNU
-		</Link>
-		<Link
-			class="shrink-0 rounded-br-lg px-3 py-2 text-[14px]"
-			href="https://teams.microsoft.com/l/team/19%3AOTSSrCNVkGTBJHl_AzocWwTuuV5ZCNEN7mx4ah62ke41%40thread.tacv2/conversations?groupId=9721146a-0c5c-49cb-a900-198193622f56&tenantId=09a10672-822f-4467-a5ba-5bb375967c05"
-			theme="light"
-			border={false}
-			trailing={true}
-			target="_blank"
-		>
-			GitHub
-		</Link>
 	</div>
 </div>

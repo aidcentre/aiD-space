@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, List
 from typing_extensions import TypedDict
 from pydantic import BaseModel, Field
 import pandas as pd
@@ -20,6 +20,7 @@ States
 """
 
 class State(TypedDict):
+    """Legacy state for the local Streamlit graph (graph.py), which still reads pickles."""
     query: str
     scientific_area: AreaOfQuery
     researchers: List[str]
@@ -28,12 +29,18 @@ class State(TypedDict):
     text_answer: str
 
 class MemoryState(TypedDict):
-    query: List[str]
+    """
+    State for the deployed FastAPI graph.
+
+    Holds no DataFrames and no cross-request state: retrieval runs fresh on
+    every turn against Cosmos, and conversation history arrives from the
+    client in `query`. `documents` is a list of retrieval.RankedDocument.
+    """
+    query: List[tuple[str, str]]
     scientific_area: AreaOfQuery
     researchers: List[str]
     score: dict
-    retrieved_df: pd.DataFrame          # retrieved articles for each message
-    total_retrieved_df: pd.DataFrame    # sum of all retrieved articles in a conversation
+    documents: List[Any]
     text_answer: str
-    most_relevant_researchers: List[tuple[str,float]]
-    general_researcher_information: List[tuple[str,str]]
+    most_relevant_researchers: List[tuple[str, float]]
+    general_researcher_information: List[tuple[str, str]]

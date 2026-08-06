@@ -1,0 +1,27 @@
+.git
+.gitignore
+.gitattributes
+.devcontainer
+.streamlit
+.venv
+venv
+__pycache__
+**/__pycache__
+*.pyc
+*.egg-info
+**/*.egg-info
+
+# Secrets never belong in an image layer.
+.env
+*.env
+
+# The corpus lives in Cosmos and Blob now. Shipping it would add hundreds of
+# megabytes and go stale the moment the index is updated.
+src/aid_expertise_search/datasets/
+
+# Local-only tooling.
+app.py
+memory_app.py
+embedding_program.py
+scripts/
+images/

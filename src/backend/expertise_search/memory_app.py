@@ -1,19 +1,31 @@
+"""
+Terminal REPL against the same graph the FastAPI backend serves.
+
+Requires the Azure environment (.env), since retrieval now runs against Cosmos.
+Conversation history is kept here in the client, matching how the SvelteKit
+frontend does it — the graph itself holds no state between turns.
+"""
+
+import pyfiglet
+
 from aid_expertise_search import memory_graph
 from aid_expertise_search.classes import MemoryState
-import pyfiglet
+from aid_expertise_search.clients import load_models
+from aid_expertise_search.config import settings
 
 print(pyfiglet.figlet_format(text="AID  Expertise  Finder"))
 
-messages = []
+load_models()
+
+messages: list[tuple[str, str]] = []
 query = input("USER: ")
-total_retrieved_df = None
 while query != "":
-    messages.extend([("user", query)])
-    state = memory_graph.memory_stream_graph(
-        MemoryState(query=messages, total_retrieved_df=total_retrieved_df)
+    messages.append(("user", query))
+    state = memory_graph.memory_invoke_graph(
+        MemoryState(query=messages[-settings.max_history_turns * 2 :])
     )
-    total_retrieved_df = state.get("total_retrieved_df")
-    general_researcher_information = state.get("general_researcher_information", [])
+    text_answer = state.get("text_answer") or ""
+    print(f"AI: {text_answer}")
     print(state.get("most_relevant_researchers", []))
-    messages.extend([("ai", state.get("text_answer"))])
+    messages.append(("ai", text_answer))
     query = input("USER: ")
