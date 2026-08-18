@@ -3,8 +3,12 @@ Build the backend image locally and push it to Azure Container Registry.
 
     powershell -ExecutionPolicy Bypass -File scripts\build_and_push.ps1
 
-Used instead of `az acr build` because ACR Tasks is not permitted on this
-subscription (TasksOperationsNotAllowed). Requires Docker Desktop running.
+FALLBACK ONLY. Prefer scripts\azure_deploy.ps1, which uses `az acr build` to
+build server-side — no Docker Desktop and no multi-GB upload. This script
+exists because ACR Tasks was blocked on the old Azure for Students
+subscription (TasksOperationsNotAllowed); use it if that error comes back.
+
+Requires Docker Desktop running.
 
 The first push moves ~2-3 GB and will be slow on a home connection. Later
 pushes are far smaller: torch and the model sit in early, stable layers, so
@@ -13,7 +17,7 @@ only the application layer changes when you edit code.
 
 [CmdletBinding()]
 param(
-    [string]$Registry = 'acrragdemo',
+    [string]$Registry = 'aidrag',
     [string]$Image    = 'aid-backend',
     [string]$Tag      = 'v1'
 )
@@ -54,7 +58,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'docker push failed' }
 
     Write-Host "`n==> Done: $fullTag" -ForegroundColor Green
-    Write-Host 'Next: deploy it with the az containerapp update command in DEPLOY.md step 5.'
+    Write-Host 'Next: powershell -ExecutionPolicy Bypass -File scripts\azure_deploy.ps1 -SkipBuild'
 }
 finally {
     Pop-Location

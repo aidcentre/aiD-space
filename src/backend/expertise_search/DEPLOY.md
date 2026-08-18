@@ -5,7 +5,7 @@ Architecture:
 ```
   Browser
      |  POST /chat
-  SvelteKit (Vercel)  --- adds X-API-Key, trims history to 3 turns
+  SvelteKit (Netlify)  --- adds X-API-Key, trims history to 3 turns
      |  POST /
   Azure Container App  --- FastAPI + LangGraph + all-mpnet-base-v2 (baked in)
      |                     |
@@ -19,43 +19,93 @@ and arrives in the request body.
 
 ---
 
-## 0. Prerequisites
+## Current deployment
 
-You need the Azure CLI. You do **not** need Docker — `az acr build` builds the
-image in Azure.
+| | |
+| --- | --- |
+| Subscription | pay-as-you-go |
+| Resource group | `stf-asc-export` |
+| Container App | `aid-api-rag` (West Europe) |
+| Container Apps environment | `aid-rag-env` (West Europe) |
+| Registry | `aidrag.azurecr.io`, image `aid-backend:v1` |
+| Cosmos DB NoSQL | `aid-rag-search-cosmosdb`, database `RagDB` |
+| Storage account | `aidknowledgebase`, blob container `documents` |
 
-```bash
-winget install --exact --id Microsoft.AzureCLI
-```
+Cosmos and the Container App do not have to share a region, and here they do
+not. The previous deployment also ran split — app in Norway East, Cosmos in
+Germany West Central — because vector search was not available in every region.
 
-Then open a new terminal and sign in:
+This replaced an earlier stack on an Azure for Students subscription
+(resource group `aiD-rag-demo`, app `api-rag-demo`, registry `acrragdemo`,
+Cosmos `cosmosnosqlaidragdemo`, storage `aiddemoknowledgebase`). Nothing was
+copied across accounts: the entire corpus rebuilds from the pickled datasets in
+`src/aid_expertise_search/datasets/`, so migrating is provision + ingest.
+
+---
+
+## The short version
 
 ```bash
 az login
 ```
 
-If you have more than one subscription, pin the right one:
+```bash
+powershell -ExecutionPolicy Bypass -File scripts\azure_deploy.ps1 -CapabilitiesOnly
+```
+
+```bash
+python scripts/provision.py && python scripts/ingest.py
+```
+
+```bash
+powershell -ExecutionPolicy Bypass -File scripts\azure_deploy.ps1
+```
+
+`azure_deploy.ps1` is idempotent — it checks for each resource before creating
+it, so a failed run can be re-run without cleaning up. It reads every secret
+from `.env` and stores none itself.
+
+The rest of this document explains what those steps do and what breaks.
+
+---
+
+## 0. Prerequisites
+
+The Azure CLI. You do **not** need Docker — on a pay-as-you-go subscription
+`az acr build` builds the image server-side.
+
+```bash
+winget install --exact --id Microsoft.AzureCLI
+```
+
+Then open a new terminal, sign in, and pin the subscription if you have more
+than one:
+
+```bash
+az login
+```
 
 ```bash
 az account set --subscription "<subscription name or id>"
 ```
 
+`azure_deploy.ps1` prints the subscription and signed-in user before it changes
+anything. Read that line — deploying into the wrong account is the easiest
+mistake to make here, especially with an old subscription still active.
+
 ---
 
-## 1. Collect these values from the portal
+## 1. Fill in `.env`
 
-Fill them into `.env` (start from `.env.example`).
+Start from `.env.example`.
 
 | Value | Where in the Azure portal |
 | --- | --- |
 | `COSMOS_ENDPOINT` | Cosmos account → **Settings → Keys** → *URI* |
 | `COSMOS_KEY` | Same page → *PRIMARY KEY* (click the eye icon) |
-| `COSMOS_DATABASE` | Cosmos account → **Data Explorer** → the database name above `knowledgebase`. Defaults to `ragdb` |
-| `AZURE_STORAGE_ACCOUNT` | Storage account → **Overview** → the resource name itself |
+| `COSMOS_DATABASE` | Cosmos account → **Data Explorer**. `RagDB` here |
+| `AZURE_STORAGE_ACCOUNT` | Storage account → **Overview** → the resource name |
 | `AZURE_STORAGE_KEY` | Storage account → **Security + networking → Access keys** → *key1 → Key* |
-| ACR login server | Container Registry → **Overview** → *Login server* (`<name>.azurecr.io`) |
-| Resource group name | Any of the above → **Overview** → *Resource group* |
-| Region | Any of the above → **Overview** → *Location* |
 
 Generate the shared secret yourself:
 
@@ -63,164 +113,169 @@ Generate the shared secret yourself:
 python -c "import secrets; print(secrets.token_urlsafe(32))"
 ```
 
-Put it in `BACKEND_API_KEY` in the backend `.env` **and** in the frontend `.env`.
+Put it in `BACKEND_API_KEY` here **and** in the frontend. Generate a fresh one
+per deployment — a key that was valid for a retired backend should not come
+along to the new one.
 
 ---
 
-## 2. Recreate the Cosmos container, then load the data
+## 2. Enable the Cosmos capabilities — do this first
 
-Your `knowledgebase` container has the vector policy but **not** the full-text
-policy or full-text index, and both are fixed at container creation. Hybrid
-search will fail without them. The container is empty, so recreating it costs
-nothing.
+**This is the step that stops a new account cold.** Hybrid search needs a
+vector policy *and* a full-text policy on the chunk container, and each is
+gated behind an account-level capability that is off by default:
+
+- `EnableNoSQLVectorSearch`
+- `EnableNoSQLFullTextSearchPreviewFeatures`
+
+Without them `scripts/provision.py` fails with:
+
+```
+(BadRequest) A Container Vector Policy has been provided, but the capability
+has not been enabled on your account.
+```
+
+A Cosmos key cannot turn these on — it is a control-plane change, so it needs
+`az login`, not `COSMOS_KEY`:
+
+```bash
+powershell -ExecutionPolicy Bypass -File scripts\azure_deploy.ps1 -CapabilitiesOnly
+```
+
+Or in the portal: Cosmos account → **Settings → Features** → enable *Vector
+Search for NoSQL API* and *Full-Text & Hybrid Search for NoSQL API*.
+
+Two things to know if you do it by hand with the CLI:
+
+- `az cosmosdb update --capabilities` **replaces** the list rather than
+  appending to it. Read the current capabilities and pass them all. Dropping
+  `EnableServerless` this way is not recoverable — it cannot be re-added after
+  account creation.
+- Enabling takes a minute or two to propagate. If `provision.py` still fails
+  immediately afterwards, wait and retry before assuming something is wrong.
+
+---
+
+## 3. Create the containers, then load the data
 
 ```bash
 pip install -e ".[ingest]"
 ```
 
 ```bash
-python scripts/provision.py --recreate
+python scripts/provision.py
 ```
 
 That creates:
 
-- `knowledgebase` — partition key `/doc_id`, vector index on `/vector`
+- `KnowledgeBase` — partition key `/doc_id`, vector index on `/vector`
   (`quantizedFlat`, cosine, 768), full-text index on `/text`
 - `documents` — partition key `/doc_id`, document metadata + 2000-char preview
 - `researchers` — partition key `/name`, the 32-person roster
 - Blob container `documents`
 
-Then load the corpus (281 documents, 5,370 chunks — expect a few minutes):
+Pass `--recreate` **only** to drop and rebuild the chunk container. The vector
+and full-text policies are fixed at creation, so a container made before those
+policies existed cannot be fixed in place. On an empty account there is nothing
+to recreate.
+
+Then load the corpus (281 documents, ~5,370 chunks — expect a few minutes):
 
 ```bash
 python scripts/ingest.py
 ```
 
-Verify in **Data Explorer → knowledgebase → Items** that items have both a
-`text` and a `vector` field.
+It upserts under deterministic ids, so it is safe to re-run. Verify in **Data
+Explorer → KnowledgeBase → Items** that items have both a `text` and a
+`vector` field.
 
 ---
 
-## 3. Run it locally against Azure
+## 4. Run it locally against Azure
 
 ```bash
 uvicorn main:app --reload
 ```
 
 ```bash
-curl -s -X POST http://127.0.0.1:8000/ -H "Content-Type: application/json" -d "{\"messages\":[{\"role\":\"user\",\"content\":\"who works on battery degradation modelling\"}]}"
+python scripts/smoke_test.py
 ```
 
-Get a real answer here before deploying — it is far faster to debug locally.
+Get a real answer here before deploying. Debugging a container build is far
+slower than debugging a local process, and at this point the whole data layer
+is already live in Azure — the only untested part is packaging.
 
 ---
 
-## 4. Build the image and push it
+## 5. Build and deploy
 
-`az acr build` does **not** work on this subscription — ACR Tasks is blocked on
-Azure for Students and fails with `TasksOperationsNotAllowed`. The image has to
-be built locally with Docker Desktop and pushed.
+```bash
+powershell -ExecutionPolicy Bypass -File scripts\azure_deploy.ps1
+```
+
+That builds the image with `az acr build`, creates the Container Apps
+environment if absent, and creates or updates the app. First build takes
+~15 minutes; only the build context is uploaded, not the image.
+
+Three settings matter and each one fails quietly:
+
+- **`--target-port 8000`.** The ACA default is 80; uvicorn listens on 8000.
+  Traffic is silently dropped otherwise.
+- **`--min-replicas 1`.** Scale-to-zero means every idle period ends in a cold
+  start that loads a 420 MB model — tens of seconds of user-visible delay.
+- **`--memory 4Gi`.** torch plus the model will not fit in less.
+
+Secrets go in as Container App secrets and are referenced as
+`secretref:openai-key` and friends, so they do not show up as plain env vars in
+`az containerapp show`.
+
+If `az acr build` fails with `TasksOperationsNotAllowed`, ACR Tasks is not
+permitted on the subscription — that was the case on Azure for Students. Build
+locally instead, then redeploy without rebuilding:
 
 ```bash
 powershell -ExecutionPolicy Bypass -File scripts\build_and_push.ps1
 ```
 
-That runs `az acr login`, `docker build --platform linux/amd64` and
-`docker push`. No registry secrets are needed — `az acr login` reuses your
-Azure CLI session.
+```bash
+powershell -ExecutionPolicy Bypass -File scripts\azure_deploy.ps1 -SkipBuild
+```
 
-First run takes ~15 minutes to build and moves 2–3 GB on the push. Later pushes
-are much smaller: torch and the model live in early, stable layers, so editing
-application code only reships the last layer.
-
-Allow the Container App to pull from the registry:
+The script prints the assigned FQDN. Smoke test it:
 
 ```bash
-az acr update --name <acr-name> --admin-enabled true
-```
-
----
-
-## 5. Deploy to the Container App
-
-This project's resources:
-
-| | |
-| --- | --- |
-| Resource group | `aiD-rag-demo` |
-| Container App | `api-rag-demo` |
-| Registry | `acrragdemo.azurecr.io` |
-| Region | `norwayeast` |
-
-The app is still on the `k8se/quickstart` sample image with settings that will
-**not** run this backend — port 80, 0.25 CPU, 0.5 GiB, scale-to-zero. All four
-have to change.
-
-Store the secrets first, so they never appear as plain env vars:
-
-```bash
-az containerapp secret set --name api-rag-demo --resource-group aiD-rag-demo --secrets openai-key="<OPENAI_API_KEY>" cosmos-key="<COSMOS_KEY>" storage-key="<AZURE_STORAGE_KEY>" backend-api-key="<BACKEND_API_KEY>"
-```
-
-Then point it at the image and give it room to run:
-
-```bash
-az containerapp update --name api-rag-demo --resource-group aiD-rag-demo --image acrragdemo.azurecr.io/aid-backend:v1 --cpu 2 --memory 4Gi --min-replicas 1 --max-replicas 3 --set-env-vars OPENAI_API_KEY=secretref:openai-key COSMOS_KEY=secretref:cosmos-key AZURE_STORAGE_KEY=secretref:storage-key BACKEND_API_KEY=secretref:backend-api-key COSMOS_ENDPOINT="<COSMOS_ENDPOINT>" COSMOS_DATABASE=RagDB COSMOS_CHUNKS_CONTAINER=KnowledgeBase AZURE_STORAGE_ACCOUNT="<storage account name>"
-```
-
-Move ingress from port 80 to 8000:
-
-```bash
-az containerapp ingress enable --name api-rag-demo --resource-group aiD-rag-demo --type external --target-port 8000 --transport auto
-```
-
-Give the app permission to pull from the registry:
-
-```bash
-az containerapp registry set --name api-rag-demo --resource-group aiD-rag-demo --server acrragdemo.azurecr.io --identity system
-```
-
-Three settings matter and are easy to get wrong:
-
-- **`--target-port 8000`.** The app currently routes to port 80; uvicorn listens
-  on 8000. Traffic silently fails otherwise.
-- **`--min-replicas 1`.** Scale-to-zero means every idle period is followed by a
-  cold start that loads a 420 MB model — tens of seconds of user-visible delay.
-- **`--memory 4Gi`.** The model plus torch will not fit in the current 0.5 GiB.
-
-The public URL is already assigned and does not change:
-
-```
-https://api-rag-demo.happybay-96c5cfb7.norwayeast.azurecontainerapps.io
-```
-
-Check it, then run the full smoke test against it:
-
-```bash
-python scripts/smoke_test.py --url https://api-rag-demo.happybay-96c5cfb7.norwayeast.azurecontainerapps.io
+python scripts/smoke_test.py --url https://<fqdn>
 ```
 
 ---
 
 ## 6. Point the frontend at it
 
-In the Vercel project → **Settings → Environment Variables**, add:
+The frontend lives in the `aiD-space` repo and proxies through
+`src/routes/chat/+server.ts`. That route currently has the backend URL and key
+**hardcoded** rather than read from the environment; there is a comment there
+explaining why and what to restore. Update both constants to the new FQDN and
+the new `BACKEND_API_KEY`, and redeploy.
 
-| Name | Value |
-| --- | --- |
-| `PRIVATE_BACKEND_URL` | `https://<fqdn>` (no trailing slash) |
-| `BACKEND_API_KEY` | the same secret from step 1 |
-
-Redeploy the frontend. Both are server-side only — do not prefix them with
-`PUBLIC_`, or they will be bundled into client JavaScript.
+The config-driven version reads `PRIVATE_BACKEND_URL` and `BACKEND_API_KEY`
+from `$env/dynamic/private`. Both are server-side only — do not prefix them
+with `PUBLIC_`, or they get bundled into client JavaScript.
 
 ---
 
-## 7. Rotate the keys that have been sitting in git-ignored files
+## 7. Rotate the keys
 
-`aidspace_backend/.env` and `aidspace_frontend/.env` contain a live OpenAI key
-and a live Sanity token in plaintext. They are now also in Azure config. Rotate
-both and update the values in Azure and Vercel.
+Any key that has been pasted into a chat, a commit, or a `.env` shared between
+machines should be rotated once the deployment is verified:
+
+- Cosmos: **Settings → Keys → Regenerate Primary Key**
+- Storage: **Security + networking → Access keys → Rotate key1**
+- OpenAI: revoke and reissue in the OpenAI dashboard
+- `BACKEND_API_KEY`: generate a new one, set it on the Container App and in the
+  frontend together — they must match or every search returns 401
+
+After rotating, update `.env`, re-run `azure_deploy.ps1 -SkipBuild` to push the
+new secrets to the Container App, and redeploy the frontend.
 
 ---
 
@@ -235,14 +290,18 @@ count changes, since the vector policy is immutable.
 
 ## Optional hardening: managed identity instead of keys
 
-The code already falls back to `DefaultAzureCredential` whenever the matching
-key env var is absent. To switch:
+`azure_deploy.ps1` uses ACR admin credentials because assigning `AcrPull` to a
+system-assigned identity requires role-assignment rights on the subscription,
+which plain Contributor does not have.
+
+The application code already falls back to `DefaultAzureCredential` whenever
+the matching key env var is absent. To switch:
 
 ```bash
-az containerapp identity assign --name <app-name> --resource-group <rg> --system-assigned
+az containerapp identity assign --name aid-api-rag --resource-group stf-asc-export --system-assigned
 ```
 
 Grant that identity the **Cosmos DB Built-in Data Contributor** role and the
 **Storage Blob Data Reader** role, then remove `COSMOS_KEY` and
-`AZURE_STORAGE_KEY` from the Container App. Role assignments can take a few
-minutes to propagate, so verify with `/health` before assuming it is broken.
+`AZURE_STORAGE_KEY` from the Container App. Role assignments take a few minutes
+to propagate, so check `/health` before assuming it is broken.

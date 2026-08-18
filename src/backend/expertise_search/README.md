@@ -1,6 +1,8 @@
 ## AID Expertise Search
 
 ### This repository shows the first version of an expertise search for the Norwegian AI center AI for Decisions (AID).
+This is a LangGraph RAG with both a Streamlit app (app.py) and a FastAPI backend (main.py).
+
 
 To prepare the program create a new virtual environment, activate it and install the dependencies
 ```bash
@@ -36,7 +38,7 @@ To prepare the dataset, we want to eventually be able to do it fully automatical
 
 ### Some Information About the Retrieval and the Scores
 
-In the preperation of the dataset, each article is divided into smaller documents. Let's call them *chunks*. Each article $i$ in the dataset is given a relevance score, which I've decided to call *article score*. For each article $i$, the article $i$ score is the cosine similarity from the chunk with the highest cosine similarity to the searchword. 
+In the preperation of the dataset, each article is divided into smaller documents. Let's call them *chunks*. Each article $i$ in the dataset is given a relevance score, which I've decided to call *article score*. For each article $i$, the article $i$ score is the cosine similarity from the chunk with the highest cosine similarity to the searchword.
 
 Every researcher is then given a score. This *researcher score* is given by the following formula:
 
