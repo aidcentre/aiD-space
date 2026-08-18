@@ -22,8 +22,14 @@ const MAX_TURNS = 3;
 // browser. The exposure is anyone who can read this repository. Restoring
 // config-driven behaviour means reading $env/dynamic/private again and setting
 // BACKEND_URL / BACKEND_API_KEY on the host.
-const BACKEND_URL = 'https://api-rag-demo.happybay-96c5cfb7.norwayeast.azurecontainerapps.io';
-const BACKEND_API_KEY = '-LcUoqsm8tpcQtCYztFiKbOp4FTNgXDQSZ0dBPDxxuQ';
+//
+// Repointed at the new SINTEF Azure account (resource group stf-asc-export,
+// Container App aid-api-rag, West Europe). The key below is the one held by
+// that app; the previous key died with the old api-rag-demo backend. Rotating
+// means updating BACKEND_API_KEY here and on the Container App together — they
+// must match or every search returns 401.
+const BACKEND_URL = 'https://aid-api-rag.ashyfield-ae8a07a3.westeurope.azurecontainerapps.io';
+const BACKEND_API_KEY = 'uZlNwK1u6MM-V9Bv7rE5STynuWBLZrl5KQybW2Yvd7Q';
 // ---------------------------------------------------------------------------
 
 interface ChatMessage {
