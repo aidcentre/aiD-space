@@ -122,14 +122,14 @@ export const researchers_data: Researcher[] = [
 		image: '/images/researchers/ivan-depina.jpg'
 	},
 	{
-		// Roster data looks corrupted (no resolvable person). Renders a clean
-		// placeholder card; the real fix belongs in the backend's
-		// researcher_information.pkl + re-ingest.
+		// Roster folder 'Johra_Kamilla' is "Johra, Kamilla" (surname truncated).
+		// Her SINTEF slug still uses her maiden name, Andersen.
 		rosterName: 'Johra_Kamilla',
-		displayName: 'Johra Kamilla',
-		institution: '',
-		profileUrl: '',
-		image: ''
+		displayName: 'Kamilla Heimar Johra',
+		institution: 'SINTEF',
+		title: 'Researcher',
+		profileUrl: 'https://www.sintef.no/alle-ansatte/ansatt/kamilla.andersen/',
+		image: '/images/researchers/kamilla-johra.jpg'
 	},
 	{
 		rosterName: 'Jonathan_Whitlock',
@@ -140,14 +140,13 @@ export const researchers_data: Researcher[] = [
 		image: '/images/researchers/jonathan-whitlock.jpg'
 	},
 	{
-		// Roster folder is 'Jo_Strandhagen'; resolved to the production-logistics
-		// professor Jan Ola Strandhagen. Verify against the AID member list.
+		// Jo Wessel Strandhagen at SINTEF — not the NTNU professor Jan Ola.
 		rosterName: 'Jo_Strandhagen',
-		displayName: 'Jan Ola Strandhagen',
-		institution: 'NTNU',
-		title: 'Professor',
-		profileUrl: 'https://www.ntnu.edu/employees/ola.strandhagen',
-		image: '/images/researchers/jan-ola-strandhagen.jpg'
+		displayName: 'Jo Wessel Strandhagen',
+		institution: 'SINTEF',
+		title: 'Researcher',
+		profileUrl: 'https://www.sintef.no/alle-ansatte/ansatt/jo.strandhagen/',
+		image: '/images/researchers/jo-wessel-strandhagen.jpg'
 	},
 	{
 		rosterName: 'Knut-Andreas Lie',

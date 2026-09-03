@@ -53,9 +53,12 @@ const SOURCES = [
 	{ slug: 'helge-langseth', page: 'https://www.ntnu.no/ansatte/helge.langseth' },
 	{ slug: 'henrik-andersson', page: 'https://www.ntnu.no/ansatte/henrik.andersson' },
 	{ slug: 'ivan-depina', page: 'https://www.ntnu.edu/employees/ivan.depina' },
-	{ slug: 'johra-kamilla', page: '' },
+	{ slug: 'kamilla-johra', page: 'https://www.sintef.no/alle-ansatte/ansatt/kamilla.andersen/' },
 	{ slug: 'jonathan-whitlock', page: 'https://www.ntnu.no/ansatte/jonathan.whitlock' },
-	{ slug: 'jan-ola-strandhagen', page: 'https://www.ntnu.edu/employees/ola.strandhagen' },
+	{
+		slug: 'jo-wessel-strandhagen',
+		page: 'https://www.sintef.no/alle-ansatte/ansatt/jo.strandhagen/'
+	},
 	{ slug: 'knut-andreas-lie', page: 'https://www.sintef.no/alle-ansatte/ansatt/knut-andreas.lie/' },
 	{ slug: 'kristian-fossum', page: '' },
 	{ slug: 'magnus-stalhane', page: 'https://www.ntnu.edu/employees/magnus.staalhane' },
