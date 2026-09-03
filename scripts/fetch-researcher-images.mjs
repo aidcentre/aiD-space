@@ -11,9 +11,15 @@
  * report; it does NOT edit researchers.ts — blank out `image` there by hand for
  * anyone who comes back empty.
  *
- * Needs `sharp` (devDependency) for the greyscale + square crop. Without it the
- * script still runs, writing source bytes unchanged, and the card's CSS
- * `grayscale` + `object-cover` keep them presentable.
+ * Needs `sharp` for the greyscale + square crop. It is deliberately NOT a
+ * dependency of this project: adding it forces a package-lock.json regeneration,
+ * and a fully-resolved lockfile breaks Netlify's `npm install` (see the reverted
+ * commit f37e747). Install it just for the run instead:
+ *
+ *   npm i --no-save sharp && node scripts/fetch-researcher-images.mjs
+ *
+ * Without sharp the script still runs, writing source bytes unchanged, and the
+ * card's CSS `grayscale` + `object-cover` keep them presentable.
  */
 
 import { mkdir, writeFile, access } from 'node:fs/promises';
