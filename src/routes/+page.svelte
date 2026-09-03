@@ -130,7 +130,7 @@
 								<ul class="mt-6 flex flex-col gap-2">
 									{#each msg.researchers as r, ri (r[0])}
 										<li in:fly={{ y: 10, duration: 350, delay: ri * 120 }}>
-											<ResearcherCard name={r[0].replace(/_/g, ' ')} score={r[1].toFixed(2)} />
+											<ResearcherCard name={r[0]} score={r[1]} />
 										</li>
 									{/each}
 								</ul>

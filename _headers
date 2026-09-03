@@ -1,0 +1,4 @@
+# Researcher headshots are content-stable (filename changes when a photo does),
+# so let the CDN and browsers hold them for a year.
+/images/researchers/*
+  Cache-Control: public, max-age=31536000, immutable

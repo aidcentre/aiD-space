@@ -62,7 +62,7 @@
 			<li class="flex flex-col gap-2">
 				{#each researchers as r, i}
 					<div in:fly={{ y: 10, duration: 350, delay: i * 500 }}>
-						<ResearcherCard name={r[0].replace(/_/g, ' ')} score={r[1].toFixed(2)} />
+						<ResearcherCard name={r[0]} score={r[1]} />
 					</div>
 				{/each}
 			</li>
