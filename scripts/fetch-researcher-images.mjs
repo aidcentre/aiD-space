@@ -60,7 +60,7 @@ const SOURCES = [
 		page: 'https://www.sintef.no/alle-ansatte/ansatt/jo.strandhagen/'
 	},
 	{ slug: 'knut-andreas-lie', page: 'https://www.sintef.no/alle-ansatte/ansatt/knut-andreas.lie/' },
-	{ slug: 'kristian-fossum', page: '' },
+	{ slug: 'kristian-fossum', page: '' }, // no photo on NORCE; headshot added by hand
 	{ slug: 'magnus-stalhane', page: 'https://www.ntnu.edu/employees/magnus.staalhane' },
 	{
 		slug: 'maria-vatshaug-ottermo',

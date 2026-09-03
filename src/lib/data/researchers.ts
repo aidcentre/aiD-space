@@ -157,13 +157,14 @@ export const researchers_data: Researcher[] = [
 		image: '/images/researchers/knut-andreas-lie.jpg'
 	},
 	{
-		// NORCE profile shows a default avatar — no photo to fetch.
+		// NORCE profile has no photo; this headshot was added by hand, so the
+		// fetch script leaves it alone (page: '').
 		rosterName: 'Kristian_Fossum',
 		displayName: 'Kristian Fossum',
 		institution: 'NORCE',
 		title: 'Senior Researcher',
 		profileUrl: 'https://www.norceresearch.no/en/persons/kristian-fossum/669',
-		image: ''
+		image: '/images/researchers/kristian-fossum.jpg'
 	},
 	{
 		rosterName: 'Magnus_Stålhane',
