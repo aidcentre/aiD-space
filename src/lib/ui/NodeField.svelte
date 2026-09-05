@@ -30,7 +30,6 @@
 		selectedId = null,
 		hoveredId = $bindable(null),
 		anchor = null,
-		blockers = () => [],
 		onselect
 	}: {
 		articles: Article[];
@@ -39,8 +38,6 @@
 		hoveredId?: string | null;
 		/** Element parked on the active node each frame; holds the tooltip. */
 		anchor?: HTMLElement | null;
-		/** Panels that swallow the pointer, so hover does not fire behind them. */
-		blockers?: () => (HTMLElement | null | undefined)[];
 		onselect?: (id: string | null) => void;
 	} = $props();
 
@@ -197,19 +194,26 @@
 		renderer.domElement.addEventListener('pointerdown', onPointerDown);
 		renderer.domElement.addEventListener('pointerup', onPointerUp);
 
+		/**
+		 * Anything the visitor could click — the detail panel, the search bar,
+		 * a search result card — must also swallow hover, or nodes light up
+		 * through it. Hit testing the actual topmost element keeps that in step
+		 * with whatever the page renders over the field: overlays that opt out
+		 * of the pointer (`pointer-events: none`) let hover through, and every
+		 * other one blocks it, with no list to keep up to date.
+		 *
+		 * The canvas sits behind the page (`-z-10`), so open space hit tests to
+		 * the document itself rather than to the canvas; both mean "nothing in
+		 * the way".
+		 */
 		function pointerIsBlocked(): boolean {
 			if (!pointer) return true;
-			return blockers().some((element) => {
-				if (!element) return false;
-				const rect = element.getBoundingClientRect();
-				return (
-					rect.width > 0 &&
-					pointer!.x >= rect.left &&
-					pointer!.x <= rect.right &&
-					pointer!.y >= rect.top &&
-					pointer!.y <= rect.bottom
-				);
-			});
+			const top = document.elementFromPoint(pointer.x, pointer.y);
+			return !(
+				top === renderer.domElement ||
+				top === document.body ||
+				top === document.documentElement
+			);
 		}
 
 		// --- per-frame state ----------------------------------------------
@@ -368,6 +372,10 @@
 				const material = node.sprite.material as THREE.SpriteMaterial;
 				material.opacity = THREE.MathUtils.lerp(material.opacity, opacity, lerpT);
 			}
+
+			// Hold the field still under the cursor: a node that keeps drifting
+			// is a node you have to chase to read or click.
+			controls.autoRotate = hoveredId === null;
 
 			controls.update();
 			renderer.render(scene, camera);

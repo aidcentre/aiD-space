@@ -13,17 +13,14 @@
 
 	let {
 		article,
-		card = $bindable(null),
 		onselect
 	}: {
 		article: Article;
-		card?: HTMLElement | null;
 		onselect?: (id: string) => void;
 	} = $props();
 </script>
 
 <button
-	bind:this={card}
 	use:squircle={{ radius: 24 }}
 	type="button"
 	class="group pointer-events-auto relative z-[2] mt-4 mr-4 mb-4 ml-auto flex w-[745px] max-w-[calc(100vw-32px)] cursor-pointer flex-col items-start gap-4 bg-off-black p-8 text-left text-white transition-colors duration-500 ease-out-expo hover:bg-white hover:text-off-black max-[900px]:mr-0 max-[900px]:mb-0 max-[900px]:w-full max-[900px]:max-w-none"

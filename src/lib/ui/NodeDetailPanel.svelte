@@ -25,11 +25,9 @@
 
 	let {
 		article,
-		panel = $bindable(null),
 		children
 	}: {
 		article: Article;
-		panel?: HTMLElement | null;
 		/** Rendered below the panel, inside its scroll container. */
 		children?: import('svelte').Snippet;
 	} = $props();
@@ -101,7 +99,6 @@
 
 <div class="pointer-events-none fixed inset-0 z-[8] overflow-y-auto">
 	<aside
-		bind:this={panel}
 		use:squircle={{ radius: 32 }}
 		class="panel pointer-events-auto relative z-[2] mt-[88px] mr-4 mb-4 ml-auto flex w-max max-w-[calc(100vw-32px)] flex-col overflow-hidden bg-white text-off-black max-[900px]:mt-[290px] max-[900px]:mr-0 max-[900px]:mb-0 max-[900px]:w-full max-[900px]:max-w-none"
 	>

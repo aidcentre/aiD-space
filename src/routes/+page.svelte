@@ -10,6 +10,7 @@
 	import NextNodeCard from '$lib/ui/NextNodeCard.svelte';
 	import { menuOpen } from '$lib/stores/menu';
 	import HomeText from '$lib/ui/HomeText.svelte';
+	import BackToFieldButton from '$lib/ui/BackToFieldButton.svelte';
 	import ResearcherCard from '$lib/chat/ResearcherCard.svelte';
 	import ArticleResultCard from '$lib/chat/ArticleResultCard.svelte';
 	import Scramble from '$lib/actions/Scramble.svelte';
@@ -41,6 +42,8 @@
 	let messages = $state<Message[]>([]);
 	let loading = $state(false);
 	let bottomAnchor = $state<HTMLDivElement>();
+	/** Bumped when the transcript is cleared, so a reply in flight is dropped. */
+	let session = 0;
 
 	const active = $derived(messages.length > 0);
 	const fallbackUrl = $derived(
@@ -52,9 +55,6 @@
 	let selectedId = $state<string | null>(null);
 	let hoveredId = $state<string | null>(null);
 	let anchorEl = $state<HTMLDivElement | null>(null);
-	let panelEl = $state<HTMLElement | null>(null);
-	let nextCardEl = $state<HTMLElement | null>(null);
-	let searchEl = $state<HTMLDivElement | null>(null);
 	let innerWidth = $state(1440);
 
 	const selectedArticle = $derived(selectedId ? (articleById(selectedId) ?? null) : null);
@@ -107,9 +107,20 @@
 		return resolved;
 	}
 
+	/** Clear the results and give the screen back to the node field. */
+	function returnToField() {
+		session++;
+		messages = [];
+		loading = false;
+		selectedId = null;
+		window.scrollTo({ top: 0, behavior: 'smooth' });
+	}
+
 	async function search(query: string) {
 		const q = query?.trim();
 		if (!q || loading) return;
+
+		const current = ++session;
 
 		// The transcript and the detail panel both want the middle of the
 		// screen; asking a question means you are done with the open article.
@@ -129,6 +140,7 @@
 			if (!response.ok) throw new Error(`backend status ${response.status}`);
 			const result = await response.json();
 			if (result.error) throw new Error('backend returned error');
+			if (current !== session) return;
 
 			messages.push({
 				role: 'ai',
@@ -138,10 +150,12 @@
 			});
 		} catch (err) {
 			console.error('Error retrieving RAG response:', err);
-			messages.push({ role: 'ai', content: '', isError: true });
+			if (current === session) messages.push({ role: 'ai', content: '', isError: true });
 		} finally {
-			loading = false;
-			await scrollToBottom();
+			if (current === session) {
+				loading = false;
+				await scrollToBottom();
+			}
 		}
 	}
 
@@ -160,7 +174,6 @@
 		bind:hoveredId
 		paused={$menuOpen}
 		anchor={anchorEl}
-		blockers={() => [panelEl, nextCardEl, searchEl]}
 		onselect={select}
 	/>
 </div>
@@ -180,10 +193,10 @@
 </div>
 
 {#if selectedArticle}
-	<NodeDetailPanel article={selectedArticle} bind:panel={panelEl}>
+	<NodeDetailPanel article={selectedArticle}>
 		{#snippet children()}
 			{#if nextArticle}
-				<NextNodeCard article={nextArticle} bind:card={nextCardEl} onselect={select} />
+				<NextNodeCard article={nextArticle} onselect={select} />
 			{/if}
 		{/snippet}
 	</NodeDetailPanel>
@@ -193,6 +206,10 @@
 	{#if active}
 		<div class="mx-auto flex min-h-screen w-full max-w-200 flex-col px-4 pt-28 pb-28">
 			<div class="pointer-events-auto flex flex-col gap-12">
+				<div class="sticky top-20 z-[3] w-fit self-start">
+					<BackToFieldButton onclick={returnToField} />
+				</div>
+
 				{#each messages as msg, i (i)}
 					{#if msg.role === 'user'}
 						<div
@@ -296,7 +313,6 @@
 </main>
 
 <div
-	bind:this={searchEl}
 	class="search-dock ease-out-expo fixed bottom-4 left-1/2 z-[10] flex w-[700px] max-w-[calc(100vw-32px)] justify-center transition-[transform,opacity] duration-500"
 	style:transform={`translateX(calc(-50% - ${searchShift}px))`}
 	style:opacity={searchHidden ? 0 : 1}
