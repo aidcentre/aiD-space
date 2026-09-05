@@ -44,10 +44,30 @@ async def health():
     return {"status": "ok"}
 
 
+class RelevantDocument(BaseModel):
+    """
+    One retrieved document, surfaced so the frontend can show the article
+    behind an answer instead of only the researcher who wrote it.
+
+    `doc_id` is the join key, but it is positional (assigned by enumeration
+    order at ingest time), so a re-ingest can rebind it to a different paper.
+    `name` + `title` are carried alongside it as a content-derived fallback.
+    """
+
+    doc_id: str
+    title: str
+    name: str
+    score: float
+    similarity: float
+
+
 class LLMResponse(BaseModel):
     text_answer: str
     most_relevant_researchers: list[tuple[str, float]]
     general_researcher_information: list[tuple[str, str]]
+    # Defaulted so a frontend built against this schema still works when it
+    # talks to a backend that has not been redeployed yet.
+    relevant_documents: list[RelevantDocument] = []
 
 
 class ChatMessage(BaseModel):
@@ -76,8 +96,23 @@ async def get_llm_response(
 
     state = memory_graph.memory_invoke_graph(MemoryState(query=formatted_messages))
 
+    # SearchAndEvaluateNode already slices to context_documents, but the
+    # researcher-lookup path returns every document by the named researchers,
+    # so cap here too rather than shipping a hundred rows to the browser.
+    documents = (state.get("documents") or [])[: settings.context_documents]
+
     return LLMResponse(
         text_answer=state.get("text_answer") or "",
         most_relevant_researchers=state.get("most_relevant_researchers") or [],
         general_researcher_information=state.get("general_researcher_information") or [],
+        relevant_documents=[
+            RelevantDocument(
+                doc_id=doc.doc_id,
+                title=doc.title,
+                name=doc.name,
+                score=doc.score,
+                similarity=doc.similarity,
+            )
+            for doc in documents
+        ],
     )

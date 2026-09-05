@@ -1,10 +1,28 @@
 <script lang="ts">
-	import ArrowRight from 'phosphor-svelte/lib/ArrowRight';
+	/**
+	 * The black pill search bar from the prototype.
+	 *
+	 * Deliberately not positioned: it renders as a plain block so the homepage
+	 * can pin it over the node field while /chat keeps it in normal flow. The
+	 * `onsubmit` / `loading` API is unchanged from the version this replaces.
+	 */
+	import { squircle } from '$lib/utils/squircle';
+	import { useScramble } from '$lib/actions/useScramble';
 
 	let { onsubmit, loading = false }: { onsubmit: (query: string) => void; loading?: boolean } =
 		$props();
 
+	const PLACEHOLDERS = [
+		'Research topics',
+		'Scientists',
+		'Machine learning',
+		'Industry partners',
+		'Anything else'
+	];
+	const CYCLE_MS = 2400;
+
 	let userQuery = $state('');
+	let placeholderEl = $state<HTMLSpanElement>();
 
 	function handleSubmit() {
 		const q = userQuery.trim();
@@ -12,52 +30,82 @@
 		userQuery = '';
 		onsubmit(q);
 	}
+
+	$effect(() => {
+		if (!placeholderEl) return;
+
+		let index = 0;
+		const scrambler = useScramble(placeholderEl, {
+			text: PLACEHOLDERS[0],
+			playOnMount: true,
+			speed: 1,
+			tick: 2,
+			step: 4,
+			scramble: 6,
+			seed: 2,
+			range: [65, 90]
+		});
+
+		const timer = setInterval(() => {
+			index = (index + 1) % PLACEHOLDERS.length;
+			scrambler.update({ text: PLACEHOLDERS[index] });
+		}, CYCLE_MS);
+
+		return () => {
+			clearInterval(timer);
+			scrambler.destroy();
+		};
+	});
 </script>
 
-<div class="group flex w-full flex-col gap-3">
-	<form
-		onsubmit={(event) => {
-			event.preventDefault();
-			handleSubmit();
-		}}
-		class="relative flex w-full flex-col rounded-xl bg-white"
+<form
+	use:squircle={{ radius: 8 }}
+	role="search"
+	aria-label="Search the aiD research base"
+	onsubmit={(event) => {
+		event.preventDefault();
+		handleSubmit();
+	}}
+	class="flex h-14 w-full max-w-[700px] items-center gap-3 bg-off-black py-0 pr-3 pl-5 font-[IBM_Mono] text-[14px] leading-[18px] tracking-[0.28px]"
+>
+	<label class="text-white select-none" for="research-topic-search">Search</label>
+
+	<div class="relative flex min-w-0 flex-1 items-center">
+		<input
+			id="research-topic-search"
+			bind:value={userQuery}
+			type="search"
+			autocomplete="off"
+			disabled={loading}
+			class="h-[18px] w-full border-none bg-transparent p-0 font-[IBM_Mono] text-[14px] leading-[18px] tracking-[0.28px] text-white focus:outline-none disabled:cursor-not-allowed"
+		/>
+		<span
+			bind:this={placeholderEl}
+			aria-hidden="true"
+			class="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 whitespace-nowrap text-medium-grey transition-opacity duration-150 ease-in-out"
+			class:opacity-0={userQuery.length > 0}
+		></span>
+	</div>
+
+	<button
+		use:squircle={{ radius: 6 }}
+		type="submit"
+		disabled={loading}
+		aria-label="Submit search"
+		class="ease-out-expo flex size-8 shrink-0 cursor-pointer items-center justify-center bg-off-black text-[16px] text-white transition-colors duration-500 hover:bg-white hover:text-off-black disabled:cursor-not-allowed disabled:opacity-60"
 	>
-		<div
-			class="border-b border-light-grey px-3 py-3 font-family-mono text-xs select-none md:px-4 md:py-3 md:text-sm lg:text-base"
-		>
-			Search scientists // <span class="text-dark-grey"
-				>Research topics, names, or anything else</span
-			>
-		</div>
-		<div
-			class="relative flex items-center justify-between px-3 py-3 font-family-mono text-xs text-grey md:px-4 md:py-3 md:text-sm lg:text-base"
-		>
-			<input
-				bind:value={userQuery}
-				name="userQuery"
-				type="text"
-				placeholder="Your query"
-				autocomplete="off"
-				disabled={loading}
-				class="w-full cursor-text rounded-lg border-none bg-white p-0 pr-10 font-family-mono text-xs font-light text-grey focus:outline-none disabled:cursor-not-allowed md:text-sm lg:text-base"
-			/>
-			<button
-				class="ease-out-expo pointer-events-auto absolute top-1/2 right-2 flex aspect-square -translate-y-1/2 cursor-pointer items-center justify-center rounded-lg bg-off-black p-1.5 leading-0 text-white transition-colors duration-800 group-hover:bg-light-grey disabled:cursor-not-allowed disabled:opacity-60 md:p-2"
-				aria-label="Search scientists // Research topics, names, or anything else"
-				type="submit"
-				disabled={loading}
-			>
-				<ArrowRight
-					class="ease-out-expo h-3 w-3 transition-colors duration-800 group-hover:fill-off-black lg:h-4 lg:w-4"
-				/>
-			</button>
-		</div>
-	</form>
-</div>
+		→
+	</button>
+</form>
 
 <style>
 	input:focus {
 		box-shadow: none !important;
 		outline: none;
+	}
+
+	/* The pill supplies its own submit control. */
+	input[type='search']::-webkit-search-cancel-button {
+		display: none;
 	}
 </style>

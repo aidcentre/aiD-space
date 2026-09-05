@@ -1,24 +1,40 @@
 <script lang="ts">
-	import { tick } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import Header from '$lib/ui/Header.svelte';
 	import Menu from '$lib/ui/Menu.svelte';
 	import SearchBar from '$lib/ui/SearchBar.svelte';
-	import NodeSphere from '$lib/ui/NodeSphere.svelte';
+	import NodeField from '$lib/ui/NodeField.svelte';
+	import NodeTooltip from '$lib/ui/NodeTooltip.svelte';
+	import NodeDetailPanel from '$lib/ui/NodeDetailPanel.svelte';
+	import NextNodeCard from '$lib/ui/NextNodeCard.svelte';
 	import { menuOpen } from '$lib/stores/menu';
 	import HomeText from '$lib/ui/HomeText.svelte';
 	import ResearcherCard from '$lib/chat/ResearcherCard.svelte';
+	import ArticleResultCard from '$lib/chat/ArticleResultCard.svelte';
 	import Scramble from '$lib/actions/Scramble.svelte';
 	import chatSymbol from '$lib/assets/chat_symbol.svg';
+	import { articles, articleById, findArticle, type Article } from '$lib/data/articles';
+	import { trackVisualViewport } from '$lib/actions/visualViewport';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 	const home = $derived(data.home);
 
+	/** One document as the backend ranked it. Empty before the API is redeployed. */
+	interface RelevantDocument {
+		doc_id: string;
+		title: string;
+		name: string;
+		score: number;
+		similarity: number;
+	}
+
 	interface Message {
 		role: 'user' | 'ai';
 		content: string;
 		researchers?: [string, number][];
+		documents?: RelevantDocument[];
 		isError?: boolean;
 	}
 
@@ -31,9 +47,73 @@
 		home?.externalUrl ?? 'https://aidexpertisesearch-nrmdnyesl7oppreljp2epb.streamlit.app/'
 	);
 
+	// --- node field -------------------------------------------------------
+
+	let selectedId = $state<string | null>(null);
+	let hoveredId = $state<string | null>(null);
+	let anchorEl = $state<HTMLDivElement | null>(null);
+	let panelEl = $state<HTMLElement | null>(null);
+	let nextCardEl = $state<HTMLElement | null>(null);
+	let searchEl = $state<HTMLDivElement | null>(null);
+	let innerWidth = $state(1440);
+
+	const selectedArticle = $derived(selectedId ? (articleById(selectedId) ?? null) : null);
+	const activeArticle = $derived(
+		selectedArticle ?? (hoveredId ? (articleById(hoveredId) ?? null) : null)
+	);
+
+	/** The article one place along the field, for the "Next" card. */
+	const nextArticle = $derived.by(() => {
+		if (!selectedArticle) return null;
+		const index = articles.indexOf(selectedArticle);
+		return articles[(index + 1) % articles.length] ?? null;
+	});
+
+	// Below this the panel fills the viewport, so the search bar would have
+	// nowhere to sit beside it.
+	const PANEL_SEARCH_HIDE_BREAKPOINT_PX = 1100;
+	const PANEL_OCCUPIED_WIDTH_PX = 761;
+
+	const searchHidden = $derived(!!selectedId && innerWidth < PANEL_SEARCH_HIDE_BREAKPOINT_PX);
+	/**
+	 * How far to slide the bar left so it recentres in the space the panel
+	 * leaves. Expressed as an offset from centre rather than an absolute `left`
+	 * so the resting position stays pure CSS — it must be right on first paint
+	 * and on any viewport this measurement has not caught up with yet.
+	 */
+	const searchShift = $derived(
+		selectedId && innerWidth >= PANEL_SEARCH_HIDE_BREAKPOINT_PX
+			? PANEL_OCCUPIED_WIDTH_PX / 2
+			: 0
+	);
+
+	function select(id: string | null) {
+		selectedId = id;
+	}
+
+	onMount(() => trackVisualViewport());
+
+	// --- search -----------------------------------------------------------
+
+	function resolveDocuments(documents: RelevantDocument[] | undefined) {
+		if (!documents) return [];
+		const resolved: { article: Article; score: number }[] = [];
+		for (const doc of documents) {
+			const article = findArticle(doc.doc_id, doc.name, doc.title);
+			// A document dropped by the article filter (a CV, say) has no card
+			// to show, and a re-ingest can leave an id pointing nowhere.
+			if (article) resolved.push({ article, score: doc.similarity || doc.score });
+		}
+		return resolved;
+	}
+
 	async function search(query: string) {
 		const q = query?.trim();
 		if (!q || loading) return;
+
+		// The transcript and the detail panel both want the middle of the
+		// screen; asking a question means you are done with the open article.
+		selectedId = null;
 
 		messages.push({ role: 'user', content: q });
 		loading = true;
@@ -53,7 +133,8 @@
 			messages.push({
 				role: 'ai',
 				content: result.text_answer,
-				researchers: result.most_relevant_researchers
+				researchers: result.most_relevant_researchers,
+				documents: result.relevant_documents
 			});
 		} catch (err) {
 			console.error('Error retrieving RAG response:', err);
@@ -70,23 +151,48 @@
 	}
 </script>
 
-<div class="fixed inset-0 -z-10 -mt-24">
-	<NodeSphere paused={$menuOpen} />
+<svelte:window bind:innerWidth />
+
+<div class="fixed inset-0 -z-10">
+	<NodeField
+		{articles}
+		{selectedId}
+		bind:hoveredId
+		paused={$menuOpen}
+		anchor={anchorEl}
+		blockers={() => [panelEl, nextCardEl, searchEl]}
+		onselect={select}
+	/>
 </div>
 
 <Header />
 <Menu />
 
-<main class="relative z-[1]">
-	<div
-		class="mx-auto flex w-full max-w-200 flex-col px-4 {active
-			? 'min-h-screen pt-28 pb-4'
-			: 'min-h-screen justify-center'}"
-	>
-		<SearchBar onsubmit={search} {loading} />
+<!-- Tooltip layer. NodeField parks `anchorEl` on the active node each frame. -->
+<div class="pointer-events-none fixed inset-0 z-[2] overflow-hidden">
+	<div bind:this={anchorEl} class="absolute top-0 left-0" style="visibility: hidden;">
+		<NodeTooltip
+			article={activeArticle}
+			selected={!!selectedId}
+			onclose={() => select(null)}
+		/>
+	</div>
+</div>
 
-		{#if active}
-			<div class="mt-10 flex flex-col gap-12">
+{#if selectedArticle}
+	<NodeDetailPanel article={selectedArticle} bind:panel={panelEl}>
+		{#snippet children()}
+			{#if nextArticle}
+				<NextNodeCard article={nextArticle} bind:card={nextCardEl} onselect={select} />
+			{/if}
+		{/snippet}
+	</NodeDetailPanel>
+{/if}
+
+<main class="pointer-events-none relative z-[1]">
+	{#if active}
+		<div class="mx-auto flex min-h-screen w-full max-w-200 flex-col px-4 pt-28 pb-28">
+			<div class="pointer-events-auto flex flex-col gap-12">
 				{#each messages as msg, i (i)}
 					{#if msg.role === 'user'}
 						<div
@@ -135,6 +241,29 @@
 									{/each}
 								</ul>
 							{/if}
+
+							{#key msg}
+								{@const documents = resolveDocuments(msg.documents)}
+								{#if documents.length > 0}
+									<p
+										class="mt-8 mb-2 w-fit bg-white px-1 font-[IBM_Mono] text-xs text-grey"
+										style="box-shadow: 0 0 60px 30px rgba(255, 255, 255, 1);"
+									>
+										Research behind this answer
+									</p>
+									<ul class="flex flex-col gap-2">
+										{#each documents as doc, di (doc.article.id)}
+											<li in:fly={{ y: 10, duration: 350, delay: di * 120 }}>
+												<ArticleResultCard
+													article={doc.article}
+													score={doc.score}
+													onopen={select}
+												/>
+											</li>
+										{/each}
+									</ul>
+								{/if}
+							{/key}
 						</div>
 					{/if}
 				{/each}
@@ -152,7 +281,8 @@
 					</div>
 				{/if}
 			</div>
-			<div class="mt-auto pt-12">
+
+			<div class="pointer-events-auto mt-auto pt-12">
 				<p
 					class="mx-auto w-fit max-w-full bg-white px-1 text-center font-family-mono text-[10px] font-light text-off-black md:text-xs"
 					style="box-shadow: 0 0 60px 30px rgba(255, 255, 255, 1);"
@@ -161,10 +291,34 @@
 				</p>
 			</div>
 			<div bind:this={bottomAnchor}></div>
-		{/if}
-	</div>
-
-	{#if !active}
-		<HomeText description={home?.description ?? ''} />
+		</div>
 	{/if}
 </main>
+
+<div
+	bind:this={searchEl}
+	class="search-dock ease-out-expo fixed bottom-4 left-1/2 z-[10] flex w-[700px] max-w-[calc(100vw-32px)] justify-center transition-[transform,opacity] duration-500"
+	style:transform={`translateX(calc(-50% - ${searchShift}px))`}
+	style:opacity={searchHidden ? 0 : 1}
+	style:pointer-events={searchHidden ? 'none' : 'auto'}
+	aria-hidden={searchHidden}
+>
+	<SearchBar onsubmit={search} {loading} />
+</div>
+
+{#if !active && !selectedId}
+	<!-- Lifted clear of the search bar, which is now docked to the bottom. -->
+	<div class="pointer-events-none fixed inset-x-0 bottom-24 z-[1]">
+		<HomeText description={home?.description ?? ''} />
+	</div>
+{/if}
+
+<style>
+	/* Sit above the soft keyboard rather than under it. */
+	@media (max-width: 900px) {
+		.search-dock {
+			bottom: auto;
+			top: calc(var(--vv-offset-top, 0px) + var(--vv-height, 100vh) - 56px - 16px);
+		}
+	}
+</style>
