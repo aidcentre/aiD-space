@@ -126,6 +126,20 @@
 						<span>{article.venue}</span>
 					</span>
 				{/if}
+				{#if article.doi}
+					<span class="inline-flex items-center gap-2">
+						<span class="text-medium-grey">DOI</span>
+						<span class="text-medium-grey">//</span>
+						<a
+							href={`https://doi.org/${article.doi}`}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="break-all underline underline-offset-4"
+						>
+							{article.doi} ↗
+						</a>
+					</span>
+				{/if}
 			</div>
 
 			<h3
@@ -197,16 +211,6 @@
 									class="font-[IBM_Mono] text-[14px] underline underline-offset-4"
 								>
 									Profile ↗
-								</a>
-							{/if}
-							{#if article.doi}
-								<a
-									href={`https://doi.org/${article.doi}`}
-									target="_blank"
-									rel="noopener noreferrer"
-									class="font-[IBM_Mono] text-[14px] underline underline-offset-4"
-								>
-									DOI ↗
 								</a>
 							{/if}
 						</div>

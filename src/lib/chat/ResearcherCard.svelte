@@ -10,6 +10,8 @@
 		[researcher?.title, researcher?.institution].filter(Boolean).join(' · ') || 'AID researcher'
 	);
 	const profileUrl = $derived(researcher?.profileUrl || undefined);
+	/** Label for the profile link: the employer whose page it points at. */
+	const profileLabel = $derived(researcher?.institution || 'Profile');
 
 	// researchers.ts records which photos exist; onerror is a second line of
 	// defence for a file that 404s on the CDN.
@@ -55,5 +57,16 @@
 				Relevance score: {scoreText}
 			</p>
 		</div>
+		{#if profileUrl}
+			<span class="self-stretch border-l border-light-grey" aria-hidden="true"></span>
+			<a
+				href={profileUrl}
+				target="_blank"
+				rel="noopener noreferrer"
+				class="px-3 py-2 font-[IBM_Mono] text-xs leading-4 text-off-black underline underline-offset-4"
+			>
+				{profileLabel} ↗
+			</a>
+		{/if}
 	</div>
 </div>

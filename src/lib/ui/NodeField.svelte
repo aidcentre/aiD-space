@@ -27,6 +27,7 @@
 	let {
 		articles,
 		paused = false,
+		interactive = true,
 		selectedId = null,
 		hoveredId = $bindable(null),
 		anchor = null,
@@ -34,6 +35,13 @@
 	}: {
 		articles: Article[];
 		paused?: boolean;
+		/**
+		 * Whether nodes answer the pointer at all. False while the search
+		 * transcript owns the screen: a result there is already the way into an
+		 * article, so lighting a node up behind it only offers a click that
+		 * never lands.
+		 */
+		interactive?: boolean;
 		selectedId?: string | null;
 		hoveredId?: string | null;
 		/** Element parked on the active node each frame; holds the tooltip. */
@@ -48,7 +56,7 @@
 		height: 72,
 		depth: 72,
 		nodeSize: 1,
-		orbitSpeed: 0.4
+		orbitSpeed: 0.2
 	};
 
 	const BACKGROUND = 0xe8e8e8;
@@ -244,7 +252,7 @@
 		 * stays generous when a node is far away.
 		 */
 		function updateHover(rect: DOMRect) {
-			if (pointerIsBlocked()) {
+			if (!interactive || pointerIsBlocked()) {
 				hoveredId = null;
 				return;
 			}

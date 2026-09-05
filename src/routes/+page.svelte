@@ -74,6 +74,16 @@
 	const PANEL_SEARCH_HIDE_BREAKPOINT_PX = 1100;
 	const PANEL_OCCUPIED_WIDTH_PX = 761;
 
+	const SEARCH_GUTTER_PX = 32;
+
+	/**
+	 * The panel scrolls in its own overlay, so on a platform with classic
+	 * scrollbars it sits that much further left than its width alone says. The
+	 * bar is `fixed` against the full viewport and does not, hence measuring
+	 * rather than assuming: on macOS-style overlay scrollbars this is 0.
+	 */
+	let scrollbarWidth = $state(0);
+
 	const searchHidden = $derived(!!selectedId && innerWidth < PANEL_SEARCH_HIDE_BREAKPOINT_PX);
 	/**
 	 * How far to slide the bar left so it recentres in the space the panel
@@ -83,15 +93,32 @@
 	 */
 	const searchShift = $derived(
 		selectedId && innerWidth >= PANEL_SEARCH_HIDE_BREAKPOINT_PX
-			? PANEL_OCCUPIED_WIDTH_PX / 2
+			? (PANEL_OCCUPIED_WIDTH_PX + scrollbarWidth) / 2
 			: 0
 	);
+	/**
+	 * The widest the bar may be. Sliding it left is only half the job: on a
+	 * window narrow enough that the panel takes most of it — half a wide
+	 * monitor, say — a 700px bar still reaches back under the panel and its
+	 * "Next" card. Capping it to the room actually left over keeps the two
+	 * apart at every size, and keeps the bar tracking the window on resize.
+	 */
+	const searchMaxWidth = $derived(Math.max(0, innerWidth - SEARCH_GUTTER_PX - searchShift * 2));
 
 	function select(id: string | null) {
 		selectedId = id;
 	}
 
-	onMount(() => trackVisualViewport());
+	onMount(() => {
+		const probe = document.createElement('div');
+		probe.style.cssText =
+			'position:absolute;top:-9999px;width:100px;height:100px;overflow:scroll;';
+		document.body.appendChild(probe);
+		scrollbarWidth = probe.offsetWidth - probe.clientWidth;
+		probe.remove();
+
+		return trackVisualViewport();
+	});
 
 	// --- search -----------------------------------------------------------
 
@@ -173,6 +200,7 @@
 		{selectedId}
 		bind:hoveredId
 		paused={$menuOpen}
+		interactive={!active}
 		anchor={anchorEl}
 		onselect={select}
 	/>
@@ -313,7 +341,8 @@
 </main>
 
 <div
-	class="search-dock ease-out-expo fixed bottom-4 left-1/2 z-[10] flex w-[700px] max-w-[calc(100vw-32px)] justify-center transition-[transform,opacity] duration-500"
+	class="search-dock ease-out-expo fixed bottom-4 left-1/2 z-[10] flex w-[700px] justify-center transition-[transform,opacity,max-width] duration-500"
+	style:max-width={`${searchMaxWidth}px`}
 	style:transform={`translateX(calc(-50% - ${searchShift}px))`}
 	style:opacity={searchHidden ? 0 : 1}
 	style:pointer-events={searchHidden ? 'none' : 'auto'}
