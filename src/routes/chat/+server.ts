@@ -1,36 +1,21 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { env } from '$env/dynamic/private';
 
 // Conversation memory is entirely client-side. The backend is stateless, so
 // only the recent transcript is worth sending — and sending more just inflates
 // the prompt. One turn is a user message plus the AI reply.
 const MAX_TURNS = 3;
 
-// ---------------------------------------------------------------------------
-// DEMO ONLY — REMOVE BEFORE THIS REPO GOES PUBLIC OR THE BACKEND STAYS UP
-// ---------------------------------------------------------------------------
-// Deliberately hardcoded, and deliberately NOT read from the environment.
-//
-// The deployed BACKEND_URL kept pointing somewhere unreachable — first
-// at this site's own origin (405), then at an address that refused the
-// connection outright (502) — and every search on the live site failed as a
-// result. Reading these from the environment is the correct long-term design,
-// but until the hosting config is fixed the environment is the thing that is
-// broken, so it is bypassed entirely here.
-//
-// This file is a SvelteKit server route, so these values are never sent to the
-// browser. The exposure is anyone who can read this repository. Restoring
-// config-driven behaviour means reading $env/dynamic/private again and setting
-// BACKEND_URL / BACKEND_API_KEY on the host.
-//
-// Repointed at the new SINTEF Azure account (resource group stf-asc-export,
-// Container App aid-api-rag, West Europe). The key below is the one held by
-// that app; the previous key died with the old api-rag-demo backend. Rotating
-// means updating BACKEND_API_KEY here and on the Container App together — they
-// must match or every search returns 401.
-const BACKEND_URL = 'https://aid-api-rag.ashyfield-ae8a07a3.westeurope.azurecontainerapps.io';
-const BACKEND_API_KEY = 'uZlNwK1u6MM-V9Bv7rE5STynuWBLZrl5KQybW2Yvd7Q';
-// ---------------------------------------------------------------------------
+// Hard cap on a single user message. Enforced here as well as in the search
+// bar so an oversized query never reaches the backend or the LLM, whatever
+// posted it. The FastAPI app applies the same limit again.
+const MAX_QUERY_CHARS = 120;
+
+// Server-side only — both come from the host's environment (the Static Web App
+// settings in production, .env locally) and never reach the browser.
+const BACKEND_URL = env.PRIVATE_BACKEND_URL;
+const BACKEND_API_KEY = env.BACKEND_API_KEY;
 
 interface ChatMessage {
 	role: string;
@@ -48,6 +33,18 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	if (recent.length === 0) {
 		return json({ error: true }, { status: 400 });
+	}
+
+	if (recent.some((m) => m.role === 'user' && m.content.trim().length > MAX_QUERY_CHARS)) {
+		return json(
+			{ error: true, message: `queries are limited to ${MAX_QUERY_CHARS} characters` },
+			{ status: 400 }
+		);
+	}
+
+	if (!BACKEND_URL) {
+		console.error('PRIVATE_BACKEND_URL is not set');
+		return json({ error: true }, { status: 502 });
 	}
 
 	const headers: Record<string, string> = { 'Content-Type': 'application/json' };

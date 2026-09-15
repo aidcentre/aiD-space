@@ -9,10 +9,12 @@
 	 */
 	import { squircle } from '$lib/utils/squircle';
 	import { useScramble } from '$lib/actions/useScramble';
-	import { formatPublicationDate, type Article } from '$lib/data/articles';
-
-	// Served straight out of static/. Every node shares one image for now.
-	const tooltipImage = '/images/nodes/node-tooltip-image.png';
+	import {
+		FALLBACK_THUMBNAIL,
+		formatPublicationDate,
+		thumbnailUrl,
+		type Article
+	} from '$lib/data/articles';
 
 	let {
 		article,
@@ -26,6 +28,16 @@
 
 	// Hover details give way to the label once the panel is open.
 	const detailsVisible = $derived(!!article && !selected);
+
+	// Served straight out of static/, one texture per article.
+	const tooltipImage = $derived(thumbnailUrl(article));
+
+	// A missing thumbnail is a regeneration that has not been run, not a bug
+	// worth showing the visitor an empty frame over.
+	function useFallback(event: Event) {
+		const image = event.currentTarget as HTMLImageElement;
+		if (!image.src.endsWith(FALLBACK_THUMBNAIL)) image.src = FALLBACK_THUMBNAIL;
+	}
 
 	let numberEl = $state<HTMLSpanElement>();
 	let activeNumberEl = $state<HTMLSpanElement>();
@@ -75,6 +87,7 @@
 		<img
 			use:squircle={{ radius: 8 }}
 			src={tooltipImage}
+			onerror={useFallback}
 			alt=""
 			aria-hidden="true"
 			class="node-image absolute top-0 right-[calc(100%+24px)] ease-out-expo transition-[opacity,transform] duration-800"
@@ -134,7 +147,7 @@
 			<button
 				use:squircle={{ radius: 8 }}
 				type="button"
-				class="node-pill node-pill-active cursor-pointer"
+				class="node-pill node-pill-active h-[30px] w-[30px] cursor-pointer p-0"
 				aria-label="Close article"
 				onclick={onclose}
 			>
@@ -144,6 +157,7 @@
 		<img
 			use:squircle={{ radius: 8 }}
 			src={tooltipImage}
+			onerror={useFallback}
 			alt=""
 			aria-hidden="true"
 			class="node-image"

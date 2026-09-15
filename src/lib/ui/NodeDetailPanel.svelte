@@ -20,7 +20,6 @@
 	import { contentMode } from '$lib/stores/contentMode';
 	import { findResearcher, displayNameFor } from '$lib/data/researchers';
 	import profilePlaceholder from '$lib/assets/aiD_profile_picture_black.png';
-	import patternBlack from '$lib/assets/pattern_black.svg';
 	import endOfArticle from '$lib/assets/end_of_article.svg';
 
 	let {
@@ -106,7 +105,7 @@
 			class="flex w-[577px] max-w-[calc(100vw-32px)] flex-col px-[76px] pt-12 pb-8 max-[900px]:px-4"
 		>
 			<div
-				class="mb-4 flex w-full max-w-[577px] flex-wrap gap-8 pt-4 font-[IBM_Mono] text-[14px] leading-none"
+				class="mb-4 flex w-full max-w-[577px] flex-wrap gap-x-8 gap-y-2 pt-4 font-[IBM_Mono] text-[14px] leading-none"
 				aria-label="Article metadata"
 			>
 				<span class="inline-flex items-center gap-2 whitespace-nowrap">
@@ -142,21 +141,21 @@
 				{/if}
 			</div>
 
-			<h3
-				class="m-0 w-full max-w-[577px] text-left font-[Milling] text-[36px] leading-[48px] font-bold"
-				aria-label={article.title}
-			>
-				<img src={patternBlack} alt="" aria-hidden="true" class="mb-4 h-4 w-4" />
-				<span bind:this={titleEl}></span>
-			</h3>
-
 			{#if article.authors.length > 0}
 				<p
-					class="mt-4 w-full max-w-[577px] text-left font-[IBM_Mono] text-[14px] leading-[18px] text-grey"
+					class="mb-4 w-full max-w-[577px] text-left font-[IBM_Mono] text-[14px] leading-[18px] text-grey"
 				>
+					<span class="text-medium-grey">Co-authors //</span>
 					{article.authors.join(', ')}
 				</p>
 			{/if}
+
+			<h3
+				class="my-0 -mr-[52px] w-[calc(100%+52px)] max-w-none text-left font-[Milling] text-[36px] leading-[48px] font-bold max-[900px]:mr-0 max-[900px]:w-full"
+				aria-label={article.title}
+			>
+				<span bind:this={titleEl}></span>
+			</h3>
 		</div>
 
 		<div class="flex flex-col items-center px-[76px] pb-12 max-[900px]:px-4">
@@ -191,6 +190,18 @@
 			<img src={endOfArticle} alt="End of article" class="my-8 h-4" />
 
 			<div class="flex w-full max-w-[577px] flex-col gap-2">
+				<svg
+					class="mb-4 size-8"
+					viewBox="0 0 100 100"
+					xmlns="http://www.w3.org/2000/svg"
+					role="img"
+					aria-label="aiD"
+				>
+					<rect x="0" y="0" width="100" height="100" rx="24" fill="#070707" />
+					<rect x="38" y="18" width="24" height="24" rx="7" fill="#fff" />
+					<rect x="20" y="52" width="24" height="24" rx="7" fill="#fff" />
+					<rect x="56" y="52" width="24" height="24" rx="7" fill="#fff" />
+				</svg>
 				<div class="flex items-center gap-6 rounded-2xl bg-off-black p-3 text-left text-white">
 					<img
 						src={photo}

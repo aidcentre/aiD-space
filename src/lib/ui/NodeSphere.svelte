@@ -21,6 +21,9 @@
 	let renderer: THREE.WebGLRenderer;
 	let frameId: number;
 
+	/** Cap on the drawing buffer scale; see the renderer below. */
+	const MAX_PIXEL_RATIO = 1.5;
+
 	// adjustable parameters
 	const params = {
 		width: 70,
@@ -45,15 +48,21 @@
 		);
 		camera.position.set(60, 60, 60);
 
-		renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-		renderer.setPixelRatio(window.devicePixelRatio);
+		// Nothing here has a geometric edge — the squircle's own alpha does the
+		// smoothing — so multisampling buys the scene nothing, and a dense
+		// display does not need every one of its pixels spent on soft blobs.
+		renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false });
+		renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO));
 		renderer.setSize(container.clientWidth, container.clientHeight);
 		container.appendChild(renderer.domElement);
 
 		const controls = new OrbitControls(camera, renderer.domElement);
 		controls.mouseButtons.RIGHT = null; // allow right-click context menu
 		// OrbitControls prevents contextmenu by default; remove so right-click works
-		renderer.domElement.removeEventListener('contextmenu', (controls as unknown as { _onContextMenu: (e: Event) => void })._onContextMenu);
+		renderer.domElement.removeEventListener(
+			'contextmenu',
+			(controls as unknown as { _onContextMenu: (e: Event) => void })._onContextMenu
+		);
 		controls.enableDamping = true;
 		controls.autoRotate = true;
 		controls.autoRotateSpeed = params.orbitSpeed;
@@ -117,20 +126,29 @@
 		const animate = () => {
 			frameId = requestAnimationFrame(animate);
 
-			const bounds = { x: params.width / 2, y: params.height / 2, z: params.depth / 2 };
-			nodes.forEach((node) => {
-				node.position.add(node.userData.velocity);
-				if (Math.abs(node.position.x) > bounds.x) node.userData.velocity.x *= -1;
-				if (Math.abs(node.position.y) > bounds.y) node.userData.velocity.y *= -1;
-				if (Math.abs(node.position.z) > bounds.z) node.userData.velocity.z *= -1;
-			});
+			// At moveSpeed 0 — where the design has it — every node's velocity is
+			// the zero vector, so this is 200 objects walked a frame to add
+			// nothing to each.
+			if (params.moveSpeed > 0) {
+				const bounds = { x: params.width / 2, y: params.height / 2, z: params.depth / 2 };
+				nodes.forEach((node) => {
+					node.position.add(node.userData.velocity);
+					if (Math.abs(node.position.x) > bounds.x) node.userData.velocity.x *= -1;
+					if (Math.abs(node.position.y) > bounds.y) node.userData.velocity.y *= -1;
+					if (Math.abs(node.position.z) > bounds.z) node.userData.velocity.z *= -1;
+				});
+			}
 
 			controls.update();
 			renderer.render(scene, camera);
 		};
 
-		const startLoop = () => { frameId = requestAnimationFrame(animate); };
-		const stopLoop = () => { cancelAnimationFrame(frameId); };
+		const startLoop = () => {
+			frameId = requestAnimationFrame(animate);
+		};
+		const stopLoop = () => {
+			cancelAnimationFrame(frameId);
+		};
 
 		const handleResize = () => {
 			camera.aspect = container.clientWidth / container.clientHeight;
@@ -159,4 +177,4 @@
 	});
 </script>
 
-<div bind:this={container} class="w-full h-full"></div>
+<div bind:this={container} class="h-full w-full"></div>

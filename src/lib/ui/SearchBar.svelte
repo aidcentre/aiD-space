@@ -21,12 +21,18 @@
 	];
 	const CYCLE_MS = 2400;
 
+	// Queries are capped so nothing oversized reaches the proxy or the LLM.
+	// The same limit is enforced again in /chat and in the backend — this one
+	// only exists so the user finds out before submitting.
+	const MAX_QUERY_CHARS = 120;
+
 	let userQuery = $state('');
+	let overLimit = $derived(userQuery.trim().length > MAX_QUERY_CHARS);
 	let placeholderEl = $state<HTMLSpanElement>();
 
 	function handleSubmit() {
 		const q = userQuery.trim();
-		if (!q || loading) return;
+		if (!q || loading || q.length > MAX_QUERY_CHARS) return;
 		userQuery = '';
 		onsubmit(q);
 	}
@@ -76,6 +82,9 @@
 			bind:value={userQuery}
 			type="search"
 			autocomplete="off"
+			maxlength={MAX_QUERY_CHARS}
+			aria-invalid={overLimit}
+			aria-describedby="research-topic-search-limit"
 			disabled={loading}
 			class="h-[18px] w-full border-none bg-transparent p-0 font-[IBM_Mono] text-[14px] leading-[18px] tracking-[0.28px] text-white focus:outline-none disabled:cursor-not-allowed"
 		/>
@@ -90,13 +99,22 @@
 	<button
 		use:squircle={{ radius: 6 }}
 		type="submit"
-		disabled={loading}
+		disabled={loading || overLimit}
 		aria-label="Submit search"
 		class="ease-out-expo flex size-8 shrink-0 cursor-pointer items-center justify-center bg-off-black text-[16px] text-white transition-colors duration-500 hover:bg-white hover:text-off-black disabled:cursor-not-allowed disabled:opacity-60"
 	>
 		→
 	</button>
 </form>
+
+<p
+	id="research-topic-search-limit"
+	role="status"
+	class="mt-1 max-w-[700px] font-[IBM_Mono] text-[11px] leading-[14px] text-medium-grey"
+	class:invisible={userQuery.trim().length < MAX_QUERY_CHARS}
+>
+	{userQuery.trim().length}/{MAX_QUERY_CHARS} characters
+</p>
 
 <style>
 	input:focus {

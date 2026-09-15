@@ -143,9 +143,13 @@
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 	}
 
+	// Mirrors MAX_QUERY_CHARS in SearchBar — the bar blocks oversized queries,
+	// this stops any other caller from pushing one into the transcript.
+	const MAX_QUERY_CHARS = 120;
+
 	async function search(query: string) {
 		const q = query?.trim();
-		if (!q || loading) return;
+		if (!q || loading || q.length > MAX_QUERY_CHARS) return;
 
 		const current = ++session;
 
