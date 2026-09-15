@@ -157,7 +157,7 @@
 		// screen; asking a question means you are done with the open article.
 		selectedId = null;
 
-		messages.push({ role: 'user', content: q });
+		const questionIndex = messages.push({ role: 'user', content: q }) - 1;
 		loading = true;
 		await scrollToBottom();
 
@@ -185,7 +185,7 @@
 		} finally {
 			if (current === session) {
 				loading = false;
-				await scrollToBottom();
+				await scrollToQuestion(questionIndex);
 			}
 		}
 	}
@@ -193,6 +193,17 @@
 	async function scrollToBottom() {
 		await tick();
 		bottomAnchor?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+	}
+
+	/**
+	 * Bring the question back to the top once its answer lands, so the answer
+	 * is read from its first line rather than from wherever the bottom was.
+	 */
+	async function scrollToQuestion(index: number) {
+		await tick();
+		document
+			.querySelector(`[data-message-index="${index}"]`)
+			?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 	}
 </script>
 
@@ -245,7 +256,8 @@
 				{#each messages as msg, i (i)}
 					{#if msg.role === 'user'}
 						<div
-							class="w-fit max-w-full self-end rounded-3xl bg-white px-4 py-3 font-[IBM_Math] text-[1rem] leading-6 font-normal tracking-[0.32px] text-black md:rounded-[46px]"
+							data-message-index={i}
+							class="scroll-mt-40 w-fit max-w-full self-end rounded-3xl bg-white px-4 py-3 font-[IBM_Math] text-[1rem] leading-6 font-normal tracking-[0.32px] text-black md:rounded-[46px]"
 						>
 							{msg.content}
 						</div>
