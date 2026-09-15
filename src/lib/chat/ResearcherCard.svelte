@@ -1,6 +1,6 @@
 <script lang="ts">
 	import profilePlaceholder from '$lib/assets/aiD_profile_picture_black.png';
-	import { findResearcher, displayNameFor } from '$lib/data/researchers';
+	import { findResearcher, displayNameFor, nvaProfileUrl } from '$lib/data/researchers';
 
 	let { name, score }: { name: string; score: number } = $props();
 
@@ -12,6 +12,7 @@
 	const profileUrl = $derived(researcher?.profileUrl || undefined);
 	/** Label for the profile link: the employer whose page it points at. */
 	const profileLabel = $derived(researcher?.institution || 'Profile');
+	const nvaUrl = $derived(nvaProfileUrl(researcher));
 
 	// researchers.ts records which photos exist; onerror is a second line of
 	// defence for a file that 404s on the CDN.
@@ -66,6 +67,17 @@
 				class="px-3 py-2 font-[IBM_Mono] text-xs leading-4 text-off-black underline underline-offset-4"
 			>
 				{profileLabel} ↗
+			</a>
+		{/if}
+		{#if nvaUrl}
+			<span class="self-stretch border-l border-light-grey" aria-hidden="true"></span>
+			<a
+				href={nvaUrl}
+				target="_blank"
+				rel="noopener noreferrer"
+				class="px-3 py-2 font-[IBM_Mono] text-xs leading-4 text-off-black underline underline-offset-4"
+			>
+				NVA ↗
 			</a>
 		{/if}
 	</div>

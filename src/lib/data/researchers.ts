@@ -23,6 +23,12 @@ export type Researcher = {
 	title?: string;
 	/** Public profile page. '' when none was found. */
 	profileUrl: string;
+	/**
+	 * NVA (Cristin) person identifier, looked up via
+	 * https://api.nva.unit.no/cristin/person?name=… and matched on affiliation.
+	 * '' when none was found. See `nvaProfileUrl`.
+	 */
+	nvaId: string;
 	/** Path under static/. '' → the card falls back to the placeholder. */
 	image: string;
 };
@@ -55,6 +61,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'SINTEF',
 		title: 'Senior Researcher',
 		profileUrl: 'https://www.sintef.no/alle-ansatte/ansatt/ahmed.mohammed/',
+		nvaId: '811849',
 		image: '/images/researchers/ahmed-mohammed.jpg'
 	},
 	{
@@ -63,6 +70,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'NTNU',
 		title: 'Researcher',
 		profileUrl: 'https://www.ntnu.no/ansatte/akhil.s.anand',
+		nvaId: '1126196',
 		image: '/images/researchers/akhil-s-anand.jpg'
 	},
 	{
@@ -71,6 +79,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'NTNU',
 		title: 'Researcher',
 		profileUrl: 'https://www.ntnu.edu/employees/antonida',
+		nvaId: '856922',
 		image: '/images/researchers/antonios-danelakis.jpg'
 	},
 	{
@@ -79,6 +88,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'NTNU',
 		title: 'Professor',
 		profileUrl: 'https://www.ntnu.no/ansatte/christian.klockner',
+		nvaId: '25198',
 		image: '/images/researchers/christian-klockner.jpg'
 	},
 	{
@@ -87,6 +97,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'SINTEF',
 		title: 'Senior Researcher',
 		profileUrl: 'https://www.sintef.no/alle-ansatte/ansatt/christian.andresen/',
+		nvaId: '36297',
 		image: '/images/researchers/christian-andresen.jpg'
 	},
 	{
@@ -95,6 +106,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'SINTEF',
 		title: 'Senior Researcher',
 		profileUrl: 'https://www.sintef.no/alle-ansatte/ansatt/esteningar.grotli/',
+		nvaId: '34704',
 		image: '/images/researchers/esten-ingar-grotli.jpg'
 	},
 	{
@@ -103,6 +115,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'NTNU',
 		title: 'Professor',
 		profileUrl: 'https://www.ntnu.no/ansatte/helge.langseth',
+		nvaId: '38277',
 		image: '/images/researchers/helge-langseth.jpg'
 	},
 	{
@@ -111,6 +124,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'NTNU',
 		title: 'Professor',
 		profileUrl: 'https://www.ntnu.no/ansatte/henrik.andersson',
+		nvaId: '29741',
 		image: '/images/researchers/henrik-andersson.jpg'
 	},
 	{
@@ -119,6 +133,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'NTNU',
 		title: 'Associate Professor',
 		profileUrl: 'https://www.ntnu.edu/employees/ivan.depina',
+		nvaId: '481384',
 		image: '/images/researchers/ivan-depina.jpg'
 	},
 	{
@@ -129,6 +144,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'SINTEF',
 		title: 'Researcher',
 		profileUrl: 'https://www.sintef.no/alle-ansatte/ansatt/kamilla.andersen/',
+		nvaId: '1151746',
 		image: '/images/researchers/kamilla-johra.jpg'
 	},
 	{
@@ -137,6 +153,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'NTNU',
 		title: 'Professor',
 		profileUrl: 'https://www.ntnu.no/ansatte/jonathan.whitlock',
+		nvaId: '29635',
 		image: '/images/researchers/jonathan-whitlock.jpg'
 	},
 	{
@@ -146,6 +163,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'SINTEF',
 		title: 'Researcher',
 		profileUrl: 'https://www.sintef.no/alle-ansatte/ansatt/jo.strandhagen/',
+		nvaId: '704610',
 		image: '/images/researchers/jo-wessel-strandhagen.jpg'
 	},
 	{
@@ -154,6 +172,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'SINTEF',
 		title: 'Chief Researcher',
 		profileUrl: 'https://www.sintef.no/alle-ansatte/ansatt/knut-andreas.lie/',
+		nvaId: '22402',
 		image: '/images/researchers/knut-andreas-lie.jpg'
 	},
 	{
@@ -164,6 +183,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'NORCE',
 		title: 'Senior Researcher',
 		profileUrl: 'https://www.norceresearch.no/en/persons/kristian-fossum/669',
+		nvaId: '399572',
 		image: '/images/researchers/kristian-fossum.jpg'
 	},
 	{
@@ -172,6 +192,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'NTNU',
 		title: 'Professor',
 		profileUrl: 'https://www.ntnu.edu/employees/magnus.staalhane',
+		nvaId: '41606',
 		image: '/images/researchers/magnus-stalhane.jpg'
 	},
 	{
@@ -180,6 +201,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'SINTEF',
 		title: 'Research Manager',
 		profileUrl: 'https://www.sintef.no/alle-ansatte/ansatt/maria.v.ottermo/',
+		nvaId: '42939',
 		image: '/images/researchers/maria-vatshaug-ottermo.jpg'
 	},
 	{
@@ -188,6 +210,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'SINTEF',
 		title: 'Researcher',
 		profileUrl: 'https://www.sintef.no/alle-ansatte/ansatt/mark.haring/',
+		nvaId: '412110',
 		image: '/images/researchers/mark-haring.jpg'
 	},
 	{
@@ -196,6 +219,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'NTNU',
 		title: 'Professor',
 		profileUrl: 'https://www.ntnu.no/ansatte/mary.a.lundteigen',
+		nvaId: '36755',
 		image: '/images/researchers/mary-ann-lundteigen.jpg'
 	},
 	{
@@ -204,6 +228,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'SINTEF',
 		title: 'Senior Researcher',
 		profileUrl: 'https://www.sintef.no/alle-ansatte/ansatt/olav.moyner/',
+		nvaId: '35132',
 		image: '/images/researchers/olav-moyner.jpg'
 	},
 	{
@@ -212,6 +237,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'NTNU',
 		title: 'Professor',
 		profileUrl: 'https://www.ntnu.no/ansatte/patrick.mikalef',
+		nvaId: '785385',
 		image: '/images/researchers/patrick-mikalef.jpg'
 	},
 	{
@@ -220,6 +246,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'IFE',
 		title: 'Principal Scientist',
 		profileUrl: 'https://ife.no/en/employee/per-oivind-braarud-2/',
+		nvaId: '397460',
 		image: '/images/researchers/per-oivind-braarud.jpg'
 	},
 	{
@@ -228,6 +255,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'SINTEF',
 		title: 'Senior Researcher',
 		profileUrl: 'https://www.sintef.no/alle-ansatte/ansatt/phu.nguyen/',
+		nvaId: '745713',
 		image: '/images/researchers/phu-nguyen.jpg'
 	},
 	{
@@ -236,6 +264,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'University of Oslo',
 		title: 'Professor',
 		profileUrl: 'https://www.mn.uio.no/ifi/english/people/aca/sabita/',
+		nvaId: '4548',
 		image: '/images/researchers/sabita-maharjan.jpg'
 	},
 	{
@@ -244,6 +273,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'NTNU',
 		title: 'Professor',
 		profileUrl: 'https://www.ntnu.no/ansatte/sebastien.gros',
+		nvaId: '1088032',
 		image: '/images/researchers/sebastien-gros.jpg'
 	},
 	{
@@ -252,6 +282,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'SINTEF',
 		title: 'Research Manager',
 		profileUrl: 'https://www.sintef.no/alle-ansatte/ansatt/signe.riemer-sorensen/',
+		nvaId: '549637',
 		image: '/images/researchers/signe-riemer-sorensen.jpg'
 	},
 	{
@@ -260,6 +291,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'SINTEF',
 		title: 'Researcher',
 		profileUrl: 'https://www.sintef.no/alle-ansatte/ansatt/simon.halvdansson/',
+		nvaId: '1316547',
 		image: '/images/researchers/simon-halvdansson.jpg'
 	},
 	{
@@ -268,6 +300,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'NTNU',
 		title: 'Professor',
 		profileUrl: 'https://www.ntnu.edu/employees/stefan.werner',
+		nvaId: '810673',
 		image: '/images/researchers/stefan-werner.jpg'
 	},
 	{
@@ -276,6 +309,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'NTNU',
 		title: 'Associate Professor',
 		profileUrl: 'https://www.ntnu.no/ansatte/steffen.bakker',
+		nvaId: '763731',
 		image: '/images/researchers/steffen-bakker.jpg'
 	},
 	{
@@ -284,6 +318,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'SINTEF',
 		title: 'Senior Researcher',
 		profileUrl: 'https://www.sintef.no/alle-ansatte/ansatt/sven-vegard.buer/',
+		nvaId: '726738',
 		image: '/images/researchers/sven-vegard-buer.jpg'
 	},
 	{
@@ -292,6 +327,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'SINTEF',
 		title: 'Senior Researcher',
 		profileUrl: 'https://www.sintef.no/alle-ansatte/ansatt/solve.eidnes/',
+		nvaId: '803455',
 		image: '/images/researchers/solve-eidnes.jpg'
 	},
 	{
@@ -300,6 +336,7 @@ export const researchers_data: Researcher[] = [
 		institution: 'SINTEF',
 		title: 'Senior Researcher',
 		profileUrl: 'https://www.sintef.no/alle-ansatte/ansatt/thor.myklebust/',
+		nvaId: '412485',
 		image: '/images/researchers/thor-myklebust.jpg'
 	},
 	{
@@ -308,9 +345,15 @@ export const researchers_data: Researcher[] = [
 		institution: 'NTNU',
 		title: 'Professor',
 		profileUrl: 'https://www.ntnu.no/ansatte/trond.kvamsdal',
+		nvaId: '31011',
 		image: '/images/researchers/trond-kvamsdal.jpg'
 	}
 ];
+
+/** Public NVA research-profile page for a researcher, or undefined when unknown. */
+export function nvaProfileUrl(researcher: Researcher | undefined): string | undefined {
+	return researcher?.nvaId ? `https://nva.sikt.no/research-profile/${researcher.nvaId}` : undefined;
+}
 
 const byKey = new Map(researchers_data.map((r) => [normalizeName(r.rosterName), r]));
 
