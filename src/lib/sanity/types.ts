@@ -42,10 +42,20 @@ export interface Employee {
 	};
 }
 
+/** Box around the visible part of an image, as fractions (0–1) of the full image. */
+export interface ContentBounds {
+	x: number;
+	y: number;
+	w: number;
+	h: number;
+}
+
 export interface Partner {
 	_id: string;
 	name?: string;
 	logo?: SanityImage;
+	/** Where the logo's ink sits inside its file; added server-side by `withLogoBounds`. */
+	logoBounds?: ContentBounds | null;
 }
 
 export interface PartnerBucketEntry extends Partner {
