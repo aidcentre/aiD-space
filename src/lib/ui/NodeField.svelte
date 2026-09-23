@@ -514,7 +514,11 @@
 			const y = (-projected.y * 0.5 + 0.5) * viewHeight;
 			const visibility = projected.z > 1 ? 'hidden' : 'visible';
 			if (anchor.style.visibility !== visibility) anchor.style.visibility = visibility;
-			anchor.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+			// Whole device pixels, and only written when they change. A transform
+			// that moves every frame gets the layer treated as animating, which
+			// leaves the thumbnail resampled at subpixel offsets with cheap filtering.
+			const transform = `translate(${snap(x)}px, ${snap(y)}px)`;
+			if (anchor.style.transform !== transform) anchor.style.transform = transform;
 
 			// The squircle fills 0.9 of its quad, so its visible top sits 0.45
 			// of the quad's scaled size above the centre. Published so the
@@ -525,7 +529,16 @@
 				depth > 0
 					? (0.45 * scale * camera.projectionMatrix.elements[5] * viewHeight) / (2 * depth)
 					: 0;
-			anchor.style.setProperty('--node-half-height', `${halfHeight.toFixed(1)}px`);
+			const halfHeightPx = `${snap(halfHeight)}px`;
+			if (anchor.style.getPropertyValue('--node-half-height') !== halfHeightPx) {
+				anchor.style.setProperty('--node-half-height', halfHeightPx);
+			}
+		}
+
+		/** Round a CSS length onto the device pixel grid. */
+		function snap(value: number) {
+			const ratio = window.devicePixelRatio || 1;
+			return Math.round(value * ratio) / ratio;
 		}
 
 		/**
