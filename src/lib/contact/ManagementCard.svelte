@@ -10,7 +10,7 @@
     <div class="flex flex-col gap-4">
         <figure class="aspect-square w-full h-auto rounded-xl overflow-hidden">
             {#if item.image}
-                <img src={item.image} alt={item.name} class="w-full h-full object-cover object-top" />
+                <img src={item.image} alt={item.name} class="w-full h-full object-cover object-top grayscale" />
             {:else}
                 <div class="w-full h-full bg-off-black"></div>
             {/if}

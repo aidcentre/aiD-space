@@ -405,9 +405,7 @@
 	<!-- Lifted clear of the search bar, which is now docked to the bottom. -->
 	<!-- From xl up it sits beside the search bar instead, bottoms aligned. -->
 	<div class="pointer-events-none fixed inset-x-0 bottom-24 z-[1] xl:bottom-4">
-		<HomeText
-			description={(home?.description ?? '').replace(/\s*We're building something great here\.?\s*Watch this space\.?\s*$/i, '')}
-		/>
+		<HomeText description={home?.description ?? ''} />
 	</div>
 {/if}
 
