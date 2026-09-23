@@ -75,6 +75,54 @@
 		else activeScrambler = scrambleDigits(activeNumberEl, number);
 	});
 
+	let cardEl = $state<HTMLDivElement>();
+	let titleEl = $state<HTMLParagraphElement>();
+
+	const CARD_WIDTH = 350;
+	const WIDE_CARD_WIDTH = CARD_WIDTH + 50;
+	const TITLE_FONT_SIZE = 18;
+	const MIN_TITLE_FONT_SIZE = 10;
+	const MAX_TITLE_LINES = 5;
+
+	function titleLines(title: HTMLElement, fontSize: number) {
+		// line-height is 130% of the font size.
+		return Math.round(title.offsetHeight / (fontSize * 1.3));
+	}
+
+	// Long titles first get a wider card (from 4 lines), then shrink until they
+	// fit in MAX_TITLE_LINES. Done imperatively so each step is measured before
+	// the next is tried, all within one frame.
+	function fitTitle() {
+		const card = cardEl;
+		const title = titleEl;
+		if (!card || !title) return;
+
+		card.style.width = `${CARD_WIDTH}px`;
+		card.style.maxWidth = `min(${CARD_WIDTH}px, 70vw)`;
+		let fontSize = TITLE_FONT_SIZE;
+		title.style.fontSize = `${fontSize}px`;
+
+		if (titleLines(title, fontSize) < 4) return;
+
+		card.style.width = `${WIDE_CARD_WIDTH}px`;
+		card.style.maxWidth = `min(${WIDE_CARD_WIDTH}px, 70vw)`;
+
+		while (titleLines(title, fontSize) > MAX_TITLE_LINES && fontSize > MIN_TITLE_FONT_SIZE) {
+			fontSize -= 0.5;
+			title.style.fontSize = `${fontSize}px`;
+		}
+	}
+
+	$effect(() => {
+		void article?.title;
+		fitTitle();
+	});
+
+	// Measurements taken before Milling loads are against the fallback font.
+	$effect(() => {
+		document.fonts?.ready.then(fitTitle);
+	});
+
 	$effect(() => () => {
 		hoverScrambler?.destroy();
 		activeScrambler?.destroy();
@@ -83,7 +131,8 @@
 
 <!-- A zero-size anchor: everything below is positioned relative to the node. -->
 <div class="pointer-events-none relative h-0 w-0">
-	<div class="absolute top-0 left-0">
+	<!-- Lifted from the node's centre to its top edge, which NodeField measures. -->
+	<div class="absolute top-[calc(-1*var(--node-half-height,0px))] left-0">
 		<img
 			use:squircle={{ radius: 8 }}
 			src={tooltipImage}
@@ -109,10 +158,11 @@
 					node // <span bind:this={numberEl} aria-label={article?.nodeNumber}></span>
 				</div>
 				<div
+					bind:this={cardEl}
 					use:squircle={{ radius: 8 }}
-					class="flex w-[350px] max-w-[min(350px,70vw)] flex-col gap-2 bg-white/80 p-4 text-left text-off-black backdrop-blur-[10px]"
+					class="flex flex-col gap-2 bg-white/80 p-4 text-left text-off-black backdrop-blur-[10px]"
 				>
-					<p class="m-0 font-[Milling] text-[18px] leading-[130%] font-bold">
+					<p bind:this={titleEl} class="m-0 font-[Milling] text-[18px] leading-[130%] font-bold">
 						{article?.title ?? ''}
 					</p>
 					<p class="m-0 line-clamp-4 font-[IBM_Math] text-[14px] leading-[130%]">
@@ -135,12 +185,13 @@
 		</div>
 	</div>
 
+	<!-- Thumbnail top-aligned with the square, 16px clear of its right edge. -->
 	<div
-		class="absolute top-6 left-6 flex flex-col items-start gap-4 transition-[opacity] duration-150 ease-in-out"
+		class="absolute top-[calc(-1*var(--node-half-height,0px))] left-[calc(var(--node-half-height,0px)+16px)] transition-[opacity] duration-150 ease-in-out"
 		class:pointer-events-auto={selected}
 		style:opacity={selected ? 1 : 0}
 	>
-		<div class="flex items-center gap-2">
+		<div class="absolute bottom-full left-0 mb-4 flex items-center gap-2">
 			<div use:squircle={{ radius: 8 }} class="node-pill node-pill-active">
 				node // <span bind:this={activeNumberEl} aria-label={article?.nodeNumber}></span>
 			</div>
@@ -191,6 +242,8 @@
 	.node-image {
 		display: block;
 		width: 162px;
+		/* Preflight's max-width: 100% would collapse it inside a shrink-to-fit parent. */
+		max-width: none;
 		height: 176px;
 		border-radius: 8px;
 		object-fit: cover;

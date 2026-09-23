@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
-	import { fly } from 'svelte/transition';
+	import { fade, fly } from 'svelte/transition';
 	import Header from '$lib/ui/Header.svelte';
 	import Menu from '$lib/ui/Menu.svelte';
 	import SearchBar from '$lib/ui/SearchBar.svelte';
@@ -109,6 +109,13 @@
 		selectedId = id;
 	}
 
+	/** Escape closes an open node, however it was opened. */
+	function onWindowKeydown(event: KeyboardEvent) {
+		if (event.key !== 'Escape' || !selectedId || event.defaultPrevented) return;
+		event.preventDefault();
+		select(null);
+	}
+
 	onMount(() => {
 		const probe = document.createElement('div');
 		probe.style.cssText =
@@ -207,7 +214,7 @@
 	}
 </script>
 
-<svelte:window bind:innerWidth />
+<svelte:window bind:innerWidth onkeydown={onWindowKeydown} />
 
 <div class="fixed inset-0 -z-10">
 	<NodeField
@@ -224,8 +231,22 @@
 <Header />
 <Menu />
 
+<!--
+	Shade the search results while a node opened from them is up. It sits above
+	the results (z-1) and below the thumbnail (z-3) and panel (z-8), and it takes
+	the pointer so the cards underneath can be neither hovered nor clicked.
+-->
+{#if selectedArticle && active}
+	<div
+		class="fixed inset-0 z-[2] bg-light-grey/70"
+		transition:fade={{ duration: 300 }}
+		onclick={() => select(null)}
+		aria-hidden="true"
+	></div>
+{/if}
+
 <!-- Tooltip layer. NodeField parks `anchorEl` on the active node each frame. -->
-<div class="pointer-events-none fixed inset-0 z-[2] overflow-hidden">
+<div class="pointer-events-none fixed inset-0 z-[3] overflow-hidden">
 	<div bind:this={anchorEl} class="absolute top-0 left-0" style="visibility: hidden;">
 		<NodeTooltip
 			article={activeArticle}
@@ -293,36 +314,49 @@
 								{/if}
 							</div>
 
-							{#if msg.researchers && msg.researchers.length > 0}
-								<ul class="mt-6 flex flex-col gap-2">
-									{#each msg.researchers as r, ri (r[0])}
-										<li in:fly={{ y: 10, duration: 350, delay: ri * 120 }}>
-											<ResearcherCard name={r[0]} score={r[1]} />
-										</li>
-									{/each}
-								</ul>
-							{/if}
-
 							{#key msg}
 								{@const documents = resolveDocuments(msg.documents)}
-								{#if documents.length > 0}
-									<p
-										class="mt-8 mb-2 w-fit bg-white px-1 font-[IBM_Mono] text-xs text-grey"
-										style="box-shadow: 0 0 60px 30px rgba(255, 255, 255, 1);"
+								{@const researchers = msg.researchers ?? []}
+								{#if researchers.length > 0 || documents.length > 0}
+									<!--
+										Researchers and the research behind the answer sit side by side
+										from md up, and stack (research under researchers) on mobile.
+									-->
+									<div
+										class="mt-6 flex flex-col gap-8 md:-mx-5 md:flex-row md:items-start md:gap-4"
 									>
-										Research behind this answer
-									</p>
-									<ul class="flex flex-col gap-2">
-										{#each documents as doc, di (doc.article.id)}
-											<li in:fly={{ y: 10, duration: 350, delay: di * 120 }}>
-												<ArticleResultCard
-													article={doc.article}
-													score={doc.score}
-													onopen={select}
-												/>
-											</li>
-										{/each}
-									</ul>
+										{#if researchers.length > 0}
+											<ul class="flex min-w-0 flex-1 flex-col gap-2">
+												{#each researchers as r, ri (r[0])}
+													<li in:fly={{ y: 10, duration: 350, delay: ri * 120 }}>
+														<ResearcherCard name={r[0]} score={r[1]} />
+													</li>
+												{/each}
+											</ul>
+										{/if}
+
+										{#if documents.length > 0}
+											<div class="min-w-0 flex-1">
+												<p
+													class="mb-2 w-fit bg-white px-1 font-[IBM_Mono] text-xs text-grey"
+													style="box-shadow: 0 0 60px 30px rgba(255, 255, 255, 1);"
+												>
+													Research behind this answer
+												</p>
+												<ul class="flex flex-col gap-2">
+													{#each documents as doc, di (doc.article.id)}
+														<li in:fly={{ y: 10, duration: 350, delay: di * 120 }}>
+															<ArticleResultCard
+																article={doc.article}
+																score={doc.score}
+																onopen={select}
+															/>
+														</li>
+													{/each}
+												</ul>
+											</div>
+										{/if}
+									</div>
 								{/if}
 							{/key}
 						</div>
@@ -369,8 +403,11 @@
 
 {#if !active && !selectedId}
 	<!-- Lifted clear of the search bar, which is now docked to the bottom. -->
-	<div class="pointer-events-none fixed inset-x-0 bottom-24 z-[1]">
-		<HomeText description={home?.description ?? ''} />
+	<!-- From xl up it sits beside the search bar instead, bottoms aligned. -->
+	<div class="pointer-events-none fixed inset-x-0 bottom-24 z-[1] xl:bottom-4">
+		<HomeText
+			description={(home?.description ?? '').replace(/\s*We're building something great here\.?\s*Watch this space\.?\s*$/i, '')}
+		/>
 	</div>
 {/if}
 

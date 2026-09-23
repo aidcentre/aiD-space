@@ -66,7 +66,10 @@
 	const NODE_COLOR = '#050505';
 	const DIM_OPACITY = 0.25;
 	const HOVER_SCALE = 1.3;
-	const ACTIVE_SCALE = 30 / 18;
+	/** On-screen size of the selected node's square once the camera settles. */
+	const SELECTED_NODE_PX = 56;
+	/** Corner radius of the selected node, matching the thumbnail beside it. */
+	const SELECTED_NODE_RADIUS_PX = 15;
 	/**
 	 * A node's drawn size is its world size under perspective, so the nearest
 	 * ones are already the largest on screen and the hover growth reads as a
@@ -180,6 +183,41 @@
 		return new THREE.CanvasTexture(canvas);
 	}
 
+	/**
+	 * The selected node's shape: a square with the thumbnail's corners, i.e.
+	 * what `squircle({ radius: 8 })` clips a SELECTED_NODE_PX box to. Same
+	 * superellipse sweep as that action, slid onto each corner's centre.
+	 */
+	function createSelectedTexture() {
+		const size = 128;
+		const canvas = document.createElement('canvas');
+		canvas.width = size;
+		canvas.height = size;
+		const ctx = canvas.getContext('2d')!;
+		// The shape fills 0.9 of the quad, like the field's texture, so the
+		// scale maths for SELECTED_NODE_PX holds for both.
+		const half = size * 0.45;
+		const r = (half * SELECTED_NODE_RADIUS_PX) / (SELECTED_NODE_PX / 2);
+		const n = 4.5;
+		const steps = 96;
+		const center = size / 2;
+		ctx.fillStyle = NODE_COLOR;
+		ctx.beginPath();
+		for (let i = 0; i <= steps; i++) {
+			const t = (Math.PI * 2 * i) / steps;
+			const ct = Math.cos(t);
+			const st = Math.sin(t);
+			const ux = Math.sign(ct) * Math.pow(Math.abs(ct), 2 / n);
+			const uy = Math.sign(st) * Math.pow(Math.abs(st), 2 / n);
+			const cx = center + (ux >= 0 ? half - r : r - half);
+			const cy = center + (uy >= 0 ? half - r : r - half);
+			if (i === 0) ctx.moveTo(cx + r * ux, cy + r * uy);
+			else ctx.lineTo(cx + r * ux, cy + r * uy);
+		}
+		ctx.fill();
+		return new THREE.CanvasTexture(canvas);
+	}
+
 	onMount(() => {
 		const scene = new THREE.Scene();
 		scene.background = new THREE.Color(BACKGROUND);
@@ -212,6 +250,7 @@
 		);
 
 		const texture = createSquircleTexture();
+		const selectedTexture = createSelectedTexture();
 
 		type Node = {
 			id: string;
@@ -348,7 +387,11 @@
 		highlightGeometry.setAttribute('aOpacity', highlightOpacity);
 		highlightGeometry.instanceCount = 1;
 
-		const highlight = new THREE.Mesh(highlightGeometry, material);
+		// Its own copy of the material so it can carry the thumbnail-cornered
+		// texture; the field's squircle underneath sits wholly inside it.
+		const highlightMaterial = material.clone();
+		highlightMaterial.uniforms.map.value = selectedTexture;
+		const highlight = new THREE.Mesh(highlightGeometry, highlightMaterial);
 		highlight.frustumCulled = false;
 		highlight.renderOrder = 1;
 		highlight.visible = false;
@@ -425,6 +468,7 @@
 
 		const cameraRight = new THREE.Vector3();
 		const projected = new THREE.Vector3();
+		const viewPosition = new THREE.Vector3();
 		const edge = new THREE.Vector3();
 		const desiredTarget = new THREE.Vector3();
 		const scratch = new THREE.Vector3();
@@ -471,6 +515,17 @@
 			const visibility = projected.z > 1 ? 'hidden' : 'visible';
 			if (anchor.style.visibility !== visibility) anchor.style.visibility = visibility;
 			anchor.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+
+			// The squircle fills 0.9 of its quad, so its visible top sits 0.45
+			// of the quad's scaled size above the centre. Published so the
+			// tooltip can line its top up with the square's.
+			const scale = scaleArray[nodes.indexOf(node)];
+			const depth = -viewPosition.copy(node.position).applyMatrix4(camera.matrixWorldInverse).z;
+			const halfHeight =
+				depth > 0
+					? (0.45 * scale * camera.projectionMatrix.elements[5] * viewHeight) / (2 * depth)
+					: 0;
+			anchor.style.setProperty('--node-half-height', `${halfHeight.toFixed(1)}px`);
 		}
 
 		/**
@@ -546,8 +601,11 @@
 		 * nobody can see, and it saves walking and projecting the field twice.
 		 */
 		function updateNodes(dt: number, lerpT: number, now: number) {
-			const heldId = hoveredId ?? selectedId;
-			const held = heldId ? nodeById.get(heldId) : undefined;
+			// While an article is open, both its node and whichever one the
+			// cursor is on stand still, but nothing steers around either: the
+			// field behind the panel is backdrop, and nodes lifting out of the
+			// way of a passing hover would only pull the eye off the article.
+			const avoided = !selectedId && hoveredId ? nodeById.get(hoveredId) : undefined;
 			const focusId = selectedId ?? hoveredId;
 			if (!selectedId) highlight.visible = false;
 
@@ -571,7 +629,7 @@
 			for (let i = 0; i < count; i++) {
 				const node = nodes[i];
 
-				const spinTarget = node === held ? 0 : 1;
+				const spinTarget = node.id === hoveredId || node.id === selectedId ? 0 : 1;
 				if (node.spin !== spinTarget) {
 					node.spin = ease(node.spin, spinTarget, FREEZE_RATE, dt);
 					if (Math.abs(node.spin - spinTarget) < 0.001) node.spin = spinTarget;
@@ -582,17 +640,17 @@
 				const z = Math.sin(node.angle) * node.radius;
 
 				let detour = 0;
-				if (held !== undefined && node !== held) {
+				if (avoided !== undefined && node !== avoided) {
 					// Squared distance first: all but a handful of nodes are
 					// nowhere near the held one, and for them this comparison is
 					// the whole of the avoidance.
-					const dx = x - held.position.x;
-					const dz = z - held.position.z;
+					const dx = x - avoided.position.x;
+					const dz = z - avoided.position.z;
 					const reachSq = dx * dx + dz * dz;
 					if (reachSq < AVOID_RANGE * AVOID_RANGE) {
 						// Measured against the course the node would hold
 						// anyway, so a detour never feeds back into itself.
-						const gap = node.baseY - held.position.y;
+						const gap = node.baseY - avoided.position.y;
 						const room = AVOID_CLEARANCE - Math.abs(gap);
 						if (room > 0) {
 							const nearness = 1 - THREE.MathUtils.smoothstep(Math.sqrt(reachSq), 0, AVOID_RANGE);
@@ -615,7 +673,13 @@
 				// arrays are left alone — and left un-uploaded — otherwise.
 				let multiplier = 1;
 				if (node.id === selectedId) {
-					multiplier = ACTIVE_SCALE;
+					// Sized against the distance the camera settles at, not the
+					// current one, so the square lands on SELECTED_NODE_PX rather
+					// than shrinking as the camera closes in. The squircle fills
+					// 0.9 of its quad.
+					multiplier =
+						(SELECTED_NODE_PX * 2 * FOCUS_DISTANCE) /
+						(0.9 * camera.projectionMatrix.elements[5] * viewHeight * PARAMS.nodeSize);
 				} else if (node.id === hoveredId) {
 					const depth = (node.position.distanceTo(camera.position) - nearDepth) / depthSpan;
 					const allowance = THREE.MathUtils.smoothstep(
@@ -804,7 +868,9 @@
 			geometry.dispose();
 			highlightGeometry.dispose();
 			material.dispose();
+			highlightMaterial.dispose();
 			texture.dispose();
+			selectedTexture.dispose();
 			controls.dispose();
 			renderer.dispose();
 		};
