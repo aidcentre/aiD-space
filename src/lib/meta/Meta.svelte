@@ -4,7 +4,7 @@
 	// Canonical origin for this site. Hardcoded rather than read from
 	// $env/static/public, where a missing value is a hard build failure — and a
 	// deploy preview must never declare itself canonical anyway. Both aid-centre.no
-	// and aid-center.no serve this site; -centre is the canonical one.
+	// and aid-centre.no serve this site; -centre is the canonical one.
 	// No trailing slash: page.url.pathname supplies the leading one.
 	const BASE_URL = 'https://aid-centre.no';
 
