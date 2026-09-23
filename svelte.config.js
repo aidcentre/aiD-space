@@ -8,8 +8,9 @@ const cacheRoutes = [
 	// Researcher headshots are content-stable (filename changes when a photo
 	// does), so let the CDN and browsers hold them for a year.
 	['/images/researchers/*', 'public, max-age=31536000, immutable'],
-	// Article abstracts change only when the corpus is regenerated, and the file
-	// name is stable, so revalidate rather than cache forever.
+	// Article abstracts and relevant-article lists change only when the corpus
+	// is regenerated, and the file names are stable, so revalidate rather than
+	// cache forever.
 	['/articles/*', 'public, max-age=3600, must-revalidate'],
 	['/images/nodes/*', 'public, max-age=31536000, immutable']
 ].map(([route, cacheControl]) => ({

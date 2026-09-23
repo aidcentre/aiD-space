@@ -3,7 +3,6 @@
 	import { dev } from '$app/environment';
 	import { page } from '$app/state';
 	import { menuOpen } from '$lib/stores/menu';
-	import NodeSphere from './NodeSphere.svelte';
 	import NavButton from './NavButton.svelte';
 	import Link from './Link.svelte';
 
@@ -41,7 +40,7 @@
 				{/if}
 				<div class="flex flex-col gap-1">
 					{#if email}
-						<Link href={`mailto:${email}`} theme="dark">
+						<Link href={`mailto:${email}`} theme="dark" class="-mx-3 -my-2 px-3 py-2">
 							{email}
 						</Link>
 					{/if}
@@ -62,13 +61,6 @@
 					{/if}
 				</div>
 			</div>
-		</div>
-		<div
-			class="pointer-events-none fixed inset-0 z-20 -mt-24 {$menuOpen
-				? 'opacity-50'
-				: 'opacity-0'}"
-		>
-			<NodeSphere theme="dark" />
 		</div>
 	</div>
 {/if}

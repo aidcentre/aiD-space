@@ -3,8 +3,9 @@
 /images/researchers/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Article abstracts change only when the corpus is regenerated, and the file
-# name is stable, so revalidate rather than cache forever.
+# Article abstracts and relevant-article lists change only when the corpus is
+# regenerated, and the file names are stable, so revalidate rather than cache
+# forever.
 /articles/*
   Cache-Control: public, max-age=3600, must-revalidate
 

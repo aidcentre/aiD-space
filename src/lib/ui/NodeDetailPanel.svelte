@@ -7,6 +7,7 @@
 	 * "date added", and the Content Mode row actually switches the abstract
 	 * between its three readings instead of only moving the active pill.
 	 */
+	import { untrack } from 'svelte';
 	import { squircle } from '$lib/utils/squircle';
 	import { useScramble } from '$lib/actions/useScramble';
 	import { formatPublicationDate, type Article } from '$lib/data/articles';
@@ -91,15 +92,46 @@
 
 	$effect(() => () => scrambler?.destroy());
 
+	/**
+	 * The panel stays mounted from one article to the next, so a new article
+	 * would otherwise open wherever the last one was scrolled to — right at the
+	 * bottom, when it was picked from the relevant articles there. Scroll back
+	 * to the top instead, and bring focus along if it was in the panel: the
+	 * card that held it has just been replaced.
+	 */
+	let scroller = $state<HTMLDivElement>();
+	let heading = $state<HTMLHeadingElement>();
+	let focusWasInPanel = false;
+
+	$effect.pre(() => {
+		void article.id;
+		// Before the DOM updates, while the card that was clicked still exists.
+		focusWasInPanel = untrack(() => !!scroller?.contains(document.activeElement));
+	});
+
+	$effect(() => {
+		void article.id;
+		untrack(() => {
+			if (!scroller) return;
+			if (focusWasInPanel) heading?.focus({ preventScroll: true });
+			const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			scroller.scrollTo({ top: 0, behavior: reduceMotion ? 'instant' : 'smooth' });
+		});
+	});
+
 	function choose(mode: ContentMode) {
 		contentMode.set(mode);
 	}
 </script>
 
-<div class="pointer-events-none fixed inset-0 z-[8] overflow-y-auto">
+<div bind:this={scroller} class="pointer-events-none fixed inset-0 z-[8] overflow-y-auto">
+	<!-- Sized by the panel alone; whatever follows stretches to match it. -->
+	<div
+		class="mt-[88px] mr-4 mb-4 ml-auto flex w-max max-w-[calc(100vw-32px)] flex-col max-[900px]:mt-[290px] max-[900px]:mr-0 max-[900px]:mb-0 max-[900px]:w-full max-[900px]:max-w-none"
+	>
 	<aside
 		use:squircle={{ radius: 32 }}
-		class="panel pointer-events-auto relative z-[2] mt-[88px] mr-4 mb-4 ml-auto flex w-max max-w-[calc(100vw-32px)] flex-col overflow-hidden bg-white text-off-black max-[900px]:mt-[290px] max-[900px]:mr-0 max-[900px]:mb-0 max-[900px]:w-full max-[900px]:max-w-none"
+		class="panel pointer-events-auto relative z-[2] flex w-full flex-col overflow-hidden bg-white text-off-black"
 	>
 		<div
 			class="flex w-[577px] max-w-[calc(100vw-32px)] flex-col px-[76px] pt-12 pb-8 max-[900px]:px-4"
@@ -151,7 +183,9 @@
 			{/if}
 
 			<h3
-				class="my-0 -mr-[52px] w-[calc(100%+52px)] max-w-none text-left font-[Milling] text-[36px] leading-[48px] font-bold max-[900px]:mr-0 max-[900px]:w-full"
+				bind:this={heading}
+				tabindex="-1"
+				class="my-0 -mr-[52px] w-[calc(100%+52px)] max-w-none text-left font-[Milling] text-[36px] leading-[48px] font-bold outline-none max-[900px]:mr-0 max-[900px]:w-full"
 				aria-label={article.title}
 			>
 				<span bind:this={titleEl}></span>
@@ -232,6 +266,7 @@
 	</aside>
 
 	{@render children?.()}
+	</div>
 </div>
 
 <style>

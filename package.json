@@ -13,7 +13,8 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"images:researchers": "node scripts/fetch-researcher-images.mjs",
-		"images:thumbnails": "python scripts/generate_node_thumbnails.py"
+		"images:thumbnails": "python scripts/generate_node_thumbnails.py",
+		"articles:related": "python scripts/build_related_articles.py"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.4.0",

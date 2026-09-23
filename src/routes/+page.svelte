@@ -7,7 +7,7 @@
 	import NodeField from '$lib/ui/NodeField.svelte';
 	import NodeTooltip from '$lib/ui/NodeTooltip.svelte';
 	import NodeDetailPanel from '$lib/ui/NodeDetailPanel.svelte';
-	import NextNodeCard from '$lib/ui/NextNodeCard.svelte';
+	import RelatedArticles from '$lib/ui/RelatedArticles.svelte';
 	import { menuOpen } from '$lib/stores/menu';
 	import HomeText from '$lib/ui/HomeText.svelte';
 	import BackToFieldButton from '$lib/ui/BackToFieldButton.svelte';
@@ -62,13 +62,6 @@
 		selectedArticle ?? (hoveredId ? (articleById(hoveredId) ?? null) : null)
 	);
 
-	/** The article one place along the field, for the "Next" card. */
-	const nextArticle = $derived.by(() => {
-		if (!selectedArticle) return null;
-		const index = articles.indexOf(selectedArticle);
-		return articles[(index + 1) % articles.length] ?? null;
-	});
-
 	// Below this the panel fills the viewport, so the search bar would have
 	// nowhere to sit beside it.
 	const PANEL_SEARCH_HIDE_BREAKPOINT_PX = 1100;
@@ -99,9 +92,10 @@
 	/**
 	 * The widest the bar may be. Sliding it left is only half the job: on a
 	 * window narrow enough that the panel takes most of it — half a wide
-	 * monitor, say — a 700px bar still reaches back under the panel and its
-	 * "Next" card. Capping it to the room actually left over keeps the two
-	 * apart at every size, and keeps the bar tracking the window on resize.
+	 * monitor, say — a 700px bar still reaches back under the panel and the
+	 * relevant articles below it. Capping it to the room actually left over
+	 * keeps them apart at every size, and keeps the bar tracking the window on
+	 * resize.
 	 */
 	const searchMaxWidth = $derived(Math.max(0, innerWidth - SEARCH_GUTTER_PX - searchShift * 2));
 
@@ -258,11 +252,7 @@
 
 {#if selectedArticle}
 	<NodeDetailPanel article={selectedArticle}>
-		{#snippet children()}
-			{#if nextArticle}
-				<NextNodeCard article={nextArticle} onselect={select} />
-			{/if}
-		{/snippet}
+		<RelatedArticles article={selectedArticle} onselect={select} />
 	</NodeDetailPanel>
 {/if}
 
