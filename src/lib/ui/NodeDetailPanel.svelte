@@ -105,7 +105,7 @@
 			class="flex w-[577px] max-w-[calc(100vw-32px)] flex-col px-[76px] pt-12 pb-8 max-[900px]:px-4"
 		>
 			<div
-				class="mb-4 flex w-full max-w-[577px] flex-wrap gap-x-8 gap-y-2 pt-4 font-[IBM_Mono] text-[14px] leading-none"
+				class="mb-4 -mr-[40px] flex w-[calc(100%+40px)] max-w-none flex-wrap max-[900px]:mr-0 max-[900px]:w-full gap-x-8 gap-y-2 pt-4 font-[IBM_Mono] text-[14px] leading-none"
 				aria-label="Article metadata"
 			>
 				<span class="inline-flex items-center gap-2 whitespace-nowrap">
@@ -143,7 +143,7 @@
 
 			{#if article.authors.length > 0}
 				<p
-					class="mb-4 w-full max-w-[577px] text-left font-[IBM_Mono] text-[14px] leading-[18px] text-grey"
+					class="mb-4 -mr-[40px] w-[calc(100%+40px)] max-w-none text-left max-[900px]:mr-0 max-[900px]:w-full font-[IBM_Mono] text-[14px] leading-[18px] text-grey"
 				>
 					<span class="text-medium-grey">Co-authors //</span>
 					{article.authors.join(', ')}

@@ -21,6 +21,17 @@ export function formatEventDatesShort(event: Pick<AidEvent, 'startDate' | 'endDa
 	return end === start ? start : `${start} – ${end}`;
 }
 
+/** True once the event's last day (end date, or start date if it has none) is before today. */
+export function isPastEvent(event: Pick<AidEvent, 'startDate' | 'endDate'>): boolean {
+	const last = event.endDate ?? event.startDate;
+	if (!last) return false;
+	const lastDay = new Date(last);
+	lastDay.setHours(0, 0, 0, 0);
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
+	return lastDay < today;
+}
+
 /** "Online" or "Venue, City" depending on the event. */
 export function formatEventLocation(
 	event: Pick<AidEvent, 'isOnline' | 'location'>

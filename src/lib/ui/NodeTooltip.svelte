@@ -15,6 +15,8 @@
 		thumbnailUrl,
 		type Article
 	} from '$lib/data/articles';
+	import { abstractFor, loadAbstracts } from '$lib/data/abstracts';
+	import { contentMode } from '$lib/stores/contentMode';
 
 	let {
 		article,
@@ -28,6 +30,21 @@
 
 	// Hover details give way to the label once the panel is open.
 	const detailsVisible = $derived(!!article && !selected);
+
+	// The hover blurb follows the reading mode picked in the node panel,
+	// showing the teaser until the abstracts have loaded.
+	let abstractsReady = $state(false);
+	$effect(() => {
+		loadAbstracts().then(() => (abstractsReady = true));
+	});
+
+	const blurb = $derived(
+		article
+			? abstractsReady
+				? abstractFor(article.id, $contentMode, article.teaser)
+				: article.teaser
+			: ''
+	);
 
 	// Served straight out of static/, one texture per article.
 	const tooltipImage = $derived(thumbnailUrl(article));
@@ -166,7 +183,7 @@
 						{article?.title ?? ''}
 					</p>
 					<p class="m-0 line-clamp-4 font-[IBM_Math] text-[14px] leading-[130%]">
-						{article?.teaser ?? ''}
+						{blurb}
 					</p>
 				</div>
 			</div>
