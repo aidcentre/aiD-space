@@ -105,6 +105,8 @@
 	const FOCUS_DISTANCE = 14;
 	/** Roughly the opening camera distance, so closing returns to the first view. */
 	const REST_DISTANCE = 111;
+	/** Furthest the scroll wheel can pull the camera back from the field. */
+	const MAX_ZOOM_OUT_DISTANCE = 200;
 	const MOBILE_BREAKPOINT_PX = 900;
 	const PANEL_OCCUPIED_WIDTH_PX = 745;
 	const MOBILE_NODE_TARGET_Y_PX = 188;
@@ -242,6 +244,7 @@
 		const controls = new OrbitControls(camera, renderer.domElement);
 		controls.enableDamping = true;
 		controls.enableZoom = true;
+		controls.maxDistance = MAX_ZOOM_OUT_DISTANCE;
 		controls.enablePan = true;
 		controls.mouseButtons.RIGHT = null;
 		renderer.domElement.removeEventListener(
