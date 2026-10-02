@@ -13,6 +13,7 @@
 		FALLBACK_THUMBNAIL,
 		formatPublicationDate,
 		thumbnailUrl,
+		thumbnailVideoUrl,
 		type Article
 	} from '$lib/data/articles';
 	import { abstractFor, loadAbstracts } from '$lib/data/abstracts';
@@ -55,6 +56,30 @@
 		const image = event.currentTarget as HTMLImageElement;
 		if (!image.src.endsWith(FALLBACK_THUMBNAIL)) image.src = FALLBACK_THUMBNAIL;
 	}
+
+	// The looping video rendered from the article's abstract, with the still
+	// standing in when there is none, it fails to load (no VP9, say), or the
+	// visitor has asked for less motion.
+	let reducedMotion = $state(false);
+	$effect(() => {
+		const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+		reducedMotion = query.matches;
+		const onChange = () => (reducedMotion = query.matches);
+		query.addEventListener('change', onChange);
+		return () => query.removeEventListener('change', onChange);
+	});
+
+	// Forgotten on the next article, so one aborted load does not disable a
+	// video for the rest of the visit.
+	let failedVideo = $state<string | null>(null);
+	$effect(() => {
+		void article?.id;
+		failedVideo = null;
+	});
+	const tooltipVideo = $derived.by(() => {
+		const src = thumbnailVideoUrl(article);
+		return src && !reducedMotion && src !== failedVideo ? src : null;
+	});
 
 	let numberEl = $state<HTMLSpanElement>();
 	let activeNumberEl = $state<HTMLSpanElement>();
@@ -150,17 +175,12 @@
 <div class="pointer-events-none relative h-0 w-0">
 	<!-- Lifted from the node's centre to its top edge, which NodeField measures. -->
 	<div class="absolute top-[calc(-1*var(--node-half-height,0px))] left-0">
-		<img
-			use:squircle={{ radius: 8 }}
-			src={tooltipImage}
-			onerror={useFallback}
-			alt=""
-			aria-hidden="true"
-			class="node-image absolute top-0 right-[calc(100%+24px)] ease-out-expo transition-[opacity,transform] duration-800"
-			style:opacity={detailsVisible ? 1 : 0}
-			style:transform={detailsVisible ? 'translate(0,0)' : 'translate(-10%, -10%)'}
-			style:transition-delay={detailsVisible ? '80ms' : '0ms'}
-		/>
+		{@render nodeMedia(
+			'node-image absolute top-0 right-[calc(100%+24px)] ease-out-expo transition-[opacity,transform] duration-800',
+			detailsVisible
+				? 'opacity: 1; transform: translate(0,0); transition-delay: 80ms'
+				: 'opacity: 0; transform: translate(-10%, -10%); transition-delay: 0ms'
+		)}
 
 		<div
 			class="ml-6 flex flex-col items-start gap-4 ease-out-expo transition-[opacity,transform] duration-800"
@@ -222,16 +242,38 @@
 				X
 			</button>
 		</div>
+		{@render nodeMedia('node-image')}
+	</div>
+</div>
+
+{#snippet nodeMedia(className: string, style = '')}
+	{#if tooltipVideo}
+		<video
+			use:squircle={{ radius: 8 }}
+			src={tooltipVideo}
+			poster={tooltipImage}
+			onerror={() => (failedVideo = tooltipVideo)}
+			autoplay
+			muted
+			loop
+			playsinline
+			disablepictureinpicture
+			aria-hidden="true"
+			class={className}
+			{style}
+		></video>
+	{:else}
 		<img
 			use:squircle={{ radius: 8 }}
 			src={tooltipImage}
 			onerror={useFallback}
 			alt=""
 			aria-hidden="true"
-			class="node-image"
+			class={className}
+			{style}
 		/>
-	</div>
-</div>
+	{/if}
+{/snippet}
 
 <style>
 	.node-pill {
