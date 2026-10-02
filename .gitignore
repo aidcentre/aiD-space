@@ -17,7 +17,15 @@ Thumbs.db
 .env.*
 !.env.example
 !.env.test
+!.env.production
 
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+/.claude
+/aiD-Logo-Anim-PNG-Sequence
+
+# Local TouchDesigner / TouchDiffusion pipeline (venv, engines, model weights, render cache)
+/TouchDiffusion-main
+/Stable_Diffusion_Particles_aiD
+*.safetensors
