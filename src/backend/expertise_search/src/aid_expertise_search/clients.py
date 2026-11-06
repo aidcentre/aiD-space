@@ -1,28 +1,41 @@
 from sentence_transformers import SentenceTransformer
 from langchain_openai import ChatOpenAI
-from os import getenv
-from dotenv import load_dotenv
 from pydantic import SecretStr
-import bm25s
 
-load_dotenv()
+from aid_expertise_search.config import settings
 
-openai_api_key = getenv("OPENAI_API_KEY")
-api_key = SecretStr(openai_api_key) if openai_api_key else None
-strong_client = ChatOpenAI(model="gpt-4.1", temperature=0.0, api_key=api_key)
-medium_client = ChatOpenAI(model="gpt-4.1-mini", temperature=0.0, api_key=api_key)
-weak_client = ChatOpenAI(model="gpt-4.1-nano", temperature=0.0, api_key=api_key)
+api_key = SecretStr(settings.openai_api_key) if settings.openai_api_key else None
+
+# One model for every call. The strong/medium/weak names are kept so existing
+# imports keep working, but they are aliases now, not a tiered set — change
+# OPENAI_MODEL to move all of them at once.
+strong_client = ChatOpenAI(model=settings.openai_model, temperature=0.0, api_key=api_key)
+medium_client = ChatOpenAI(model=settings.openai_model, temperature=0.0, api_key=api_key)
+weak_client = ChatOpenAI(model=settings.openai_model, temperature=0.0, api_key=api_key)
 answer_client = ChatOpenAI(
-    model="gpt-4.1-mini",
+    model=settings.openai_model,
     temperature=0.0,
     api_key=api_key,
     tags=["answer"],
 )
 
 embedding_model: SentenceTransformer | None = None
-bm25_retriever: bm25s.BM25 | None = None
 
-def load_models():
-    global embedding_model, bm25_retriever
-    embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
-    bm25_retriever = bm25s.BM25.load("src/aid_expertise_search/datasets/bm25")
+
+def load_models() -> None:
+    """
+    Load the embedding model into the module global.
+
+    Called once from the FastAPI lifespan hook. The weights are baked into the
+    Docker image, so this is a local disk read rather than a network download.
+    """
+    global embedding_model
+    if embedding_model is None:
+        embedding_model = SentenceTransformer(settings.embedding_model)
+
+
+def encode(text: str) -> list[float]:
+    """Embed `text` as a plain list, ready to hand to Cosmos as a query parameter."""
+    if embedding_model is None:
+        raise RuntimeError("load_models() has not run")
+    return embedding_model.encode(text).tolist()

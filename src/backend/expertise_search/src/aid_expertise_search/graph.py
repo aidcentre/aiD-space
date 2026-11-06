@@ -1,6 +1,7 @@
 from langgraph.graph import StateGraph, START, END
 from typing import Literal
 import aid_expertise_search.functions as aid_functions
+import aid_expertise_search.legacy_local as legacy
 from aid_expertise_search.clients import weak_client, medium_client, strong_client
 import aid_expertise_search.clients as _clients
 from aid_expertise_search.classes import State
@@ -31,7 +32,7 @@ def SearchAndEvaluateNode(state: State) -> State:
     else:
         vector = _clients.embedding_model.encode(state.get('scientific_area').specific_area)
 
-    retrieved_df = aid_functions.retrieval(df = aid_functions.load_dataframe('documents.pkl'), vector = vector).sort_values(by='cosine', ascending=False)
+    retrieved_df = legacy.retrieval(df = aid_functions.load_dataframe('documents.pkl'), vector = vector).sort_values(by='cosine', ascending=False)
 
     authors_article_score  = {}
     authors_total_n_papers  = {}

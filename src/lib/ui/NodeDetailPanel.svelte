@@ -1,0 +1,310 @@
+<script lang="ts">
+	/**
+	 * The article panel that docks to the right when a node is opened.
+	 *
+	 * Ported from the prototype's NodeDetailPanel, with two differences: the
+	 * metadata row shows the article's real publication date rather than a
+	 * "date added", and the Content Mode row actually switches the abstract
+	 * between its three readings instead of only moving the active pill.
+	 */
+	import { untrack } from 'svelte';
+	import { squircle } from '$lib/utils/squircle';
+	import { useScramble } from '$lib/actions/useScramble';
+	import { formatPublicationDate, type Article } from '$lib/data/articles';
+	import {
+		CONTENT_MODES,
+		CONTENT_MODE_LABELS,
+		abstractFor,
+		loadAbstracts,
+		type ContentMode
+	} from '$lib/data/abstracts';
+	import { contentMode } from '$lib/stores/contentMode';
+	import { findResearcher, displayNameFor } from '$lib/data/researchers';
+	import profilePlaceholder from '$lib/assets/aiD_profile_picture_black.png';
+	import endOfArticle from '$lib/assets/end_of_article.svg';
+
+	let {
+		article,
+		children
+	}: {
+		article: Article;
+		/** Rendered below the panel, inside its scroll container. */
+		children?: import('svelte').Snippet;
+	} = $props();
+
+	/**
+	 * Abstracts arrive over the network, so track the load and re-read on
+	 * settle. Until then the teaser stands in, which is the same prose.
+	 */
+	let abstractsReady = $state(false);
+	$effect(() => {
+		loadAbstracts().then(() => (abstractsReady = true));
+	});
+
+	const body = $derived(
+		abstractsReady
+			? abstractFor(article.id, $contentMode, article.teaser)
+			: article.teaser
+	);
+
+	const researcher = $derived(findResearcher(article.researcher));
+	const researcherName = $derived(
+		researcher?.displayName ?? displayNameFor(article.researcher)
+	);
+	const researcherSubtitle = $derived(
+		[researcher?.title, researcher?.institution].filter(Boolean).join(' · ') || 'aiD researcher'
+	);
+
+	let brokenPhoto = $state(false);
+	const photo = $derived(
+		!brokenPhoto && researcher?.image ? researcher.image : profilePlaceholder
+	);
+
+	// The title decodes in after the panel has finished sliding, matching the
+	// prototype's 400ms beat.
+	let titleEl = $state<HTMLElement>();
+	let scrambler: ReturnType<typeof useScramble> | null = null;
+
+	$effect(() => {
+		const text = article.title;
+		if (!titleEl) return;
+
+		if (scrambler) {
+			scrambler.update({ text });
+			return;
+		}
+
+		const element = titleEl;
+		const timer = setTimeout(() => {
+			scrambler = useScramble(element, {
+				text,
+				playOnMount: true,
+				speed: 1.5,
+				tick: 1,
+				step: 6,
+				scramble: 4,
+				overflow: true,
+				range: [65, 90]
+			});
+		}, 400);
+		return () => clearTimeout(timer);
+	});
+
+	$effect(() => () => scrambler?.destroy());
+
+	/**
+	 * The panel stays mounted from one article to the next, so a new article
+	 * would otherwise open wherever the last one was scrolled to — right at the
+	 * bottom, when it was picked from the relevant articles there. Scroll back
+	 * to the top instead, and bring focus along if it was in the panel: the
+	 * card that held it has just been replaced.
+	 */
+	let scroller = $state<HTMLDivElement>();
+	let heading = $state<HTMLHeadingElement>();
+	let focusWasInPanel = false;
+
+	$effect.pre(() => {
+		void article.id;
+		// Before the DOM updates, while the card that was clicked still exists.
+		focusWasInPanel = untrack(() => !!scroller?.contains(document.activeElement));
+	});
+
+	$effect(() => {
+		void article.id;
+		untrack(() => {
+			if (!scroller) return;
+			if (focusWasInPanel) heading?.focus({ preventScroll: true });
+			const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			scroller.scrollTo({ top: 0, behavior: reduceMotion ? 'instant' : 'smooth' });
+		});
+	});
+
+	function choose(mode: ContentMode) {
+		contentMode.set(mode);
+	}
+</script>
+
+<div bind:this={scroller} class="pointer-events-none fixed inset-0 z-[8] overflow-y-auto">
+	<!-- Sized by the panel alone; whatever follows stretches to match it. -->
+	<div
+		class="mt-[88px] mr-4 mb-4 ml-auto flex w-max max-w-[calc(100vw-32px)] flex-col max-[900px]:mt-[290px] max-[900px]:mr-0 max-[900px]:mb-0 max-[900px]:w-full max-[900px]:max-w-none"
+	>
+	<aside
+		use:squircle={{ radius: 32 }}
+		class="panel pointer-events-auto relative z-[2] flex w-full flex-col overflow-hidden bg-white text-off-black"
+	>
+		<div
+			class="flex w-[577px] max-w-[calc(100vw-32px)] flex-col px-[76px] pt-12 pb-8 max-[900px]:px-4"
+		>
+			<div
+				class="mb-4 -mr-[40px] flex w-[calc(100%+40px)] max-w-none flex-wrap max-[900px]:mr-0 max-[900px]:w-full gap-x-8 gap-y-2 pt-4 font-[IBM_Mono] text-[14px] leading-none"
+				aria-label="Article metadata"
+			>
+				<span class="inline-flex items-center gap-2 whitespace-nowrap">
+					<span class="text-medium-grey">Type</span>
+					<span class="text-medium-grey">//</span>
+					<span>Article</span>
+				</span>
+				<span class="inline-flex items-center gap-2 whitespace-nowrap">
+					<span class="text-medium-grey">Publication date</span>
+					<span class="text-medium-grey">//</span>
+					<span>{formatPublicationDate(article.publicationDate)}</span>
+				</span>
+				{#if article.venue}
+					<span class="inline-flex items-center gap-2">
+						<span class="text-medium-grey">Published in</span>
+						<span class="text-medium-grey">//</span>
+						<span>{article.venue}</span>
+					</span>
+				{/if}
+				{#if article.doi}
+					<span class="inline-flex items-center gap-2">
+						<span class="text-medium-grey">DOI</span>
+						<span class="text-medium-grey">//</span>
+						<a
+							href={`https://doi.org/${article.doi}`}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="break-all underline underline-offset-4"
+						>
+							{article.doi} ↗
+						</a>
+					</span>
+				{/if}
+			</div>
+
+			{#if article.authors.length > 0}
+				<p
+					class="mb-4 -mr-[40px] w-[calc(100%+40px)] max-w-none text-left max-[900px]:mr-0 max-[900px]:w-full font-[IBM_Mono] text-[14px] leading-[18px] text-grey"
+				>
+					<span class="text-medium-grey">Co-authors //</span>
+					{article.authors.join(', ')}
+				</p>
+			{/if}
+
+			<h3
+				bind:this={heading}
+				tabindex="-1"
+				class="my-0 -mr-[52px] w-[calc(100%+52px)] max-w-none text-left font-[Milling] text-[36px] leading-[48px] font-bold outline-none max-[900px]:mr-0 max-[900px]:w-full"
+				aria-label={article.title}
+			>
+				<span bind:this={titleEl}></span>
+			</h3>
+		</div>
+
+		<div class="flex flex-col items-center px-[76px] pb-12 max-[900px]:px-4">
+			<div class="mb-6 flex w-full max-w-[577px] flex-wrap items-center gap-2">
+				<span class="font-[IBM_Mono] text-[14px] leading-none whitespace-nowrap text-medium-grey">
+					Content Mode //
+				</span>
+				<div class="flex items-center gap-2" role="group" aria-label="Content mode">
+					{#each CONTENT_MODES as mode (mode)}
+						<button
+							use:squircle={{ radius: 8 }}
+							type="button"
+							class="cursor-pointer rounded-lg p-2 font-[IBM_Mono] text-[14px] leading-none backdrop-blur-[10px] {$contentMode ===
+							mode
+								? 'bg-off-black text-white'
+								: 'bg-transparent text-off-black'}"
+							aria-pressed={$contentMode === mode}
+							onclick={() => choose(mode)}
+						>
+							{CONTENT_MODE_LABELS[mode]}
+						</button>
+					{/each}
+				</div>
+			</div>
+
+			<div class="w-full max-w-[577px] text-left font-[IBM_Math] text-[18px] leading-6">
+				{#key `${article.id}-${$contentMode}`}
+					<p class="body-in m-0">{body}</p>
+				{/key}
+			</div>
+
+			<img src={endOfArticle} alt="End of article" class="my-8 h-4" />
+
+			<div class="flex w-full max-w-[577px] flex-col gap-2">
+				<svg
+					class="mb-4 size-8"
+					viewBox="0 0 100 100"
+					xmlns="http://www.w3.org/2000/svg"
+					role="img"
+					aria-label="aiD"
+				>
+					<rect x="0" y="0" width="100" height="100" rx="24" fill="#070707" />
+					<rect x="38" y="18" width="24" height="24" rx="7" fill="#fff" />
+					<rect x="20" y="52" width="24" height="24" rx="7" fill="#fff" />
+					<rect x="56" y="52" width="24" height="24" rx="7" fill="#fff" />
+				</svg>
+				<div class="flex items-center gap-6 rounded-2xl bg-off-black p-3 text-left text-white">
+					<img
+						src={photo}
+						alt={researcherName}
+						onerror={() => (brokenPhoto = true)}
+						class="size-[97px] shrink-0 rounded-lg object-cover grayscale"
+					/>
+					<div class="flex flex-col gap-2">
+						<p class="m-0 font-[IBM_Mono] text-[14px] leading-[18px]">
+							{researcherName}<br aria-hidden="true" />↳ {researcherSubtitle}
+						</p>
+						<div class="flex flex-wrap gap-4">
+							{#if researcher?.profileUrl}
+								<a
+									href={researcher.profileUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="font-[IBM_Mono] text-[14px] underline underline-offset-4"
+								>
+									Profile ↗
+								</a>
+							{/if}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</aside>
+
+	{@render children?.()}
+	</div>
+</div>
+
+<style>
+	.panel {
+		border-radius: 32px;
+		animation: panel-in 240ms ease-out both;
+		animation-delay: 400ms;
+	}
+
+	@media (max-width: 900px) {
+		.panel {
+			border-radius: 24px 24px 0 0;
+		}
+	}
+
+	@keyframes panel-in {
+		from {
+			opacity: 0;
+			transform: translateY(16px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.body-in {
+		animation: body-in 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+	}
+
+	@keyframes body-in {
+		from {
+			opacity: 0;
+			transform: translateY(6px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+</style>

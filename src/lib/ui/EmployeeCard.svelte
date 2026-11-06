@@ -12,7 +12,7 @@
             <img
                 src={employee.image?.asset.url}
                 alt={employee.name ?? ''}
-                class="w-full h-full object-cover object-top"
+                class="w-full h-full object-cover object-top grayscale"
                 loading="lazy"
             />
         {:else}

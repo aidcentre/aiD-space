@@ -28,6 +28,8 @@ export interface UseScrambleOptions {
 	overdrive?: boolean | number;
 	/** Characters to skip scrambling (e.g. spaces) */
 	ignore?: string[];
+	/** Per-character flags marking which characters of `text` render bold */
+	boldMask?: boolean[];
 	/** Don't auto-play on mount */
 	playOnMount?: boolean;
 	/** Trigger animation when element scrolls into view */
@@ -42,6 +44,36 @@ export interface UseScrambleOptions {
 
 function getRandomInt(min: number, max: number): number {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function escapeHtml(value: string): string {
+	return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+/**
+ * Write `value` into the node, wrapping the character positions flagged in
+ * `mask` in <strong>. Positions line up with the source text, so partially
+ * revealed frames stay correctly bolded mid-animation.
+ */
+function render(node: HTMLElement, value: string, mask?: boolean[]) {
+	if (!mask) {
+		node.textContent = value;
+		return;
+	}
+	let html = '';
+	let run = '';
+	let runBold = false;
+	for (let i = 0; i < value.length; i++) {
+		const bold = mask[i] === true;
+		if (bold !== runBold) {
+			if (run) html += runBold ? `<strong>${escapeHtml(run)}</strong>` : escapeHtml(run);
+			run = '';
+			runBold = bold;
+		}
+		run += value[i];
+	}
+	if (run) html += runBold ? `<strong>${escapeHtml(run)}</strong>` : escapeHtml(run);
+	node.innerHTML = html;
 }
 
 function getRandomChar(range: RangeOrCharCodes): string {
@@ -67,6 +99,7 @@ export function useScramble(
 		range = [48, 57],
 		overdrive = true,
 		ignore = [' '],
+		boldMask,
 		playOnMount = true,
 		scrollIntoView = true,
 		onAnimationStart,
@@ -184,7 +217,7 @@ export function useScramble(
 					result += '';
 			}
 		}
-		node.textContent = result;
+		render(node, result, boldMask);
 		onAnimationFrame?.(result);
 
 		if (result === text) {
@@ -222,7 +255,7 @@ export function useScramble(
 		cancelAnimationFrame(rafId);
 		const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		if (prefersReducedMotion) {
-			node.textContent = text;
+			render(node, text, boldMask);
 			onAnimationEnd?.();
 			return;
 		}
@@ -251,13 +284,13 @@ export function useScramble(
 		if (playOnMount) {
 			play();
 		} else {
-			node.textContent = text;
+			render(node, text, boldMask);
 		}
 		return () => {};
 	};
 
 	// Initial text & reactive text updates
-	node.textContent = text;
+	render(node, text, boldMask);
 	control = text.split('');
 	let cleanup: (() => void) | undefined;
 
@@ -266,7 +299,7 @@ export function useScramble(
 	} else if (scrollIntoView) {
 		cleanup = startAnimation();
 	} else {
-		node.textContent = text;
+		render(node, text, boldMask);
 	}
 
 	return {
@@ -286,6 +319,7 @@ export function useScramble(
 			range = newOptions.range ?? range;
 			overdrive = newOptions.overdrive ?? overdrive;
 			ignore = newOptions.ignore ?? ignore;
+			boldMask = newOptions.boldMask ?? boldMask;
 			playOnMount = newOptions.playOnMount ?? playOnMount;
 			scrollIntoView = newOptions.scrollIntoView ?? scrollIntoView;
 			if (newOptions.onAnimationStart !== undefined) onAnimationStart = newOptions.onAnimationStart;
@@ -304,14 +338,14 @@ export function useScramble(
 				}
 			}
 
-			node.textContent = text;
+			render(node, text, boldMask);
 			control = text.split('');
 			if (playOnMount && !scrollIntoView) {
 				play();
 			} else if (scrollIntoView) {
 				cleanup = startAnimation();
 			} else {
-				node.textContent = text;
+				render(node, text, boldMask);
 			}
 		},
 		destroy() {

@@ -1,55 +1,84 @@
 <script lang="ts">
-	import Link from '$lib/ui/Link.svelte';
-	import { management_data } from '$lib/data/management';
+	import profilePlaceholder from '$lib/assets/aiD_profile_picture_black.png';
+	import { findResearcher, displayNameFor, nvaProfileUrl } from '$lib/data/researchers';
 
-	// need to pass in professional site links
-	let { name, score } = $props();
+	let { name, score }: { name: string; score: number } = $props();
 
-	const researcher_data = management_data.find((p) => p.name.toLowerCase() === name.toLowerCase());
+	const researcher = $derived(findResearcher(name));
+	const displayName = $derived(researcher?.displayName ?? displayNameFor(name));
+	const subtitle = $derived(
+		[researcher?.title, researcher?.institution].filter(Boolean).join(' · ') || 'AID researcher'
+	);
+	const profileUrl = $derived(researcher?.profileUrl || undefined);
+	/** Label for the profile link: the employer whose page it points at. */
+	const profileLabel = $derived(researcher?.institution || 'Profile');
+	const nvaUrl = $derived(nvaProfileUrl(researcher));
 
-	const imageSrc = researcher_data?.image || 'src/lib/assets/aiD_profile_picture_black.png';
-	const description = researcher_data
-		? `${researcher_data?.title}, ${researcher_data?.affiliation} `
-		: 'Researcher';
+	// researchers.ts records which photos exist; onerror is a second line of
+	// defence for a file that 404s on the CDN.
+	let broken = $state(false);
+	const imageSrc = $derived(!broken && researcher?.image ? researcher.image : profilePlaceholder);
+
+	const scoreText = $derived(score.toFixed(2));
 </script>
 
 <div class="divide-solid divide-off-black overflow-hidden rounded-lg bg-white">
 	<div class="flex flex-col gap-3 p-3 md:flex-row md:items-center">
-		<img src={imageSrc} alt="Researcher {name}" class="w-20 rounded-lg select-none" />
+		<img
+			src={imageSrc}
+			alt={displayName}
+			width="80"
+			height="80"
+			loading="eager"
+			decoding="async"
+			onerror={() => (broken = true)}
+			class="size-20 shrink-0 rounded-lg bg-light-grey object-cover grayscale select-none"
+		/>
 		<div>
-			<p class="mb-1 font-[Milling] leading-6 font-bold">{name}</p>
+			{#if profileUrl}
+				<a
+					href={profileUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="mb-1 block font-[Milling] leading-6 font-bold hover:underline"
+				>
+					{displayName}
+				</a>
+			{:else}
+				<p class="mb-1 font-[Milling] leading-6 font-bold">{displayName}</p>
+			{/if}
 			<p class="font-[IBM_Mono] text-[14px] leading-4.5 font-normal tracking-[0.28px]">
-				{description}
+				{subtitle}
 			</p>
 		</div>
 	</div>
-	<div
-		class="flex flex-row items-center gap-0 divide-x divide-solid divide-light-grey border-t border-light-grey bg-white"
-	>
-		<div class="flex-1 rounded-bl-lg px-3 py-2">
-			<p class="text-grey font-[IBM_Mono] text-xs leading-4 font-bold">
-				Relevance score: {score}
+	<div class="flex flex-row items-center border-t border-light-grey bg-white">
+		<div class="flex-1 rounded-b-lg px-3 py-2">
+			<p class="font-[IBM_Mono] text-xs leading-4 font-bold text-grey">
+				Relevance score: {scoreText}
 			</p>
 		</div>
-		<Link
-			class="shrink-0 px-3 py-2 text-[14px]"
-			href="https://teams.microsoft.com/l/team/19%3AOTSSrCNVkGTBJHl_AzocWwTuuV5ZCNEN7mx4ah62ke41%40thread.tacv2/conversations?groupId=9721146a-0c5c-49cb-a900-198193622f56&tenantId=09a10672-822f-4467-a5ba-5bb375967c05"
-			theme="light"
-			border={false}
-			trailing={true}
-			target="_blank"
-		>
-			NTNU
-		</Link>
-		<Link
-			class="shrink-0 rounded-br-lg px-3 py-2 text-[14px]"
-			href="https://teams.microsoft.com/l/team/19%3AOTSSrCNVkGTBJHl_AzocWwTuuV5ZCNEN7mx4ah62ke41%40thread.tacv2/conversations?groupId=9721146a-0c5c-49cb-a900-198193622f56&tenantId=09a10672-822f-4467-a5ba-5bb375967c05"
-			theme="light"
-			border={false}
-			trailing={true}
-			target="_blank"
-		>
-			GitHub
-		</Link>
+		{#if profileUrl}
+			<span class="self-stretch border-l border-light-grey" aria-hidden="true"></span>
+			<a
+				href={profileUrl}
+				target="_blank"
+				rel="noopener noreferrer"
+				class="px-3 py-2 font-[IBM_Mono] text-xs leading-4 text-off-black underline underline-offset-4"
+			>
+				{profileLabel} ↗
+			</a>
+		{/if}
+		{#if nvaUrl}
+			<span class="self-stretch border-l border-light-grey" aria-hidden="true"></span>
+			<a
+				href={nvaUrl}
+				target="_blank"
+				rel="noopener noreferrer"
+				class="px-3 py-2 font-[IBM_Mono] text-xs leading-4 text-off-black underline underline-offset-4"
+			>
+				NVA ↗
+			</a>
+		{/if}
 	</div>
 </div>

@@ -11,14 +11,15 @@ authors = [
 ]
 readme = "README.md"
 requires-python = ">=3.13"
+
+# Runtime dependencies only — this is what ships in the container image.
+# PDF parsing, plotting, Streamlit and the old bm25s index are build/local-time
+# concerns and live in the optional groups below.
 dependencies = [
     "fastapi==0.135.2",
-    "uvicorn==0.24.0",
+    "uvicorn[standard]==0.34.0",
     "pandas==2.2.3",
     "numpy==2.3.5",
-    "hdbscan==0.8.40",
-    "umap-learn==0.5.7",
-    "nltk==3.9.1",
     "sentence-transformers==3.3.1",
     "openai==1.86.0",
     "python-dotenv==1.1.0",
@@ -27,16 +28,31 @@ dependencies = [
     "langchain-openai==0.3.24",
     "langchain-text-splitters==0.3.8",
     "langsmith==0.4.1",
-    "scikit-learn==1.7.1",
-    "matplotlib==3.10.3",
     "langgraph==0.5.4",
-    "streamlit==1.47.1",
-    "pyfiglet==1.0.4",
-    "bm25s==0.3.2.post1",
+    "azure-cosmos>=4.9.0",
+    "azure-identity>=1.19.0",
+    "azure-storage-blob>=12.24.0",
+]
+
+[project.optional-dependencies]
+# Needed to build the corpus and push it to Azure (scripts/ingest.py,
+# embedding_program.py). Not installed in the container.
+ingest = [
     "PyMuPDF==1.26.6",
     "pymupdf-layout==1.26.6",
-    "pymupdf4llm==0.2.9"
+    "pymupdf4llm==0.2.9",
+    "nltk==3.9.1",
+]
 
+# The legacy local Streamlit explorer (app.py, memory_app.py, graph.py).
+local = [
+    "streamlit==1.47.1",
+    "bm25s==0.3.2.post1",
+    "scikit-learn==1.7.1",
+    "matplotlib==3.10.3",
+    "umap-learn==0.5.7",
+    "hdbscan==0.8.40",
+    "pyfiglet==1.0.4",
 ]
 
 [tool.setuptools.packages.find]

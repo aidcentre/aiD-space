@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+import traceback
 
 os.environ["OPENAI_API_KEY"] = st.secrets["openai"]["api_key"]
 
@@ -15,7 +16,32 @@ with aid_logo:
 with title:
     st.markdown("# AID Expertise Search")
 
-from aid_expertise_search import graph
+try:
+    from aid_expertise_search import graph
+    from aid_expertise_search.clients import load_models
+except Exception as e:
+    print(f"ERROR importing graph module: {e}")
+    print(traceback.format_exc())
+    st.error(f"Failed to load graph module: {str(e)}")
+    st.stop()
+
+
+# The embedding model and BM25 retriever are module-level globals that start as
+# None; they must be loaded before any query runs. Cache so this happens once
+# across Streamlit's per-interaction reruns.
+@st.cache_resource
+def _ensure_models_loaded():
+    load_models()
+    return True
+
+
+try:
+    _ensure_models_loaded()
+except Exception as e:
+    print(f"ERROR loading models: {e}")
+    print(traceback.format_exc())
+    st.error(f"Failed to load models: {str(e)}")
+    st.stop()
 
 if "query" not in st.session_state:
     st.session_state.query = ""
@@ -85,11 +111,15 @@ def run_graph(state: graph.State = None):
                 reverse=True,
             )
         )
-    except:
+    except Exception as e:
+        import traceback
+        error_msg = traceback.format_exc()
+        print(f"Error in graph execution:\n{error_msg}")
         st.session_state.suggestions = []
         st.session_state.query_suggestions = []
         st.session_state.response = (
-            "Something went wrong, please try again with a different query."
+            "Something went wrong, please try again with a different query.\n\n"
+            f"**Error:** `{type(e).__name__}: {e}`"
         )
         st.session_state.authors = []
 
@@ -226,7 +256,7 @@ with button:
 
   <footer>
   <p>
-    Made in 2025 by SINTEF Digital
+    © 2025 - 2026 SINTEF Digital
   </p>
 </footer>
 

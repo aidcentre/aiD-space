@@ -100,14 +100,30 @@
 			{#if displayedPartners.length}
 				<div bind:this={container} class="flex flex-wrap gap-1">
 					{#each displayedPartners as partner (partner._id)}
-						<div class="partner-tile flex w-fit items-center rounded-lg lg:rounded-xl xl:rounded-2xl bg-white">
-							{#if partner.logo}
-								<img
-									src={urlFor(partner.logo).url()}
-									alt={partner.name ?? ''}
-									class="w-auto h-20 lg:h-26 xl:h-32"
-									loading="lazy"
-								/>
+						{@const asset = partner.logo?.asset}
+						{@const ink = partner.logoBounds ?? { x: 0, y: 0, w: 1, h: 1 }}
+						{@const size = asset?.metadata?.dimensions}
+						{@const ratio = size ? (ink.w * size.width) / (ink.h * size.height) : 1}
+						<!-- Padding matches the vertical gap left by the logo's max height, so logos sit evenly inset -->
+						<div
+							class="partner-tile flex h-20 w-fit items-center justify-center rounded-lg bg-white px-5 lg:h-26 lg:rounded-xl lg:px-7 xl:h-32 xl:rounded-2xl xl:px-9"
+						>
+							{#if asset}
+								<!-- A window onto just the logo's ink: the image is scaled and shifted so padding baked into the file falls outside it -->
+								<div
+									class="relative aspect-(--ratio) w-[min(8rem,2.5rem*var(--ratio))] overflow-hidden lg:w-[min(10rem,3rem*var(--ratio))] xl:w-[min(12rem,3.5rem*var(--ratio))]"
+									style:--ratio={ratio}
+								>
+									<img
+										src={urlFor(asset).height(Math.ceil(112 / ink.h)).fit('max').auto('format').url()}
+										alt={partner.name ?? ''}
+										class="absolute h-auto max-w-none"
+										style:width="{100 / ink.w}%"
+										style:left="{(-100 * ink.x) / ink.w}%"
+										style:top="{(-100 * ink.y) / ink.h}%"
+										loading="lazy"
+									/>
+								</div>
 							{/if}
 						</div>
 					{/each}

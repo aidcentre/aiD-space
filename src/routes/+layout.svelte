@@ -1,5 +1,5 @@
 <script lang="ts">
-	import './style.css';
+	import './style.css?v=20260910';
 	import Meta from '$lib/meta/Meta.svelte';
 	import type { LayoutProps } from './$types';
 

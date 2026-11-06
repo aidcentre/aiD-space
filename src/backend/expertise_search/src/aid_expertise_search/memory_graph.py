@@ -1,159 +1,196 @@
-from langgraph.graph import StateGraph, START, END
+"""
+The graph behind the FastAPI backend.
+
+Differs from the original in two ways:
+
+  * Retrieval hits Cosmos DB (hybrid vector + BM25 via RRF) instead of sweeping
+    an in-memory pandas DataFrame and a local bm25s index.
+  * There is no server-side conversation memory. The old `total_retrieved_df`
+    accumulated retrieved documents across turns in a module global, which was
+    shared by every concurrent user and could not survive more than one ACA
+    replica. Retrieval now runs fresh each turn against the client-supplied
+    history, so the process holds nothing between requests.
+"""
+
+import re
 from typing import Literal
-import pandas as pd
+
+from langgraph.graph import StateGraph, START, END
+
 import aid_expertise_search.functions as aid_functions
-from aid_expertise_search.clients import weak_client, medium_client, strong_client, answer_client
-import aid_expertise_search.clients as _clients
+from aid_expertise_search import clients, retrieval
 from aid_expertise_search.classes import MemoryState
+from aid_expertise_search.config import settings
+
+# The answering prompt has always used only the opening slice of each document.
+_CONTEXT_CHARS = 2000
+
+# Markers that the model failed to pin down a scientific field. The prompt asks
+# for the literal word "other", but models phrase the fallback freely
+# ("Unclear (insufficient context)", "Unknown", "N/A"), and embedding that text
+# as the search query retrieves noise. Anything matching here falls back to the
+# user's own words instead.
+#
+# Matched on word boundaries: a substring test would flag legitimate fields
+# such as "nonequilibrium thermodynamics" on "none".
+_UNSPECIFIC_PATTERN = re.compile(
+    r"\b(other|unclear|unknown|unspecified|none|not\s+\w+|n/?a)\b", re.IGNORECASE
+)
+# Long enough for a descriptive field with examples, short enough to reject a
+# hedging sentence that slipped past the markers.
+_MAX_AREA_CHARS = 140
 
 
-"""
+def _is_unspecific(area: str) -> bool:
+    stripped = area.strip()
+    if not stripped or len(stripped) > _MAX_AREA_CHARS:
+        return True
+    return bool(_UNSPECIFIC_PATTERN.search(stripped))
 
-Application With Memory Between Each Search
-
-"""
 
 def Memory_GatherInformationNode(state: MemoryState) -> MemoryState:
     """
     Gathers relevant information to give better answer depending on the context given by the users query
-    Same Logic as in the Non-Memory Graph
     """
     return aid_functions.information_node(state)
 
+
 def Memory_SearchAndEvaluateNode(state: MemoryState) -> MemoryState:
     """
-    Retrieves relevant articles, and tries to score the authors on relevance to the query
+    Retrieves relevant documents from Cosmos and scores researchers on relevance.
     """
+    raw_query = state.get("query")[-1][1]
 
-    scientific_area = state.get('scientific_area')
-    if scientific_area.specific_area.lower() == "other":
-        query = state.get('query')[-1][1]
+    scientific_area = state.get("scientific_area")
+    if scientific_area and not _is_unspecific(scientific_area.specific_area):
+        query = scientific_area.specific_area
     else:
-        query = state.get('scientific_area').specific_area
+        query = raw_query
 
-    vector = _clients.embedding_model.encode(query)
+    vector = clients.encode(query)
+    # Relevance is judged on the user's own words, not the rewritten field —
+    # see retrieval.search for why.
+    gate_vector = vector if query == raw_query else clients.encode(raw_query)
+    result = retrieval.search(query, vector, gate_vector=gate_vector)
 
-    df = aid_functions.load_dataframe('documents.pkl')
+    if result.is_empty:
+        return {"documents": [], "score": {}, "most_relevant_researchers": []}
 
-    cosine_retrieved_df = aid_functions.retrieval(df, vector = vector).sort_values(by='cosine', ascending=False)
-    bm25_retrieved_df = aid_functions.bm25_retrieval(df, query=query, k = 10).sort_values(by='bm25', ascending=False)
+    relevant_researchers = retrieval.top_researchers(result.researcher_scores, limit=5)
 
-    if len(cosine_retrieved_df):
+    return {
+        "score": result.researcher_scores,
+        "documents": result.documents[: settings.context_documents],
+        "most_relevant_researchers": relevant_researchers,
+    }
 
-        max_cosine = max(cosine_retrieved_df['cosine'])
-        max_bm25 = max(bm25_retrieved_df['bm25'])
-        
-        cosine_retrieved_df['score'] = cosine_retrieved_df['cosine']
-        bm25_retrieved_df['score'] = bm25_retrieved_df['bm25'].apply(lambda x: x*max_cosine/max_bm25)
-        
-        cosine_relevance_score = aid_functions.gather_relevance_score(cosine_retrieved_df, square = True)
-        bm25_relevance_score = aid_functions.gather_relevance_score(bm25_retrieved_df, square = False)
 
-        authors_relevance_score = {}
-        top_score_bm25 = max(bm25_relevance_score.values())
-        top_score_cosine = max(cosine_relevance_score.values())
-        for a in set(list(bm25_relevance_score.keys())+list(cosine_relevance_score)):
-            authors_relevance_score[a] = cosine_relevance_score.get(a,0)/top_score_cosine + bm25_relevance_score.get(a,0)/top_score_bm25
+def Memory_ResearcherInformationNode(state: MemoryState) -> MemoryState:
+    """
+    Returns the documents authored by researchers named in the query.
+    """
+    documents = retrieval.documents_for_researchers(state.get("researchers", []))
+    return {"documents": documents, "score": {}, "most_relevant_researchers": []}
 
-        cosine_index_to_score = {}
-        for index, score in zip(cosine_retrieved_df['index'], cosine_retrieved_df['score']):
-            cosine_index_to_score[index] = score
 
-        bm25_index_to_score = {}
-        for index, score in zip(bm25_retrieved_df['index'], bm25_retrieved_df['score']):
-            bm25_index_to_score[index] = score
+def _format_context(documents, include_names: bool) -> str:
+    context = "\n\n" + "-" * 40
+    n = len(documents)
+    for i, doc in enumerate(documents):
+        if include_names:
+            context += f"Researcher: {doc.name.replace('_', ' ')}"
+        context += "\n Document Information (only first 2000 letters added)\n---------\n"
+        context += "\n".join(doc.snippets)[:_CONTEXT_CHARS]
+        if i != n - 1:
+            context += "\n\n" + "-" * 20 + "NEXT DOCUMENT" + "-" * 20 + "\n\n"
+    return context
 
-        df['score'] = df['index'].apply(lambda x: cosine_index_to_score.get(x,0)+bm25_index_to_score.get(x,0))
-        retrieved_df = df[df['score'].apply(lambda x: x>0)].sort_values(by = 'score', ascending=False)
-
-        total_retrieved_df = pd.concat([retrieved_df.head(5), state.get('total_retrieved_df')]).drop_duplicates(subset=["title"], keep="first")
-        relevant_researchers = sorted(authors_relevance_score.items(), key = lambda researcher_tuple: researcher_tuple[1], reverse=True)[:5]
-
-        if relevant_researchers:
-            most_relevant_researchers = [relevant_researchers[0][0]]
-            best_score = relevant_researchers[0][1]
-            for researcher, score in relevant_researchers[1:]:
-                if score > best_score*2/3:
-                    most_relevant_researchers.append((researcher, score))
-                else:
-                    break
-        else:
-            most_relevant_researchers = []
-
-        return {"score": authors_relevance_score, "retrieved_df": retrieved_df, "total_retrieved_df": total_retrieved_df, "most_relevant_researchers": relevant_researchers}
-    else:
-        return {}
 
 def Memory_AnswerNode(state: MemoryState) -> MemoryState:
     """
-    Produces Text answer to reply the user
+    Produces the text answer, plus a per-researcher justification.
     """
-    context = "\n\n" + "-"*40
-    retrieved_df = state.get('total_retrieved_df', pd.DataFrame())
-    n = len(retrieved_df)
-    for article_text, name, i in zip(retrieved_df['full_text'], retrieved_df['name'], range(n)):
-        context += f"Researcher: {name.replace("_"," ")}"
-        context += "\n Document Information (only first 2000 letters added)\n---------\n"
-        context += article_text[:2000]
-        if i != n-1:
-            context += "\n\n" + "-"*20 + "NEXT DOCUMENT" + "-"*20 + "\n\n"
+    documents = state.get("documents") or []
 
-    msg = [{"role": "system", "content": f"""
+    if not documents:
+        return {
+            "text_answer": (
+                "I could not find any AID research that matches that question. "
+                "Try rephrasing it, or naming a specific research area."
+            ),
+            "general_researcher_information": [],
+        }
+
+    context = _format_context(documents, include_names=True)
+
+    msg = [
+        {
+            "role": "system",
+            "content": f"""
             You are going to guide the user to the Researchers best suited to help with their problem.
             State which researcers have relevant context related to the users query.
             You should only mention the authors presented in the 'Researcher: <name_of_researcher>'.
             Do not try and solve the users problem. Your answer should be a short paragraph.
-            Context:{context}"""}]
-    
-    msg.extend([{"role": messager, "content": content} for messager, content in state.get('query')])
+            Context:{context}""",
+        }
+    ]
+    msg.extend(
+        [{"role": messager, "content": content} for messager, content in state.get("query")]
+    )
 
-    text_answer = answer_client.invoke(msg).content
-    most_relevant_researchers = state.get("most_relevant_researchers",[])
-    
+    text_answer = clients.answer_client.invoke(msg).content
+    most_relevant_researchers = state.get("most_relevant_researchers", [])
+
+    mentioned_researchers = aid_functions.find_mentioned_researchers(
+        text_answer, most_relevant_researchers, mode="mentioned_aid_list"
+    )
+
     general_researcher_information = []
-
-    mentioned_researchers = aid_functions.find_mentioned_researchers(text_answer, most_relevant_researchers, mode = 'mentioned_aid_list')
-    retrieved_df = state.get('retrieved_df')
-
     for researcher in mentioned_researchers:
-        context = "\n\n" + "-"*40
-        relevant_df = retrieved_df[retrieved_df['name'] == researcher]
-        n = len(relevant_df)
-        for article_text, name, i in zip(relevant_df['full_text'], relevant_df['name'], range(n)):
-            context += "\n Document Information (only first 2000 letters added)\n---------\n"
-            context += article_text[:2000]
-            if i != n-1:
-                context += "\n\n" + "-"*20 + "NEXT DOCUMENT" + "-"*20 + "\n\n"
+        researcher_docs = [d for d in documents if d.name == researcher]
+        if not researcher_docs:
+            continue
+        researcher_context = _format_context(researcher_docs, include_names=False)
 
-        msg = [{"role": "system", "content": f"""
-                You are going to state why the researcher {researcher} is relevant to the users query, please provide some background here. 
+        msg = [
+            {
+                "role": "system",
+                "content": f"""
+                You are going to state why the researcher {researcher} is relevant to the users query, please provide some background here.
                 Do not try and solve the users problem. Your answer should be a short paragraph.
                 The context is the first 2000 letters of relevant articles made by {researcher}
-                Context:{context}"""}]
-        
-        msg.extend([{"role": messager, "content": content} for messager, content in state.get('query')])
+                Context:{researcher_context}""",
+            }
+        ]
+        msg.extend(
+            [
+                {"role": messager, "content": content}
+                for messager, content in state.get("query")
+            ]
+        )
 
-        researcher_answer = medium_client.invoke(msg).content
+        researcher_answer = clients.medium_client.invoke(msg).content
         general_researcher_information.append((researcher, researcher_answer))
 
-    return {"text_answer": text_answer, "general_researcher_information": general_researcher_information}
+    return {
+        "text_answer": text_answer,
+        "general_researcher_information": general_researcher_information,
+    }
 
-def Memory_ResearcherInformationNode(state: MemoryState) -> MemoryState:
-    """
-    Returns DataFrame with articles by researchers mentioned in the query
-    """
-    df = aid_functions.load_dataframe('documents.pkl')
-    return{'retrieved_df': df[df['name'].isin(state.get('researchers'))], 'score': {}}
 
 """
 Routers
 """
 
-def Memory_InformationRouter(state: MemoryState) -> Literal["SearchAndEvaluateNode", "ResearcherInformationNode"]:
-    if state.get('researchers'):
+
+def Memory_InformationRouter(
+    state: MemoryState,
+) -> Literal["SearchAndEvaluateNode", "ResearcherInformationNode"]:
+    if state.get("researchers"):
         return "ResearcherInformationNode"
     else:
         return "SearchAndEvaluateNode"
+
 
 """
 Build Graph
@@ -166,32 +203,23 @@ memory_graph_builder.add_node("SearchAndEvaluateNode", Memory_SearchAndEvaluateN
 memory_graph_builder.add_node("AnswerNode", Memory_AnswerNode)
 
 memory_graph_builder.add_edge(START, "GatherInformationNode")
-memory_graph_builder.add_conditional_edges("GatherInformationNode", Memory_InformationRouter, {"ResearcherInformationNode": "ResearcherInformationNode", "SearchAndEvaluateNode": "SearchAndEvaluateNode"})
+memory_graph_builder.add_conditional_edges(
+    "GatherInformationNode",
+    Memory_InformationRouter,
+    {
+        "ResearcherInformationNode": "ResearcherInformationNode",
+        "SearchAndEvaluateNode": "SearchAndEvaluateNode",
+    },
+)
 memory_graph_builder.add_edge("SearchAndEvaluateNode", "AnswerNode")
 memory_graph_builder.add_edge("ResearcherInformationNode", "AnswerNode")
 memory_graph_builder.add_edge("AnswerNode", END)
 
 memory_program = memory_graph_builder.compile()
 
+
 def memory_invoke_graph(state: MemoryState) -> MemoryState:
     """
-    Invoke the graph
+    Invoke the graph.
     """
     return memory_program.invoke(state)
-
-def memory_stream_graph(state: MemoryState) -> MemoryState:
-    """
-    Stream the graph
-    """
-    print("AI: ", end = "", flush=True)
-    latest_state = None
-    for mode, chunk in memory_program.stream(state, stream_mode=["messages", "values"]):
-        if mode == "messages":
-            msg, metadata = chunk
-            if "tags" in metadata.keys():
-                if metadata["tags"] == ["answer"]:
-                    print(msg.content, end = "", flush=True)
-        else:
-            latest_state = chunk
-    print("")
-    return latest_state

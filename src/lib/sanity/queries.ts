@@ -156,6 +156,10 @@ const navigationRef = /* groq */ `
 		_type == "careers" => {
 			"title": "Careers",
 			"url": "/careers"
+		},
+		_type == "events" => {
+			"title": "Events",
+			"url": "/events"
 		}
 	}
 `;
@@ -305,5 +309,88 @@ export const careersPageQuery = /* groq */ `
 export const allOpeningsQuery = /* groq */ `
 	*[_type == "opening"] | order(deadline asc) {
 		${openingDoc}
+	}
+`;
+
+const eventDoc = /* groq */ `
+	_id,
+	title,
+	"slug": slug.current,
+	excerpt,
+	startDate,
+	endDate,
+	eventType,
+	isOnline,
+	location {
+		venue,
+		city,
+		country
+	},
+	"image": image {
+		${image}
+	},
+	registrationUrl,
+	featured
+`;
+
+/** Singleton: `_id == "events"` (intro + SEO for the /events page). */
+export const eventsPageQuery = /* groq */ `
+	*[_id == "events"][0]{
+		_id,
+		introduction,
+		${seo}
+	}
+`;
+
+/** Events whose end (or start, if no end) hasn't passed yet, soonest first. */
+export const upcomingEventsQuery = /* groq */ `
+	*[_type == "event" && defined(slug.current) && coalesce(endDate, startDate) >= now()]
+		| order(startDate asc) {
+		${eventDoc}
+	}
+`;
+
+/** Events that have already ended, most recent first. */
+export const pastEventsQuery = /* groq */ `
+	*[_type == "event" && defined(slug.current) && coalesce(endDate, startDate) < now()]
+		| order(startDate desc) {
+		${eventDoc}
+	}
+`;
+
+/** All events, soonest first. */
+export const allEventsQuery = /* groq */ `
+	*[_type == "event" && defined(slug.current)]
+		| order(startDate asc) {
+		${eventDoc}
+	}
+`;
+
+/** Single event by slug, with full body and resolved speakers/partners. */
+export const eventBySlugQuery = /* groq */ `
+	*[_type == "event" && slug.current == $slug][0]{
+		${eventDoc},
+		body,
+		"speakers": speakers[_type == "guestSpeaker" || defined(@->_id)]{
+			_key,
+			_type == "reference" => @->{
+				name,
+				role,
+				"image": image {
+					${image}
+				}
+			},
+			_type == "guestSpeaker" => {
+				name,
+				role,
+				"image": image {
+					${image}
+				}
+			}
+		},
+		"partners": partners[defined(@->_id)]->{
+			_type,
+			${partnerDoc}
+		}
 	}
 `;
