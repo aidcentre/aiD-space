@@ -8,6 +8,11 @@
 	// No trailing slash: page.url.pathname supplies the leading one.
 	const BASE_URL = 'https://aid-centre.no';
 
+	// Keep the staging preview out of search results. Checked by hostname, not
+	// added only on the staging branch, so merging to production can't deindex the
+	// live site. robots.txt stays open: crawlers must fetch a page to see this tag.
+	let isStaging = $derived(page.url.hostname.includes('-staging.'));
+
 	let title = 'Norwegian Centre on AI for Decisions';
 
 	let meta = $derived({
@@ -27,4 +32,7 @@
 	<meta name="description" content={meta.description} />
 	<link rel="canonical" href={`${BASE_URL}${page.url.pathname}`} />
 	<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+	{#if isStaging}
+		<meta name="robots" content="noindex, nofollow" />
+	{/if}
 </svelte:head>
