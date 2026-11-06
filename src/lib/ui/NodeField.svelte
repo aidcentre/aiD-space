@@ -27,6 +27,8 @@
 	import * as THREE from 'three';
 	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 	import type { Article } from '$lib/data/articles';
+	import { loadRelated, relatedFor } from '$lib/data/related';
+	import { squircle } from '$lib/utils/squircle';
 
 	let {
 		articles,
@@ -132,8 +134,83 @@
 	const RESOLUTION_RECOVERY_WINDOWS = 4;
 	/** Longest a cached hit test of what is over the cursor is trusted. */
 	const POINTER_BLOCK_CHECK_MS = 150;
+	/** How far a string bows out of true, as a share of its on-screen length. */
+	const STRING_BEND = 0.16;
+	/** Clearance between a related title and its node, or another title. */
+	const LABEL_GAP_PX = 8;
+	/** Closest a related title may come to the edge of the window. */
+	const LABEL_EDGE_PX = 8;
+	/** Highest a related title may sit, clear of the header drawn over the field. */
+	const LABEL_TOP_PX = 88;
+	const EASE_OUT_EXPO = 'cubic-bezier(0.16, 1, 0.3, 1)';
 
 	let container = $state<HTMLDivElement>();
+
+	// --- strings to the hovered node's related articles -----------------------
+
+	/** One slot per related article, each list holding at most three. */
+	const LINK_SLOTS = [0, 1, 2];
+
+	const stringEls = $state<(SVGPathElement | undefined)[]>([]);
+	const labelEls = $state<(HTMLDivElement | undefined)[]>([]);
+	const labelCardEls = $state<(HTMLDivElement | undefined)[]>([]);
+
+	let relatedReady = $state(false);
+	const linksVisible = $derived(!!hoveredId && !selectedId);
+
+	// Outlives the hover, so the strings still have their titles as they fade.
+	let linkedId = $state<string | null>(null);
+	$effect(() => {
+		if (!linksVisible) return;
+		linkedId = hoveredId;
+		loadRelated().then(() => (relatedReady = true));
+	});
+
+	const links = $derived(
+		relatedReady && linkedId ? relatedFor(linkedId).map(({ article }) => article) : []
+	);
+	/** Spared the dimming, so each string lands on a node you can actually see. */
+	const litIds = $derived(new Set(linksVisible ? links.map((article) => article.id) : []));
+
+	// Each string draws out from the hovered node, with its title following.
+	$effect(() => {
+		if (!linksVisible || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		for (let i = 0; i < links.length; i++) {
+			stringEls[i]?.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], {
+				duration: 900,
+				delay: i * 70,
+				easing: EASE_OUT_EXPO,
+				fill: 'backwards'
+			});
+			labelCardEls[i]?.animate(
+				[
+					{ opacity: 0, transform: 'translateY(6px)' },
+					{ opacity: 1, transform: 'none' }
+				],
+				{ duration: 500, delay: 250 + i * 70, easing: EASE_OUT_EXPO, fill: 'backwards' }
+			);
+		}
+	});
+
+	/**
+	 * Titles only change size when their text does, so they are measured then
+	 * rather than read back from the layout every frame.
+	 */
+	const labelSizes = LINK_SLOTS.map(() => ({ width: 0, height: 0 }));
+	function measureLabels() {
+		for (const i of LINK_SLOTS) {
+			labelSizes[i].width = labelEls[i]?.offsetWidth ?? 0;
+			labelSizes[i].height = labelEls[i]?.offsetHeight ?? 0;
+		}
+	}
+	$effect(() => {
+		void links;
+		measureLabels();
+	});
+	// Measurements taken before the font loads are against the fallback.
+	$effect(() => {
+		document.fonts?.ready.then(measureLabels);
+	});
 
 	/** Deterministic positions: same article, same corner of the field. */
 	function seedFrom(id: string): number {
@@ -526,15 +603,152 @@
 			// The squircle fills 0.9 of its quad, so its visible top sits 0.45
 			// of the quad's scaled size above the centre. Published so the
 			// tooltip can line its top up with the square's.
-			const scale = scaleArray[nodes.indexOf(node)];
-			const depth = -viewPosition.copy(node.position).applyMatrix4(camera.matrixWorldInverse).z;
-			const halfHeight =
-				depth > 0
-					? (0.45 * scale * camera.projectionMatrix.elements[5] * viewHeight) / (2 * depth)
-					: 0;
+			const halfHeight = nodeHalfHeight(node, scaleArray[nodes.indexOf(node)]);
 			const halfHeightPx = `${snap(halfHeight)}px`;
 			if (anchor.style.getPropertyValue('--node-half-height') !== halfHeightPx) {
 				anchor.style.setProperty('--node-half-height', halfHeightPx);
+			}
+		}
+
+		/** Half the on-screen height of a node's square, in pixels. */
+		function nodeHalfHeight(node: Node, scale: number) {
+			const depth = -viewPosition.copy(node.position).applyMatrix4(camera.matrixWorldInverse).z;
+			return depth > 0
+				? (0.45 * scale * camera.projectionMatrix.elements[5] * viewHeight) / (2 * depth)
+				: 0;
+		}
+
+		type Box = { x: number; y: number; w: number; h: number };
+
+		const labelBoxes = LINK_SLOTS.map(() => ({
+			el: null as HTMLElement | null,
+			x: 0,
+			y: 0,
+			w: 0,
+			h: 0
+		}));
+		const placedBoxes: typeof labelBoxes = [];
+
+		/** Whether two boxes come within LABEL_GAP_PX of each other. */
+		function crowds(a: Box, b: Box) {
+			return (
+				a.x < b.x + b.w &&
+				b.x < a.x + a.w &&
+				a.y < b.y + b.h + LABEL_GAP_PX &&
+				b.y < a.y + a.h + LABEL_GAP_PX
+			);
+		}
+
+		/** Move a title up or down until it is clear of everything in `solids`. */
+		function moveClear(box: Box, solids: Box[], direction: 'up' | 'down') {
+			let moved = true;
+			while (moved) {
+				moved = false;
+				for (const solid of solids) {
+					if (crowds(box, solid)) {
+						box.y =
+							direction === 'up'
+								? solid.y - box.h - LABEL_GAP_PX
+								: solid.y + solid.h + LABEL_GAP_PX;
+						moved = true;
+					}
+				}
+			}
+		}
+
+		/**
+		 * Run the strings from the hovered node to its related ones, and park
+		 * each title just above its node. Left as they are while fading out:
+		 * nothing moves far enough in that moment to see.
+		 */
+		function updateLinks() {
+			if (!linksVisible) return;
+			const source = linkedId ? nodeById.get(linkedId) : undefined;
+			if (!source) return;
+
+			projected.copy(source.position).applyMatrix4(viewProjection);
+			const sourceX = (projected.x * 0.5 + 0.5) * viewWidth;
+			const sourceY = (-projected.y * 0.5 + 0.5) * viewHeight;
+
+			// The hover card sits above this layer, so a title under it is lost.
+			const tooltip: Box[] = [];
+			anchor?.querySelectorAll('.link-obstacle').forEach((element) => {
+				const rect = element.getBoundingClientRect();
+				tooltip.push({ x: rect.x, y: rect.y, w: rect.width, h: rect.height });
+			});
+
+			placedBoxes.length = 0;
+			for (const i of LINK_SLOTS) {
+				const string = stringEls[i];
+				const label = labelEls[i];
+				if (!string || !label) continue;
+
+				const target = links[i] ? nodeById.get(links[i].id) : undefined;
+				if (target) projected.copy(target.position).applyMatrix4(viewProjection);
+
+				// Behind the camera, where projecting a point turns it inside out.
+				if (!target || projected.z > 1) {
+					string.style.visibility = 'hidden';
+					label.style.visibility = 'hidden';
+					continue;
+				}
+
+				const x = (projected.x * 0.5 + 0.5) * viewWidth;
+				const y = (-projected.y * 0.5 + 0.5) * viewHeight;
+
+				// Bowed to alternate sides, so the three fan out from the node.
+				const bend = STRING_BEND * (i % 2 ? -1 : 1);
+				const controlX = (sourceX + x) / 2 - (y - sourceY) * bend;
+				const controlY = (sourceY + y) / 2 + (x - sourceX) * bend;
+				string.setAttribute(
+					'd',
+					`M${sourceX.toFixed(1)} ${sourceY.toFixed(1)}Q${controlX.toFixed(1)} ${controlY.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}`
+				);
+				string.style.visibility = 'visible';
+
+				// A string can lead off the edge; its title has nowhere to sit.
+				if (x < 0 || x > viewWidth || y < 0 || y > viewHeight) {
+					label.style.visibility = 'hidden';
+					continue;
+				}
+
+				const { width, height } = labelSizes[i];
+				const box = labelBoxes[i];
+				box.el = label;
+				box.w = width;
+				box.h = height;
+				box.x = THREE.MathUtils.clamp(
+					x - width / 2,
+					LABEL_EDGE_PX,
+					Math.max(LABEL_EDGE_PX, viewWidth - width - LABEL_EDGE_PX)
+				);
+				// Above the node, unless the card is in the way and below it is free.
+				const halfHeight = nodeHalfHeight(target, PARAMS.nodeSize);
+				const above = y - halfHeight - LABEL_GAP_PX - height;
+				box.y = above;
+				if (tooltip.some((solid) => crowds(box, solid))) {
+					box.y = y + halfHeight + LABEL_GAP_PX;
+					if (tooltip.some((solid) => crowds(box, solid))) box.y = above;
+				}
+				placedBoxes.push(box);
+			}
+
+			// Lowest first, each title lifting clear of any it would land on, or
+			// dropping below them if that would take it up under the header.
+			placedBoxes.sort((a, b) => b.y - a.y);
+			for (let i = 0; i < placedBoxes.length; i++) {
+				const box = placedBoxes[i];
+				const solids = [...tooltip, ...placedBoxes.slice(0, i)];
+				const wanted = box.y;
+				moveClear(box, solids, 'up');
+				if (box.y < LABEL_TOP_PX) {
+					box.y = Math.max(wanted, LABEL_TOP_PX);
+					moveClear(box, solids, 'down');
+				}
+				const el = box.el!;
+				el.style.visibility = 'visible';
+				const transform = `translate(${snap(box.x)}px, ${snap(box.y)}px)`;
+				if (el.style.transform !== transform) el.style.transform = transform;
 			}
 		}
 
@@ -723,7 +937,8 @@
 					highlight.visible = true;
 				}
 
-				const opacityTarget = !focusId || node.id === focusId ? 1 : DIM_OPACITY;
+				const opacityTarget =
+					!focusId || node.id === focusId || litIds.has(node.id) ? 1 : DIM_OPACITY;
 				if (opacityArray[i] !== opacityTarget) {
 					const next = THREE.MathUtils.lerp(opacityArray[i], opacityTarget, lerpT);
 					opacityArray[i] = Math.abs(next - opacityTarget) < 0.002 ? opacityTarget : next;
@@ -835,6 +1050,7 @@
 
 			renderer.render(scene, camera);
 			updateAnchor();
+			updateLinks();
 			adaptResolution(frameMs);
 		};
 
@@ -893,4 +1109,51 @@
 	});
 </script>
 
-<div bind:this={container} class="h-full w-full"></div>
+<div bind:this={container} class="relative h-full w-full overflow-hidden">
+	<div
+		class="pointer-events-none absolute inset-0 transition-opacity duration-200"
+		style:opacity={linksVisible ? 1 : 0}
+		aria-hidden="true"
+	>
+		<svg class="absolute inset-0 h-full w-full">
+			{#each LINK_SLOTS as i (i)}
+				<path bind:this={stringEls[i]} class="string" pathLength="1" visibility="hidden" />
+			{/each}
+		</svg>
+
+		{#each LINK_SLOTS as i (i)}
+			<div bind:this={labelEls[i]} class="absolute top-0 left-0" style="visibility: hidden;">
+				<div bind:this={labelCardEls[i]} use:squircle={{ radius: 8 }} class="related-title">
+					<span class="line-clamp-3">{links[i]?.title ?? ''}</span>
+				</div>
+			</div>
+		{/each}
+	</div>
+</div>
+
+<style>
+	.string {
+		fill: none;
+		stroke: var(--color-off-black);
+		stroke-width: 1px;
+		stroke-linecap: round;
+		/* A dash the length of the whole path, for it to draw out along. */
+		stroke-dasharray: 1;
+		stroke-dashoffset: 0;
+	}
+
+	/* The type of the "node // 0000" pill, wrapped since a title is far longer. */
+	.related-title {
+		width: max-content;
+		max-width: 280px;
+		padding: 8px;
+		border-radius: 8px;
+		font-family: 'IBM Mono', courier, monospace;
+		font-size: 14px;
+		line-height: 120%;
+		color: var(--color-off-black);
+		background: rgb(150 150 150 / 0.5);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+	}
+</style>

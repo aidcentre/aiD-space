@@ -173,24 +173,24 @@
 
 <!-- A zero-size anchor: everything below is positioned relative to the node. -->
 <div class="pointer-events-none relative h-0 w-0">
-	<!-- Lifted from the node's centre to its top edge, which NodeField measures. -->
+	<!-- Lifted from the node's centre to its top edge, which NodeField measures. NodeField also keeps its related-article titles off each `link-obstacle`. -->
 	<div class="absolute top-[calc(-1*var(--node-half-height,0px))] left-0">
 		{@render nodeMedia(
-			'node-image absolute top-0 right-[calc(100%+24px)] ease-out-expo transition-[opacity,transform] duration-800',
+			'node-image link-obstacle absolute top-0 right-[calc(100%+24px)] ease-out-expo transition-[opacity,transform] duration-800',
 			detailsVisible
 				? 'opacity: 1; transform: translate(0,0); transition-delay: 80ms'
 				: 'opacity: 0; transform: translate(-10%, -10%); transition-delay: 0ms'
 		)}
 
 		<div
-			class="ml-6 flex flex-col items-start gap-4 ease-out-expo transition-[opacity,transform] duration-800"
+			class="link-obstacle ease-out-expo ml-6 flex flex-col items-start gap-4 transition-[opacity,transform] duration-800"
 			style:opacity={detailsVisible ? 1 : 0}
 			style:transform={detailsVisible ? 'translate(0,0)' : 'translate(-10%, -10%)'}
 		>
 			<div class="relative">
 				<div
 					use:squircle={{ radius: 8 }}
-					class="node-pill absolute bottom-full left-0 mb-2"
+					class="node-pill link-obstacle absolute bottom-full left-0 mb-2"
 				>
 					node // <span bind:this={numberEl} aria-label={article?.nodeNumber}></span>
 				</div>
