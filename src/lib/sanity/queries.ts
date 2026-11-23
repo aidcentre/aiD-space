@@ -187,6 +187,15 @@ export const settingsQuery = /* groq */ `
 			label,
 			url
 		},
+		aboutWebsite {
+			title,
+			body,
+			credits[] {
+				_key,
+				label,
+				value
+			}
+		},
 		"favicon": favicon {
 			${image}
 		},

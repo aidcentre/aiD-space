@@ -4,12 +4,22 @@
 	import { menuOpen } from '$lib/stores/menu';
 	import NavButton from './NavButton.svelte';
 	import Link from './Link.svelte';
+	import { ABOUT_WEBSITE_HREF, resolveAboutWebsite, revealAboutWebsite } from '$lib/aboutWebsite';
 
 	const easeOutExpo = (t: number) => (t === 1 ? 1 : 1 - Math.pow(2, -12 * t));
 
 	const settings = $derived(page.data.settings);
 	const email = $derived(settings?.contactInformation?.email);
 	const phone = $derived(settings?.contactInformation?.phone);
+	const aboutWebsiteTitle = $derived(resolveAboutWebsite(settings).title);
+
+	// The link's hash opens the section when arriving from another page; on the
+	// What is aiD page itself the menu has to be closed and the section told directly.
+	function openAboutWebsite() {
+		menuOpen.set(false);
+		revealAboutWebsite();
+	}
+
 	// Fallback: show Events until it's added to Settings → Navigation in the studio.
 	const navigation = $derived.by(() => {
 		const items = settings?.navigation ?? [];
@@ -48,16 +58,25 @@
 							{phone}
 						</Link>
 					{/if}
-					{#if settings?.externalUrl?.url}
-						<Link
-							href={settings.externalUrl.url}
-							theme="dark"
-							border={true}
-							trailing={true}
-						>
-							{settings.externalUrl.label ?? settings.externalUrl.url}
+					<!-- Stacked on mobile; one row with a bullet between them on desktop. -->
+					<div class="flex flex-col items-start gap-1 md:w-max md:flex-row md:items-center md:gap-2">
+						{#if settings?.externalUrl?.url}
+							<Link
+								href={settings.externalUrl.url}
+								theme="dark"
+								border={true}
+								trailing={true}
+							>
+								{settings.externalUrl.label ?? settings.externalUrl.url}
+							</Link>
+							<span aria-hidden="true" class="hidden font-family-mono text-sm select-none md:inline">
+								•
+							</span>
+						{/if}
+						<Link href={ABOUT_WEBSITE_HREF} theme="dark" border={true} onclick={openAboutWebsite}>
+							{aboutWebsiteTitle}
 						</Link>
-					{/if}
+					</div>
 				</div>
 			</div>
 		</div>

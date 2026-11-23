@@ -80,8 +80,23 @@ export interface Settings extends Seo {
 		label?: string;
 		url?: string;
 	};
+	aboutWebsite?: AboutWebsite;
 	favicon?: SanityImage;
 	navigation?: NavigationItem[];
+}
+
+export interface AboutWebsiteCredit {
+	_key: string;
+	label?: string;
+	value?: string;
+}
+
+/** Settings → "About this website": the collapsible credits section on What is aiD. */
+export interface AboutWebsite {
+	title?: string;
+	/** Plain text; blank lines separate paragraphs. */
+	body?: string;
+	credits?: AboutWebsiteCredit[];
 }
 
 export interface Home extends Seo {

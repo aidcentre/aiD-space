@@ -8,6 +8,12 @@
 	$effect(() => {
 		menuOpen.set(open);
 	});
+
+	// Links inside the menu can close it through the store (e.g. a link to a
+	// section of the page that's already open, where nothing remounts).
+	$effect(() => {
+		if (!$menuOpen) open = false;
+	});
 </script>
 
 <header>

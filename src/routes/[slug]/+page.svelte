@@ -5,6 +5,8 @@
 	import Header from '$lib/ui/Header.svelte';
 	import Menu from '$lib/ui/Menu.svelte';
 	import { page as pageState } from '$app/state';
+	import AboutWebsite from '$lib/ui/AboutWebsite.svelte';
+	import { ABOUT_WEBSITE_PAGE_SLUG } from '$lib/aboutWebsite';
 
 	const pageDoc = $derived(pageState.data.page);
 </script>
@@ -26,6 +28,9 @@
 	{/if}
 	{#if pageDoc?.contentBlocks?.length}
 		<PageBlocks blocks={pageDoc.contentBlocks} />
+	{/if}
+	{#if pageDoc?.slug === ABOUT_WEBSITE_PAGE_SLUG}
+		<AboutWebsite />
 	{/if}
 </main>
 
