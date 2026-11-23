@@ -18,15 +18,23 @@
 	} from '$lib/data/articles';
 	import { abstractFor, loadAbstracts } from '$lib/data/abstracts';
 	import { contentMode } from '$lib/stores/contentMode';
+	import type { Snippet } from 'svelte';
 
 	let {
 		article,
 		selected = false,
-		onclose
+		onclose,
+		media
 	}: {
 		article: Article | null;
 		selected?: boolean;
 		onclose?: () => void;
+		/**
+		 * Replaces the thumbnail video/still (used by /ParticleMorphingDemo).
+		 * Called with the class and style the media must carry, and whether it
+		 * is the hover thumbnail (true) or the one beside the selected node.
+		 */
+		media?: Snippet<[string, string, boolean]>;
 	} = $props();
 
 	// Hover details give way to the label once the panel is open.
@@ -179,7 +187,8 @@
 			'node-image link-obstacle absolute top-0 right-[calc(100%+24px)] ease-out-expo transition-[opacity,transform] duration-800',
 			detailsVisible
 				? 'opacity: 1; transform: translate(0,0); transition-delay: 80ms'
-				: 'opacity: 0; transform: translate(-10%, -10%); transition-delay: 0ms'
+				: 'opacity: 0; transform: translate(-10%, -10%); transition-delay: 0ms',
+			true
 		)}
 
 		<div
@@ -242,12 +251,14 @@
 				X
 			</button>
 		</div>
-		{@render nodeMedia('node-image')}
+		{@render nodeMedia('node-image', '', false)}
 	</div>
 </div>
 
-{#snippet nodeMedia(className: string, style = '')}
-	{#if tooltipVideo}
+{#snippet nodeMedia(className: string, style: string, hover: boolean)}
+	{#if media}
+		{@render media(className, style, hover)}
+	{:else if tooltipVideo}
 		<video
 			use:squircle={{ radius: 8 }}
 			src={tooltipVideo}
