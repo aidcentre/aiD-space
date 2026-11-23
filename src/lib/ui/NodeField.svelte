@@ -23,12 +23,13 @@
 	 *   - The tooltip is a single DOM element that this component moves each
 	 *     frame, rather than one overlay per node. Only ever one is visible.
 	 */
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import * as THREE from 'three';
 	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 	import type { Article } from '$lib/data/articles';
 	import { loadRelated, relatedFor } from '$lib/data/related';
 	import { squircle } from '$lib/utils/squircle';
+	import { AREAS, OTHER_AREA, areaFor, type Area, type AreaId } from '$lib/data/areas';
 
 	let {
 		articles,
@@ -37,8 +38,17 @@
 		selectedId = null,
 		hoveredId = $bindable(null),
 		anchor = null,
-		onselect
+		clusterArea = null,
+		onselect,
+		onclusterarea
 	}: {
+		/**
+		 * When set, the field gathers into one cluster per research area, laid
+		 * out on a ring, with this area's cluster turned to the front.
+		 */
+		clusterArea?: AreaId | null;
+		/** A cluster was clicked, or the ring was dragged round to another. */
+		onclusterarea?: (id: AreaId) => void;
 		articles: Article[];
 		paused?: boolean;
 		/**
@@ -143,6 +153,85 @@
 	/** Highest a related title may sit, clear of the header drawn over the field. */
 	const LABEL_TOP_PX = 88;
 	const EASE_OUT_EXPO = 'cubic-bezier(0.16, 1, 0.3, 1)';
+
+	// --- clustered view ----------------------------------------------------
+
+	/** Radius of the ring the area clusters sit on. */
+	const RING_RADIUS = 78;
+	/** A cluster's radius grows with the cube root of its size, so density holds. */
+	const CLUSTER_SPREAD = 2.6;
+	/** How far the clusters rise and fall around the ring, for a less rigid galaxy. */
+	const RING_WAVE = 6;
+	/** Seconds for the field to gather into clusters, or scatter back. */
+	const CLUSTER_TRANSITION_S = 1.6;
+	/** Share of the transition spent staggering nodes, so they don't all leave at once. */
+	const CLUSTER_STAGGER = 0.4;
+	/** Each cluster turns slowly on its own axis, so it stays alive while you look. */
+	const CLUSTER_SPIN = 0.06;
+	/** How quickly the ring turns to bring a cluster to the front. */
+	const RING_TURN_RATE = 3.2;
+	/** Ring rotation per pixel dragged. */
+	const DRAG_YAW_PER_PX = 0.0045;
+	const DRAG_ELEVATION_PER_PX = 0.004;
+	/** How quickly a flicked ring slows, and below which speed it settles on a cluster. */
+	const RING_FRICTION = 3.5;
+	const RING_SETTLE_SPEED = 0.25;
+	const CLUSTER_VIEW_DISTANCE = 54;
+	const CLUSTER_VIEW_MIN_DISTANCE = 18;
+	const CLUSTER_VIEW_MAX_DISTANCE = 170;
+	const CLUSTER_ELEVATION = 0.3;
+	const CLUSTER_MIN_ELEVATION = -0.2;
+	const CLUSTER_MAX_ELEVATION = 1.25;
+	const CAMERA_RIG_RATE = 3;
+	/** Nodes of clusters away from the front fade back, so the front one reads first. */
+	const BACK_CLUSTER_OPACITY = 0.28;
+	const SIDE_CLUSTER_OPACITY = 0.7;
+
+	type ClusterLayout = {
+		area: Area;
+		count: number;
+		/** Where on the ring it sits, before the ring's own rotation. */
+		theta: number;
+		y: number;
+		radius: number;
+	};
+
+	/** One cluster per area that has articles, in AREAS' ring order. */
+	function buildClusterLayout(list: Article[]) {
+		const counts = new Map<AreaId, number>();
+		for (const article of list) {
+			const id = areaFor(article).id;
+			counts.set(id, (counts.get(id) ?? 0) + 1);
+		}
+		const present = [...AREAS, OTHER_AREA].filter((area) => counts.has(area.id));
+		return present.map<ClusterLayout>((area, i) => {
+			const count = counts.get(area.id)!;
+			return {
+				area,
+				count,
+				theta: (Math.PI * 2 * i) / present.length,
+				y: Math.sin(i * 2.1) * RING_WAVE,
+				radius: CLUSTER_SPREAD * Math.cbrt(count) + 1
+			};
+		});
+	}
+
+	// Built once, like the nodes themselves: the corpus doesn't change under a mounted field.
+	// svelte-ignore state_referenced_locally
+	const clusterLayout = buildClusterLayout(articles);
+	const clusterIndexByArea = new Map(clusterLayout.map((cluster, i) => [cluster.area.id, i]));
+
+	const clusterLabelEls = $state<(HTMLButtonElement | undefined)[]>([]);
+	/** The cluster under the cursor (or its title), for the title's emphasis. */
+	let hoveredClusterIndex = $state<number | null>(null);
+	/** The cluster at the front of the ring. */
+	let focusedClusterIndex = $state(0);
+	/** Set by the titles themselves, which sit over the canvas and hide it from the hit test. */
+	let labelHoverIndex: number | null = null;
+	/** Whether the clusters are gathered enough for their titles to take the pointer. */
+	let clusterLabelsLive = $state(false);
+	/** Called by a title; set up inside onMount, where the ring lives. */
+	let focusClusterFromLabel: (index: number) => void = () => {};
 
 	let container = $state<HTMLDivElement>();
 
@@ -345,6 +434,14 @@
 			spin: number;
 			/** Current detour off `baseY`, in world units. */
 			yOffset: number;
+			/** Index into clusterLayout: the node's research area. */
+			cluster: number;
+			/** Its place in that cluster, which turns about its own vertical axis. */
+			localRadius: number;
+			localAngle: number;
+			localY: number;
+			/** 0–1: how late this node sets off when the field gathers or scatters. */
+			delay: number;
 		};
 
 		const nodes: Node[] = articles.map((article) => {
@@ -352,6 +449,12 @@
 			const x = (random() - 0.5) * PARAMS.width;
 			const y = (random() - 0.5) * PARAMS.height;
 			const z = (random() - 0.5) * PARAMS.depth;
+
+			// A point in the cluster's ball: cube root on the distance keeps the
+			// ball evenly filled rather than bunched at its centre.
+			const cluster = clusterIndexByArea.get(areaFor(article).id) ?? 0;
+			const reach = clusterLayout[cluster].radius * Math.cbrt(0.08 + 0.92 * random());
+			const polar = Math.acos(2 * random() - 1);
 			return {
 				id: article.id,
 				position: new THREE.Vector3(x, y, z),
@@ -359,9 +462,94 @@
 				angle: Math.atan2(z, x),
 				baseY: y,
 				spin: 1,
-				yOffset: 0
+				yOffset: 0,
+				cluster,
+				localRadius: reach * Math.sin(polar),
+				localAngle: random() * Math.PI * 2,
+				localY: reach * Math.cos(polar),
+				delay: random()
 			};
 		});
+
+		// --- clusters -----------------------------------------------------
+
+		type Cluster = ClusterLayout & {
+			/** Live world centre, after the ring's rotation. */
+			center: THREE.Vector3;
+			/** 1 at the front of the ring (facing the camera), -1 at the back. */
+			front: number;
+			/** On-screen centre and radius, for the cluster hit test. */
+			screenX: number;
+			screenY: number;
+			screenRadius: number;
+			onScreen: boolean;
+			/** Last opacity written to its title, so unchanged ones are skipped. */
+			labelOpacity: number;
+		};
+
+		const clusters: Cluster[] = clusterLayout.map((layout) => ({
+			...layout,
+			center: new THREE.Vector3(),
+			front: 0,
+			screenX: 0,
+			screenY: 0,
+			screenRadius: 0,
+			onScreen: false,
+			labelOpacity: -1
+		}));
+
+		/** 0 = the free field, 1 = fully gathered. Moves linearly; nodes ease it. */
+		let clusterMix = 0;
+		let clusterTarget = 0;
+		/** The ring's rotation, and where it is turning to. */
+		let ringYaw = 0;
+		let ringYawTarget = 0;
+		/** Spin left on the ring after a flick, in rad/s. Null when not coasting. */
+		let ringVelocity: number | null = null;
+		/** Azimuth the camera looks in from; the cluster here is "the front". */
+		let frontAngle = 0;
+		let focusedCluster = 0;
+		let clusterDistance = CLUSTER_VIEW_DISTANCE;
+		let clusterElevation = CLUSTER_ELEVATION;
+		let drag: {
+			x: number;
+			y: number;
+			time: number;
+			velocity: number;
+			/** Past the click slop, so letting go should coast and settle. */
+			moved: boolean;
+		} | null = null;
+		const clustered = () => clusterTarget === 1;
+
+		/** The equivalent of `angle` nearest `current`, so the ring takes the short way. */
+		function nearestTurn(angle: number, current: number) {
+			const turn = Math.PI * 2;
+			return angle + turn * Math.round((current - angle) / turn);
+		}
+
+		function turnTo(index: number) {
+			focusedCluster = index;
+			focusedClusterIndex = index;
+			ringYawTarget = nearestTurn(frontAngle - clusters[index].theta, ringYaw);
+			ringVelocity = null;
+		}
+
+		/** Bring a cluster to the front, telling the page so its state agrees. */
+		function focusCluster(index: number) {
+			turnTo(index);
+			const id = clusters[index].area.id;
+			if (id !== clusterArea) onclusterarea?.(id);
+		}
+		focusClusterFromLabel = focusCluster;
+
+		/** The cluster nearest the front once the ring has been dragged round. */
+		function frontmostCluster() {
+			let best = 0;
+			for (let i = 1; i < clusters.length; i++) {
+				if (clusters[i].front > clusters[best].front) best = i;
+			}
+			return best;
+		}
 
 		const nodeById = new Map(nodes.map((node) => [node.id, node]));
 
@@ -486,6 +674,33 @@
 		const onPointerMove = (event: PointerEvent) => {
 			pointer = { x: event.clientX, y: event.clientY };
 			pointerMoved = true;
+
+			// In the clustered view a held drag turns the ring itself, rather
+			// than orbiting the camera, and tilts the view up or down.
+			if (drag) {
+				const now = performance.now();
+				const dx = event.clientX - drag.x;
+				const dy = event.clientY - drag.y;
+				const turn = dx * DRAG_YAW_PER_PX;
+				ringYaw += turn;
+				ringYawTarget = ringYaw;
+				const elapsed = Math.max(1, now - drag.time) / 1000;
+				drag.velocity = THREE.MathUtils.lerp(drag.velocity, turn / elapsed, 0.5);
+				clusterElevation = THREE.MathUtils.clamp(
+					clusterElevation + dy * DRAG_ELEVATION_PER_PX,
+					CLUSTER_MIN_ELEVATION,
+					CLUSTER_MAX_ELEVATION
+				);
+				drag.x = event.clientX;
+				drag.y = event.clientY;
+				drag.time = now;
+				if (
+					pressedAt &&
+					Math.hypot(event.clientX - pressedAt.x, event.clientY - pressedAt.y) > CLICK_SLOP_PX
+				) {
+					drag.moved = true;
+				}
+			}
 		};
 		const onPointerLeave = () => {
 			pointer = null;
@@ -493,6 +708,16 @@
 		const onPointerDown = (event: PointerEvent) => {
 			pressedAt = { x: event.clientX, y: event.clientY };
 			returning = false;
+			if (clustered() && !selectedId && event.button === 0) {
+				drag = {
+					x: event.clientX,
+					y: event.clientY,
+					time: performance.now(),
+					velocity: 0,
+					moved: false
+				};
+				ringVelocity = null;
+			}
 		};
 		const onPointerUp = (event: PointerEvent) => {
 			if (!pressedAt) return;
@@ -501,13 +726,49 @@
 			// Releasing after an orbit drag should not open whatever happens to
 			// be under the cursor.
 			if (travelled > CLICK_SLOP_PX) return;
+			// A click on a cluster other than the front one brings it forward;
+			// only the front cluster's nodes answer the pointer individually.
+			if (
+				!hoveredId &&
+				clustered() &&
+				!selectedId &&
+				hoveredClusterIndex !== null &&
+				hoveredClusterIndex !== focusedCluster
+			) {
+				focusCluster(hoveredClusterIndex);
+				return;
+			}
 			onselect?.(hoveredId);
+		};
+		/** Let go of the ring: a flick coasts on, then settles on a cluster. */
+		const onDragEnd = () => {
+			if (!drag) return;
+			// A plain click never turned the ring, so there is nothing to settle;
+			// leave whatever the click itself asked for alone.
+			if (drag.moved) {
+				const recent = performance.now() - drag.time < 80;
+				ringVelocity = recent ? drag.velocity : 0;
+			}
+			drag = null;
+		};
+		/** Zoom is the camera's distance from the front cluster while gathered. */
+		const onWheel = (event: WheelEvent) => {
+			if (!clustered() || selectedId) return;
+			event.preventDefault();
+			clusterDistance = THREE.MathUtils.clamp(
+				clusterDistance * Math.exp(event.deltaY * 0.001),
+				CLUSTER_VIEW_MIN_DISTANCE,
+				CLUSTER_VIEW_MAX_DISTANCE
+			);
 		};
 
 		window.addEventListener('pointermove', onPointerMove);
+		window.addEventListener('pointerup', onDragEnd);
+		window.addEventListener('pointercancel', onDragEnd);
 		renderer.domElement.addEventListener('pointerleave', onPointerLeave);
 		renderer.domElement.addEventListener('pointerdown', onPointerDown);
 		renderer.domElement.addEventListener('pointerup', onPointerUp);
+		renderer.domElement.addEventListener('wheel', onWheel, { passive: false });
 
 		let blocked = true;
 		let blockedCheckedAt = 0;
@@ -810,6 +1071,140 @@
 		}
 
 		/**
+		 * Gather or scatter, and turn the ring: towards the front cluster,
+		 * along with a drag, or coasting after a flick until it settles on
+		 * whichever cluster is nearest the front.
+		 */
+		function updateClusters(dt: number) {
+			if (clusterMix !== clusterTarget) {
+				const step = dt / CLUSTER_TRANSITION_S;
+				clusterMix =
+					clusterTarget > clusterMix
+						? Math.min(clusterTarget, clusterMix + step)
+						: Math.max(clusterTarget, clusterMix - step);
+			}
+			if (clusterMix === 0) return;
+
+			if (ringVelocity !== null && !drag) {
+				ringYaw += ringVelocity * dt;
+				ringYawTarget = ringYaw;
+				ringVelocity *= Math.exp(-RING_FRICTION * dt);
+				if (Math.abs(ringVelocity) < RING_SETTLE_SPEED) {
+					// Centres are a frame old here, which is close enough to pick by.
+					focusCluster(frontmostCluster());
+				}
+			} else if (!drag && ringYaw !== ringYawTarget) {
+				ringYaw = ease(ringYaw, ringYawTarget, RING_TURN_RATE, dt);
+				if (Math.abs(ringYaw - ringYawTarget) < 0.0005) ringYaw = ringYawTarget;
+			}
+
+			for (const cluster of clusters) {
+				const angle = cluster.theta + ringYaw;
+				cluster.center.set(Math.cos(angle) * RING_RADIUS, cluster.y, Math.sin(angle) * RING_RADIUS);
+				cluster.front = Math.cos(angle - frontAngle);
+			}
+		}
+
+		const rigTarget = new THREE.Vector3();
+		const rigPosition = new THREE.Vector3();
+
+		/**
+		 * While gathered, the camera stands outside the ring looking in at its
+		 * front, so the front cluster sits centre stage with its neighbours
+		 * curving away to either side. The ring turns; the camera only tilts
+		 * and zooms.
+		 */
+		function updateClusterRig(dt: number) {
+			if (!clustered() || selectedId) return;
+			const fx = Math.cos(frontAngle);
+			const fz = Math.sin(frontAngle);
+			rigTarget.set(fx * RING_RADIUS, clusters[focusedCluster].y, fz * RING_RADIUS);
+			const flat = Math.cos(clusterElevation) * clusterDistance;
+			rigPosition.set(
+				rigTarget.x + fx * flat,
+				rigTarget.y + Math.sin(clusterElevation) * clusterDistance,
+				rigTarget.z + fz * flat
+			);
+			const k = 1 - Math.exp(-CAMERA_RIG_RATE * dt);
+			controls.target.lerp(rigTarget, k);
+			camera.position.lerp(rigPosition, k);
+		}
+
+		const labelPoint = new THREE.Vector3();
+
+		/**
+		 * Project each cluster for the hit test, and park its title just above
+		 * it. Titles at the back of the ring fade; the hovered one and the
+		 * front one stay solid.
+		 */
+		function updateClusterLabels() {
+			const live = clusterMix > 0.6 && clustered() && !selectedId;
+			if (live !== clusterLabelsLive) clusterLabelsLive = live;
+			if (clusterMix === 0 && clusters[0].labelOpacity === 0) return;
+
+			camera.matrixWorld.extractBasis(cameraRight, scratch, scratch);
+			const appear = selectedId ? 0 : THREE.MathUtils.smoothstep(clusterMix, 0.45, 1);
+
+			for (let i = 0; i < clusters.length; i++) {
+				const cluster = clusters[i];
+				const label = clusterLabelEls[i];
+
+				projected.copy(cluster.center).applyMatrix4(viewProjection);
+				cluster.onScreen = projected.z >= -1 && projected.z <= 1;
+				const x = (projected.x * 0.5 + 0.5) * viewWidth;
+				const y = (-projected.y * 0.5 + 0.5) * viewHeight;
+				cluster.screenX = viewLeft + x;
+				cluster.screenY = viewTop + y;
+				edge
+					.copy(cluster.center)
+					.addScaledVector(cameraRight, cluster.radius + 1)
+					.applyMatrix4(viewProjection);
+				cluster.screenRadius = Math.hypot(
+					(edge.x * 0.5 + 0.5) * viewWidth - x,
+					(-edge.y * 0.5 + 0.5) * viewHeight - y
+				);
+
+				if (!label) continue;
+				const emphasised = i === hoveredClusterIndex || i === focusedCluster;
+				const presence = emphasised
+					? 1
+					: 0.3 + 0.5 * THREE.MathUtils.smoothstep(cluster.front, -0.6, 0.9);
+				const opacity = cluster.onScreen ? Math.round(appear * presence * 100) / 100 : 0;
+				if (opacity !== cluster.labelOpacity) {
+					cluster.labelOpacity = opacity;
+					label.style.opacity = String(opacity);
+					label.style.visibility = opacity > 0 ? 'visible' : 'hidden';
+				}
+				if (opacity === 0) continue;
+
+				labelPoint.copy(cluster.center);
+				labelPoint.y += cluster.radius + 1.5;
+				projected.copy(labelPoint).applyMatrix4(viewProjection);
+				const transform = `translate(${snap((projected.x * 0.5 + 0.5) * viewWidth)}px, ${snap((-projected.y * 0.5 + 0.5) * viewHeight)}px)`;
+				if (label.style.transform !== transform) label.style.transform = transform;
+				const z = String(i === hoveredClusterIndex ? 200 : Math.round((cluster.front + 1) * 50));
+				if (label.style.zIndex !== z) label.style.zIndex = z;
+			}
+		}
+
+		/** Which cluster the cursor is over, front-most first. */
+		function hitCluster(testing: boolean): number | null {
+			if (!clustered() || clusterMix < 0.6 || selectedId) return null;
+			if (labelHoverIndex !== null) return labelHoverIndex;
+			if (hoveredId) return nodeById.get(hoveredId)?.cluster ?? null;
+			if (!testing) return null;
+			let best: number | null = null;
+			for (let i = 0; i < clusters.length; i++) {
+				const cluster = clusters[i];
+				if (!cluster.onScreen) continue;
+				const distance = Math.hypot(pointer!.x - cluster.screenX, pointer!.y - cluster.screenY);
+				if (distance > Math.max(cluster.screenRadius, 14)) continue;
+				if (best === null || cluster.front > clusters[best].front) best = i;
+			}
+			return best;
+		}
+
+		/**
 		 * The single pass over the field: travel, the room the held node is
 		 * given, how each node should look, and the hit test — all of it, once
 		 * per node per frame.
@@ -835,8 +1230,12 @@
 			// cursor is on stand still, but nothing steers around either: the
 			// field behind the panel is backdrop, and nodes lifting out of the
 			// way of a passing hover would only pull the eye off the article.
-			const avoided = !selectedId && hoveredId ? nodeById.get(hoveredId) : undefined;
+			const avoided =
+				!selectedId && hoveredId && clusterMix === 0 ? nodeById.get(hoveredId) : undefined;
 			const focusId = selectedId ?? hoveredId;
+			// Once gathered, only the front cluster's nodes answer the pointer;
+			// the rest are reached by bringing their cluster forward first.
+			const frontOnly = clustered() && clusterMix > 0.6;
 			if (!selectedId) highlight.visible = false;
 
 			// The front and back of the field along the camera's line of sight,
@@ -847,7 +1246,7 @@
 			// The hit test is the expensive half of the pass, and there is
 			// nothing to gain from it while the transcript owns the screen, the
 			// cursor is off the canvas, or it is over something drawn on top.
-			const testing = interactive && pointer !== null && !pointerIsBlocked(now);
+			const testing = interactive && pointer !== null && !drag && !pointerIsBlocked(now);
 			if (testing) camera.matrixWorld.extractBasis(cameraRight, scratch, scratch);
 
 			let nearestId: string | null = null;
@@ -866,8 +1265,8 @@
 				}
 				if (node.spin !== 0) node.angle -= ORBIT_SPEED * node.spin * dt;
 
-				const x = Math.cos(node.angle) * node.radius;
-				const z = Math.sin(node.angle) * node.radius;
+				let x = Math.cos(node.angle) * node.radius;
+				let z = Math.sin(node.angle) * node.radius;
 
 				let detour = 0;
 				if (avoided !== undefined && node !== avoided) {
@@ -893,7 +1292,30 @@
 					if (Math.abs(node.yOffset - detour) < 0.001) node.yOffset = detour;
 				}
 
-				const y = node.baseY + node.yOffset;
+				let y = node.baseY + node.yOffset;
+
+				// Gathered: slide from the free field towards the node's place
+				// in its cluster, each node setting off a little after the last.
+				let gathered = 0;
+				if (clusterMix > 0) {
+					if (node.spin !== 0) node.localAngle += CLUSTER_SPIN * node.spin * dt;
+					const t = THREE.MathUtils.clamp(
+						(clusterMix - node.delay * CLUSTER_STAGGER) / (1 - CLUSTER_STAGGER),
+						0,
+						1
+					);
+					gathered = t * t * (3 - 2 * t);
+					if (gathered > 0) {
+						const center = clusters[node.cluster].center;
+						const cx = center.x + Math.cos(node.localAngle) * node.localRadius;
+						const cy = center.y + node.localY;
+						const cz = center.z + Math.sin(node.localAngle) * node.localRadius;
+						x += (cx - x) * gathered;
+						y += (cy - y) * gathered;
+						z += (cz - z) * gathered;
+					}
+				}
+
 				node.position.set(x, y, z);
 				offsetArray[i * 3] = x;
 				offsetArray[i * 3 + 1] = y;
@@ -912,11 +1334,11 @@
 						(0.9 * camera.projectionMatrix.elements[5] * viewHeight * PARAMS.nodeSize);
 				} else if (node.id === hoveredId) {
 					const depth = (node.position.distanceTo(camera.position) - nearDepth) / depthSpan;
-					const allowance = THREE.MathUtils.smoothstep(
-						depth,
-						HOVER_SCALE_NEAR_ZONE,
-						HOVER_SCALE_FULL_ZONE
-					);
+					// The depth band is the free field's; a cluster is small enough
+					// that the whole of it can take the growth.
+					const allowance = frontOnly
+						? 1
+						: THREE.MathUtils.smoothstep(depth, HOVER_SCALE_NEAR_ZONE, HOVER_SCALE_FULL_ZONE);
 					multiplier = 1 + (HOVER_SCALE - 1) * allowance;
 				}
 				const scaleTarget = PARAMS.nodeSize * multiplier;
@@ -937,15 +1359,28 @@
 					highlight.visible = true;
 				}
 
-				const opacityTarget =
+				let opacityTarget =
 					!focusId || node.id === focusId || litIds.has(node.id) ? 1 : DIM_OPACITY;
+				if (gathered > 0 && !focusId) {
+					// The front and hovered clusters read solid; the rest recede
+					// with their distance round the ring.
+					const ring =
+						node.cluster === focusedCluster || node.cluster === hoveredClusterIndex
+							? 1
+							: THREE.MathUtils.lerp(
+									BACK_CLUSTER_OPACITY,
+									SIDE_CLUSTER_OPACITY,
+									THREE.MathUtils.smoothstep(clusters[node.cluster].front, -0.6, 0.85)
+								);
+					opacityTarget = Math.round((1 + (ring - 1) * gathered) * 100) / 100;
+				}
 				if (opacityArray[i] !== opacityTarget) {
 					const next = THREE.MathUtils.lerp(opacityArray[i], opacityTarget, lerpT);
 					opacityArray[i] = Math.abs(next - opacityTarget) < 0.002 ? opacityTarget : next;
 					opacitiesDirty = true;
 				}
 
-				if (!testing) continue;
+				if (!testing || (frontOnly && node.cluster !== focusedCluster)) continue;
 
 				// Nodes are billboards a pixel or two across, so raycasting them
 				// is a frustrating hit test. Projecting each and measuring pixel
@@ -981,6 +1416,20 @@
 			if (opacitiesDirty) opacities.needsUpdate = true;
 
 			hoveredId = testing && nearestDistanceSq <= nearestHitAreaSq ? nearestId : null;
+
+			const cluster = hitCluster(testing);
+			if (cluster !== hoveredClusterIndex) hoveredClusterIndex = cluster;
+
+			if (clusterMix > 0 || renderer.domElement.style.cursor) {
+				const cursor = !clustered()
+					? ''
+					: drag
+						? 'grabbing'
+						: hoveredId || (cluster !== null && cluster !== focusedCluster)
+							? 'pointer'
+							: 'grab';
+				if (renderer.domElement.style.cursor !== cursor) renderer.domElement.style.cursor = cursor;
+			}
 		}
 
 		let windowFrames = 0;
@@ -1037,7 +1486,9 @@
 			const dt = lastFrameTime ? Math.min(frameMs / 1000, 0.05) : 1 / 60;
 			lastFrameTime = time;
 
+			updateClusters(dt);
 			updateFocus(lerpT);
+			updateClusterRig(dt);
 			controls.update();
 
 			// Everything below works from where the camera has just ended up,
@@ -1046,6 +1497,7 @@
 			camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
 			viewProjection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
 
+			updateClusterLabels();
 			updateNodes(dt, lerpT, time);
 
 			renderer.render(scene, camera);
@@ -1068,16 +1520,47 @@
 		window.addEventListener('resize', handleResize);
 		handleResize();
 
-		let wasSelected = false;
+		let wasLocked = false;
 		$effect(() => {
 			// Selection locks the orbit controls; the rest of the field keeps
-			// travelling, so it stays alive while you read.
-			const locked = selectedId !== null;
-			if (wasSelected && !locked) returning = true;
-			wasSelected = locked;
+			// travelling, so it stays alive while you read. The clustered view
+			// locks them too: there a drag turns the ring instead.
+			const locked = selectedId !== null || clusterArea !== null;
+			if (wasLocked && !locked) returning = true;
+			wasLocked = locked;
 			controls.enableRotate = !locked;
 			controls.enablePan = !locked;
 			controls.enableZoom = !locked;
+		});
+
+		$effect(() => {
+			const id = clusterArea;
+			untrack(() => {
+				if (id === null) {
+					clusterTarget = 0;
+					drag = null;
+					ringVelocity = null;
+					return;
+				}
+				const index = clusterIndexByArea.get(id) ?? 0;
+				if (clusterMix === 0) {
+					// Starting fresh: the front is wherever the camera already
+					// looks from, so the field gathers in place rather than
+					// swinging round, and the ring starts with this area in front.
+					frontAngle = Math.atan2(
+						camera.position.z - controls.target.z,
+						camera.position.x - controls.target.x
+					);
+					clusterDistance = CLUSTER_VIEW_DISTANCE;
+					clusterElevation = CLUSTER_ELEVATION;
+					turnTo(index);
+					ringYaw = ringYawTarget;
+				} else {
+					turnTo(index);
+				}
+				clusterTarget = 1;
+				returning = false;
+			});
 		});
 
 		$effect(() => {
@@ -1093,10 +1576,13 @@
 		return () => {
 			cancelAnimationFrame(frameId);
 			window.removeEventListener('pointermove', onPointerMove);
+			window.removeEventListener('pointerup', onDragEnd);
+			window.removeEventListener('pointercancel', onDragEnd);
 			window.removeEventListener('resize', handleResize);
 			renderer.domElement.removeEventListener('pointerleave', onPointerLeave);
 			renderer.domElement.removeEventListener('pointerdown', onPointerDown);
 			renderer.domElement.removeEventListener('pointerup', onPointerUp);
+			renderer.domElement.removeEventListener('wheel', onWheel);
 			geometry.dispose();
 			highlightGeometry.dispose();
 			material.dispose();
@@ -1110,6 +1596,36 @@
 </script>
 
 <div bind:this={container} class="relative h-full w-full overflow-hidden">
+	<!-- Cluster titles, parked above each cluster by the frame loop. -->
+	{#each clusterLayout as cluster, i (cluster.area.id)}
+		<button
+			bind:this={clusterLabelEls[i]}
+			type="button"
+			class="cluster-label"
+			class:is-front={focusedClusterIndex === i}
+			class:is-hovered={hoveredClusterIndex === i}
+			style="visibility: hidden; opacity: 0;"
+			style:pointer-events={clusterLabelsLive ? 'auto' : 'none'}
+			tabindex={clusterLabelsLive ? 0 : -1}
+			aria-hidden={!clusterLabelsLive}
+			aria-label={`${cluster.area.name}, ${cluster.count} articles`}
+			onpointerenter={() => (labelHoverIndex = i)}
+			onpointerleave={() => {
+				if (labelHoverIndex === i) labelHoverIndex = null;
+			}}
+			onfocus={() => (labelHoverIndex = i)}
+			onblur={() => {
+				if (labelHoverIndex === i) labelHoverIndex = null;
+			}}
+			onclick={() => focusClusterFromLabel(i)}
+		>
+			<span use:squircle={{ radius: 8 }} class="cluster-label-card">
+				<span>{cluster.area.name}</span>
+				<span class="cluster-label-count">{cluster.count}</span>
+			</span>
+		</button>
+	{/each}
+
 	<div
 		class="pointer-events-none absolute inset-0 transition-opacity duration-200"
 		style:opacity={linksVisible ? 1 : 0}
@@ -1140,6 +1656,79 @@
 		/* A dash the length of the whole path, for it to draw out along. */
 		stroke-dasharray: 1;
 		stroke-dashoffset: 0;
+	}
+
+	/*
+	 * Cluster titles. Quiet by default, so sixteen of them don't shout over the
+	 * nodes; the front one firms up, and the hovered one turns into the solid
+	 * pill the rest of the field uses for whatever is active.
+	 */
+	.cluster-label {
+		position: absolute;
+		top: 0;
+		left: 0;
+		padding: 0;
+		border: 0;
+		background: none;
+		cursor: pointer;
+		transition: opacity 200ms linear;
+	}
+
+	.cluster-label:focus-visible {
+		outline: none;
+	}
+
+	.cluster-label-card {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0;
+		padding: 6px 8px;
+		border-radius: 8px;
+		white-space: nowrap;
+		font-family: 'IBM Mono', courier, monospace;
+		font-size: 12px;
+		line-height: 100%;
+		color: var(--color-off-black);
+		background: rgb(150 150 150 / 0.22);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		transform: translate(-50%, -100%);
+		transform-origin: 50% 100%;
+		transition:
+			transform 450ms cubic-bezier(0.16, 1, 0.3, 1),
+			background-color 250ms ease,
+			color 250ms ease;
+	}
+
+	.cluster-label-count {
+		max-width: 0;
+		overflow: hidden;
+		opacity: 0;
+		color: var(--color-medium-grey);
+		transition:
+			max-width 450ms cubic-bezier(0.16, 1, 0.3, 1),
+			margin 450ms cubic-bezier(0.16, 1, 0.3, 1),
+			opacity 250ms ease;
+	}
+
+	.is-front .cluster-label-card {
+		background: rgb(150 150 150 / 0.5);
+		transform: translate(-50%, -100%) scale(1.17);
+	}
+
+	.is-hovered .cluster-label-card,
+	.cluster-label:focus-visible .cluster-label-card {
+		color: #fff;
+		background: var(--color-off-black);
+		transform: translate(-50%, -100%) scale(1.33);
+	}
+
+	.is-front .cluster-label-count,
+	.is-hovered .cluster-label-count,
+	.cluster-label:focus-visible .cluster-label-count {
+		max-width: 4ch;
+		margin-left: 1ch;
+		opacity: 1;
 	}
 
 	/* The type of the "node // 0000" pill, wrapped since a title is far longer. */

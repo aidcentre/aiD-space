@@ -11,6 +11,7 @@
 	import { squircle } from '$lib/utils/squircle';
 	import { useScramble } from '$lib/actions/useScramble';
 	import { formatPublicationDate, type Article } from '$lib/data/articles';
+	import { areaFor, type AreaId } from '$lib/data/areas';
 	import {
 		CONTENT_MODES,
 		CONTENT_MODE_LABELS,
@@ -25,12 +26,17 @@
 
 	let {
 		article,
+		onarea,
 		children
 	}: {
 		article: Article;
+		/** The Area label was clicked: close the article and show the areas as clusters. */
+		onarea?: (id: AreaId) => void;
 		/** Rendered below the panel, inside its scroll container. */
 		children?: import('svelte').Snippet;
 	} = $props();
+
+	const area = $derived(areaFor(article));
 
 	/**
 	 * Abstracts arrive over the network, so track the load and re-read on
@@ -42,23 +48,17 @@
 	});
 
 	const body = $derived(
-		abstractsReady
-			? abstractFor(article.id, $contentMode, article.teaser)
-			: article.teaser
+		abstractsReady ? abstractFor(article.id, $contentMode, article.teaser) : article.teaser
 	);
 
 	const researcher = $derived(findResearcher(article.researcher));
-	const researcherName = $derived(
-		researcher?.displayName ?? displayNameFor(article.researcher)
-	);
+	const researcherName = $derived(researcher?.displayName ?? displayNameFor(article.researcher));
 	const researcherSubtitle = $derived(
 		[researcher?.title, researcher?.institution].filter(Boolean).join(' · ') || 'aiD researcher'
 	);
 
 	let brokenPhoto = $state(false);
-	const photo = $derived(
-		!brokenPhoto && researcher?.image ? researcher.image : profilePlaceholder
-	);
+	const photo = $derived(!brokenPhoto && researcher?.image ? researcher.image : profilePlaceholder);
 
 	// The title decodes in after the panel has finished sliding, matching the
 	// prototype's 400ms beat.
@@ -129,143 +129,155 @@
 	<div
 		class="mt-[88px] mr-4 mb-4 ml-auto flex w-max max-w-[calc(100vw-32px)] flex-col max-[900px]:mt-[290px] max-[900px]:mr-0 max-[900px]:mb-0 max-[900px]:w-full max-[900px]:max-w-none"
 	>
-	<aside
-		use:squircle={{ radius: 32 }}
-		class="panel pointer-events-auto relative z-[2] flex w-full flex-col overflow-hidden bg-white text-off-black"
-	>
-		<div
-			class="flex w-[577px] max-w-[calc(100vw-32px)] flex-col px-[76px] pt-12 pb-8 max-[900px]:px-4"
+		<aside
+			use:squircle={{ radius: 32 }}
+			class="panel pointer-events-auto relative z-[2] flex w-full flex-col overflow-hidden bg-white text-off-black"
 		>
 			<div
-				class="mb-4 -mr-[40px] flex w-[calc(100%+40px)] max-w-none flex-wrap max-[900px]:mr-0 max-[900px]:w-full gap-x-8 gap-y-2 pt-4 font-[IBM_Mono] text-[14px] leading-none"
-				aria-label="Article metadata"
+				class="flex w-[577px] max-w-[calc(100vw-32px)] flex-col px-[76px] pt-12 pb-8 max-[900px]:px-4"
 			>
-				<span class="inline-flex items-center gap-2 whitespace-nowrap">
-					<span class="text-medium-grey">Type</span>
-					<span class="text-medium-grey">//</span>
-					<span>Article</span>
-				</span>
-				<span class="inline-flex items-center gap-2 whitespace-nowrap">
-					<span class="text-medium-grey">Publication date</span>
-					<span class="text-medium-grey">//</span>
-					<span>{formatPublicationDate(article.publicationDate)}</span>
-				</span>
-				{#if article.venue}
-					<span class="inline-flex items-center gap-2">
-						<span class="text-medium-grey">Published in</span>
-						<span class="text-medium-grey">//</span>
-						<span>{article.venue}</span>
-					</span>
-				{/if}
-				{#if article.doi}
-					<span class="inline-flex items-center gap-2">
-						<span class="text-medium-grey">DOI</span>
-						<span class="text-medium-grey">//</span>
-						<a
-							href={`https://doi.org/${article.doi}`}
-							target="_blank"
-							rel="noopener noreferrer"
-							class="break-all underline underline-offset-4"
-						>
-							{article.doi} ↗
-						</a>
-					</span>
-				{/if}
-			</div>
-
-			{#if article.authors.length > 0}
-				<p
-					class="mb-4 -mr-[40px] w-[calc(100%+40px)] max-w-none text-left max-[900px]:mr-0 max-[900px]:w-full font-[IBM_Mono] text-[14px] leading-[18px] text-grey"
+				<div
+					class="-mr-[40px] mb-4 flex w-[calc(100%+40px)] max-w-none flex-wrap gap-x-8 gap-y-2 pt-4 font-[IBM_Mono] text-[14px] leading-none max-[900px]:mr-0 max-[900px]:w-full"
+					aria-label="Article metadata"
 				>
-					<span class="text-medium-grey">Co-authors //</span>
-					{article.authors.join(', ')}
-				</p>
-			{/if}
-
-			<h3
-				bind:this={heading}
-				tabindex="-1"
-				class="my-0 -mr-[52px] w-[calc(100%+52px)] max-w-none text-left font-[Milling] text-[36px] leading-[48px] font-bold outline-none max-[900px]:mr-0 max-[900px]:w-full"
-				aria-label={article.title}
-			>
-				<span bind:this={titleEl}></span>
-			</h3>
-		</div>
-
-		<div class="flex flex-col items-center px-[76px] pb-12 max-[900px]:px-4">
-			<div class="mb-6 flex w-full max-w-[577px] flex-wrap items-center gap-2">
-				<span class="font-[IBM_Mono] text-[14px] leading-none whitespace-nowrap text-medium-grey">
-					Content Mode //
-				</span>
-				<div class="flex items-center gap-2" role="group" aria-label="Content mode">
-					{#each CONTENT_MODES as mode (mode)}
+					<span class="inline-flex items-center gap-2 whitespace-nowrap">
+						<span class="text-medium-grey">Type</span>
+						<span class="text-medium-grey">//</span>
+						<span>Article</span>
+					</span>
+					<span class="inline-flex items-center gap-2 whitespace-nowrap">
+						<span class="text-medium-grey">Area</span>
+						<span class="text-medium-grey">//</span>
 						<button
-							use:squircle={{ radius: 8 }}
 							type="button"
-							class="cursor-pointer rounded-lg p-2 font-[IBM_Mono] text-[14px] leading-none backdrop-blur-[10px] {$contentMode ===
-							mode
-								? 'bg-off-black text-white'
-								: 'bg-transparent text-off-black'}"
-							aria-pressed={$contentMode === mode}
-							onclick={() => choose(mode)}
+							class="cursor-pointer underline decoration-medium-grey underline-offset-4 transition-colors duration-200 hover:decoration-off-black"
+							title="See every research area as clusters"
+							onclick={() => onarea?.(area.id)}
 						>
-							{CONTENT_MODE_LABELS[mode]}
+							{area.name}
 						</button>
-					{/each}
+					</span>
+					<span class="inline-flex items-center gap-2 whitespace-nowrap">
+						<span class="text-medium-grey">Publication date</span>
+						<span class="text-medium-grey">//</span>
+						<span>{formatPublicationDate(article.publicationDate)}</span>
+					</span>
+					{#if article.venue}
+						<span class="inline-flex items-center gap-2">
+							<span class="text-medium-grey">Published in</span>
+							<span class="text-medium-grey">//</span>
+							<span>{article.venue}</span>
+						</span>
+					{/if}
+					{#if article.doi}
+						<span class="inline-flex items-center gap-2">
+							<span class="text-medium-grey">DOI</span>
+							<span class="text-medium-grey">//</span>
+							<a
+								href={`https://doi.org/${article.doi}`}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="break-all underline underline-offset-4"
+							>
+								{article.doi} ↗
+							</a>
+						</span>
+					{/if}
 				</div>
-			</div>
 
-			<div class="w-full max-w-[577px] text-left font-[IBM_Math] text-[18px] leading-6">
-				{#key `${article.id}-${$contentMode}`}
-					<p class="body-in m-0">{body}</p>
-				{/key}
-			</div>
+				{#if article.authors.length > 0}
+					<p
+						class="-mr-[40px] mb-4 w-[calc(100%+40px)] max-w-none text-left font-[IBM_Mono] text-[14px] leading-[18px] text-grey max-[900px]:mr-0 max-[900px]:w-full"
+					>
+						<span class="text-medium-grey">Co-authors //</span>
+						{article.authors.join(', ')}
+					</p>
+				{/if}
 
-			<img src={endOfArticle} alt="End of article" class="my-8 h-4" />
-
-			<div class="flex w-full max-w-[577px] flex-col gap-2">
-				<svg
-					class="mb-4 size-8"
-					viewBox="0 0 100 100"
-					xmlns="http://www.w3.org/2000/svg"
-					role="img"
-					aria-label="aiD"
+				<h3
+					bind:this={heading}
+					tabindex="-1"
+					class="my-0 -mr-[52px] w-[calc(100%+52px)] max-w-none text-left font-[Milling] text-[36px] leading-[48px] font-bold outline-none max-[900px]:mr-0 max-[900px]:w-full"
+					aria-label={article.title}
 				>
-					<rect x="0" y="0" width="100" height="100" rx="24" fill="#070707" />
-					<rect x="38" y="18" width="24" height="24" rx="7" fill="#fff" />
-					<rect x="20" y="52" width="24" height="24" rx="7" fill="#fff" />
-					<rect x="56" y="52" width="24" height="24" rx="7" fill="#fff" />
-				</svg>
-				<div class="flex items-center gap-6 rounded-2xl bg-off-black p-3 text-left text-white">
-					<img
-						src={photo}
-						alt={researcherName}
-						onerror={() => (brokenPhoto = true)}
-						class="size-[97px] shrink-0 rounded-lg object-cover grayscale"
-					/>
-					<div class="flex flex-col gap-2">
-						<p class="m-0 font-[IBM_Mono] text-[14px] leading-[18px]">
-							{researcherName}<br aria-hidden="true" />↳ {researcherSubtitle}
-						</p>
-						<div class="flex flex-wrap gap-4">
-							{#if researcher?.profileUrl}
-								<a
-									href={researcher.profileUrl}
-									target="_blank"
-									rel="noopener noreferrer"
-									class="font-[IBM_Mono] text-[14px] underline underline-offset-4"
-								>
-									Profile ↗
-								</a>
-							{/if}
+					<span bind:this={titleEl}></span>
+				</h3>
+			</div>
+
+			<div class="flex flex-col items-center px-[76px] pb-12 max-[900px]:px-4">
+				<div class="mb-6 flex w-full max-w-[577px] flex-wrap items-center gap-2">
+					<span class="font-[IBM_Mono] text-[14px] leading-none whitespace-nowrap text-medium-grey">
+						Content Mode //
+					</span>
+					<div class="flex items-center gap-2" role="group" aria-label="Content mode">
+						{#each CONTENT_MODES as mode (mode)}
+							<button
+								use:squircle={{ radius: 8 }}
+								type="button"
+								class="cursor-pointer rounded-lg p-2 font-[IBM_Mono] text-[14px] leading-none backdrop-blur-[10px] {$contentMode ===
+								mode
+									? 'bg-off-black text-white'
+									: 'bg-transparent text-off-black'}"
+								aria-pressed={$contentMode === mode}
+								onclick={() => choose(mode)}
+							>
+								{CONTENT_MODE_LABELS[mode]}
+							</button>
+						{/each}
+					</div>
+				</div>
+
+				<div class="w-full max-w-[577px] text-left font-[IBM_Math] text-[18px] leading-6">
+					{#key `${article.id}-${$contentMode}`}
+						<p class="body-in m-0">{body}</p>
+					{/key}
+				</div>
+
+				<img src={endOfArticle} alt="End of article" class="my-8 h-4" />
+
+				<div class="flex w-full max-w-[577px] flex-col gap-2">
+					<svg
+						class="mb-4 size-8"
+						viewBox="0 0 100 100"
+						xmlns="http://www.w3.org/2000/svg"
+						role="img"
+						aria-label="aiD"
+					>
+						<rect x="0" y="0" width="100" height="100" rx="24" fill="#070707" />
+						<rect x="38" y="18" width="24" height="24" rx="7" fill="#fff" />
+						<rect x="20" y="52" width="24" height="24" rx="7" fill="#fff" />
+						<rect x="56" y="52" width="24" height="24" rx="7" fill="#fff" />
+					</svg>
+					<div class="flex items-center gap-6 rounded-2xl bg-off-black p-3 text-left text-white">
+						<img
+							src={photo}
+							alt={researcherName}
+							onerror={() => (brokenPhoto = true)}
+							class="size-[97px] shrink-0 rounded-lg object-cover grayscale"
+						/>
+						<div class="flex flex-col gap-2">
+							<p class="m-0 font-[IBM_Mono] text-[14px] leading-[18px]">
+								{researcherName}<br aria-hidden="true" />↳ {researcherSubtitle}
+							</p>
+							<div class="flex flex-wrap gap-4">
+								{#if researcher?.profileUrl}
+									<a
+										href={researcher.profileUrl}
+										target="_blank"
+										rel="noopener noreferrer"
+										class="font-[IBM_Mono] text-[14px] underline underline-offset-4"
+									>
+										Profile ↗
+									</a>
+								{/if}
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-	</aside>
+		</aside>
 
-	{@render children?.()}
+		{@render children?.()}
 	</div>
 </div>
 

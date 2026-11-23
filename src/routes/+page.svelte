@@ -16,6 +16,7 @@
 	import Scramble from '$lib/actions/Scramble.svelte';
 	import chatSymbol from '$lib/assets/chat_symbol.svg';
 	import { articles, articleById, findArticle, type Article } from '$lib/data/articles';
+	import { areaFor, findArea, type AreaId } from '$lib/data/areas';
 	import { trackVisualViewport } from '$lib/actions/visualViewport';
 	import type { PageData } from './$types';
 
@@ -99,21 +100,50 @@
 	 */
 	const searchMaxWidth = $derived(Math.max(0, innerWidth - SEARCH_GUTTER_PX - searchShift * 2));
 
+	// --- area clusters ------------------------------------------------------
+
+	/**
+	 * Set while the field is gathered into one cluster per research area; the
+	 * value is the area turned to the front. Trial feature: the areas are a
+	 * hand-made table in $lib/data/areas, not yet produced by the backend.
+	 */
+	let clusterArea = $state<AreaId | null>(null);
+	const clusterAreaName = $derived(findArea(clusterArea)?.name ?? '');
+
+	/** The Area label in an open article: close it and show the areas. */
+	function openArea(id: AreaId) {
+		selectedId = null;
+		clusterArea = id;
+	}
+
+	function leaveClusters() {
+		clusterArea = null;
+	}
+
 	function select(id: string | null) {
+		// Closing an article while the areas are up leaves its own area in
+		// front, which is where a related article may have taken you.
+		if (id === null && clusterArea && selectedId) {
+			clusterArea = areaFor(articleById(selectedId)).id;
+		}
 		selectedId = id;
 	}
 
-	/** Escape closes an open node, however it was opened. */
+	/** Escape closes an open node, however it was opened, then the clusters. */
 	function onWindowKeydown(event: KeyboardEvent) {
-		if (event.key !== 'Escape' || !selectedId || event.defaultPrevented) return;
-		event.preventDefault();
-		select(null);
+		if (event.key !== 'Escape' || event.defaultPrevented) return;
+		if (selectedId) {
+			event.preventDefault();
+			select(null);
+		} else if (clusterArea) {
+			event.preventDefault();
+			leaveClusters();
+		}
 	}
 
 	onMount(() => {
 		const probe = document.createElement('div');
-		probe.style.cssText =
-			'position:absolute;top:-9999px;width:100px;height:100px;overflow:scroll;';
+		probe.style.cssText = 'position:absolute;top:-9999px;width:100px;height:100px;overflow:scroll;';
 		document.body.appendChild(probe);
 		scrollbarWidth = probe.offsetWidth - probe.clientWidth;
 		probe.remove();
@@ -141,6 +171,7 @@
 		messages = [];
 		loading = false;
 		selectedId = null;
+		clusterArea = null;
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 	}
 
@@ -155,8 +186,10 @@
 		const current = ++session;
 
 		// The transcript and the detail panel both want the middle of the
-		// screen; asking a question means you are done with the open article.
+		// screen; asking a question means you are done with the open article,
+		// and the results want the free field behind them, not the clusters.
 		selectedId = null;
+		clusterArea = null;
 
 		const questionIndex = messages.push({ role: 'user', content: q }) - 1;
 		loading = true;
@@ -218,7 +251,9 @@
 		paused={$menuOpen}
 		interactive={!active}
 		anchor={anchorEl}
+		{clusterArea}
 		onselect={select}
+		onclusterarea={(id) => (clusterArea = id)}
 	/>
 </div>
 
@@ -242,16 +277,12 @@
 <!-- Tooltip layer. NodeField parks `anchorEl` on the active node each frame. -->
 <div class="pointer-events-none fixed inset-0 z-[3] overflow-hidden">
 	<div bind:this={anchorEl} class="absolute top-0 left-0" style="visibility: hidden;">
-		<NodeTooltip
-			article={activeArticle}
-			selected={!!selectedId}
-			onclose={() => select(null)}
-		/>
+		<NodeTooltip article={activeArticle} selected={!!selectedId} onclose={() => select(null)} />
 	</div>
 </div>
 
 {#if selectedArticle}
-	<NodeDetailPanel article={selectedArticle}>
+	<NodeDetailPanel article={selectedArticle} onarea={openArea}>
 		<RelatedArticles article={selectedArticle} onselect={select} />
 	</NodeDetailPanel>
 {/if}
@@ -268,7 +299,7 @@
 					{#if msg.role === 'user'}
 						<div
 							data-message-index={i}
-							class="scroll-mt-40 w-fit max-w-full self-end rounded-3xl bg-white px-4 py-3 font-[IBM_Math] text-[1rem] leading-6 font-normal tracking-[0.32px] text-black md:rounded-[46px]"
+							class="w-fit max-w-full scroll-mt-40 self-end rounded-3xl bg-white px-4 py-3 font-[IBM_Math] text-[1rem] leading-6 font-normal tracking-[0.32px] text-black md:rounded-[46px]"
 						>
 							{msg.content}
 						</div>
@@ -391,7 +422,34 @@
 	<SearchBar onsubmit={search} {loading} />
 </div>
 
-{#if !active && !selectedId}
+{#if clusterArea && !active}
+	<!-- Way out of the clustered view, with what it is showing and how to move it. -->
+	<div
+		class="pointer-events-none fixed top-24 left-4 z-[4] flex flex-col items-start gap-2"
+		transition:fly={{ y: -8, duration: 400 }}
+	>
+		<div class="pointer-events-auto">
+			<BackToFieldButton onclick={leaveClusters} />
+		</div>
+		<p
+			class="m-0 w-fit bg-light-grey/70 px-1 font-[IBM_Mono] text-[12px] leading-[18px] text-grey backdrop-blur-[10px]"
+			aria-live="polite"
+		>
+			<span class="text-medium-grey">Area //</span>
+			<span class="text-off-black">{clusterAreaName}</span>
+		</p>
+		{#if !selectedId}
+			<p
+				class="m-0 w-fit bg-light-grey/70 px-1 font-[IBM_Mono] text-[12px] leading-[18px] text-grey backdrop-blur-[10px] max-[900px]:hidden"
+				transition:fade={{ duration: 200 }}
+			>
+				Drag to turn the ring · click a cluster to bring it forward
+			</p>
+		{/if}
+	</div>
+{/if}
+
+{#if !active && !selectedId && !clusterArea}
 	<!-- Lifted clear of the search bar, which is now docked to the bottom. -->
 	<!-- From xl up it sits beside the search bar instead, bottoms aligned. -->
 	<div class="pointer-events-none fixed inset-x-0 bottom-24 z-[1] xl:bottom-4">
