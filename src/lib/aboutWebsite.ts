@@ -37,8 +37,8 @@ Above all, the site is a collaboration between people and AI: human judgement an
 
 const DEFAULT_CREDITS: AboutWebsiteCredit[] = [
 	{
-		_key: 'developed-by',
-		label: 'Website developed by',
+		_key: 'created-by',
+		label: 'Website created by',
 		value:
 			'Aedan Soellaart, Veronika Artiuschenko, Isaac Fagerli, Morten Johansen, Jane Al-Shihabi, Iben Alexander Eikrem Nesset and Signe Riemer-Sørensen'
 	},
