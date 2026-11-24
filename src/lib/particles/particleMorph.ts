@@ -22,6 +22,7 @@
  */
 import * as THREE from 'three/webgpu';
 import {
+	abs,
 	clamp,
 	cos,
 	float,
@@ -29,8 +30,12 @@ import {
 	fract,
 	instancedBufferAttribute,
 	length,
+	max,
+	min,
 	mix,
 	mod,
+	pow,
+	screenUV,
 	sin,
 	smoothstep,
 	uniform,
@@ -41,6 +46,8 @@ import {
 	vec4
 } from 'three/tsl';
 import {
+	CORNER_EXPONENT,
+	CORNER_RADIUS,
 	FRAME_HEIGHT,
 	FRAME_PADDING,
 	FRAME_WIDTH,
@@ -69,6 +76,12 @@ const REST_DRIFT = 3.4;
 const REST_RATE = 0.6;
 /** Radius (CSS px) of the small orbit every particle also wanders. */
 const REST_WANDER = 0.9;
+/**
+ * Within this many CSS px of the frame's edge, a resting particle's drift
+ * across that edge fades out (it still slides along it), so the image keeps
+ * a flat outline while its inside shimmers.
+ */
+const EDGE_CALM = 6;
 
 export type Backend = 'webgpu' | 'webgl2';
 
@@ -233,7 +246,13 @@ export class ParticleMorph {
 			sin(time.mul(rnd.x.mul(1.5).add(1.2)).add(rnd.z.mul(Math.PI * 2))),
 			cos(time.mul(rnd.w.mul(1.5).add(1.0)).add(rnd.y.mul(Math.PI * 2)))
 		);
-		const drifted = flown.add(flow.mul(life.mul(REST_DRIFT))).add(wander.mul(REST_WANDER));
+		// Near the frame's edge, damp the drift across it: x near the left and
+		// right sides, y near the top and bottom, both in the corners. Measured
+		// from the straight path, which stays inside the frame mid-morph.
+		const toEdge = vec2(FRAME_WIDTH / 2, FRAME_HEIGHT / 2).sub(abs(straight));
+		const calm = vec2(smoothstep(0, EDGE_CALM, toEdge.x), smoothstep(0, EDGE_CALM, toEdge.y));
+		const drift = flow.mul(life.mul(REST_DRIFT)).add(wander.mul(REST_WANDER));
+		const drifted = flown.add(drift.mul(calm));
 		const breath = sin(life.mul(Math.PI));
 
 		// Gathering in on hover, from a loose cloud around the frame.
@@ -252,12 +271,37 @@ export class ParticleMorph {
 		});
 		material.alphaToCoverage = false;
 		material.positionNode = vec3(position, 0);
+		// The outermost row of dots never shrinks below a full dot, so the
+		// clipped edge below stays solid while they breathe.
+		const rim = float(1).sub(smoothstep(0, 2, min(toEdge.x, toEdge.y)));
 		material.sizeNode = float(PARTICLE_SIZE)
 			.mul(rnd.w.mul(0.4).add(0.8))
-			.mul(breath.mul(0.45).add(0.75))
+			.mul(max(breath.mul(0.45).add(0.75), rim.mul(1.3)))
 			.mul(flight.mul(0.35).add(1));
+
+		// Resting dots are clipped to the thumbnail's squircle, so the image
+		// has a crisp, flat outline with rounded corners. Dots in flight (and
+		// the gather-in cloud) are not, so they can still swing out past it.
+		const settled = varying(float(1).sub(flight).mul(float(1).sub(intro)));
+		const width = FRAME_WIDTH + FRAME_PADDING * 2;
+		const height = FRAME_HEIGHT + FRAME_PADDING * 2;
+		// The shape is symmetric, so screenUV's y direction does not matter.
+		const pixel = screenUV.sub(0.5).mul(vec2(width, height));
+		const inset = abs(pixel).sub(vec2(FRAME_WIDTH / 2 - CORNER_RADIUS, FRAME_HEIGHT / 2 - CORNER_RADIUS));
+		const corner = max(inset, vec2(1e-4)).div(CORNER_RADIUS);
+		const outside = pow(
+			pow(corner.x, CORNER_EXPONENT).add(pow(corner.y, CORNER_EXPONENT)),
+			1 / CORNER_EXPONENT
+		)
+			.sub(1)
+			.mul(CORNER_RADIUS)
+			.add(min(max(inset.x, inset.y), 0));
+		const inside = smoothstep(0.4, -0.4, outside);
+
 		const edge = length(uv().sub(0.5));
-		const alpha = smoothstep(0.5, 0.32, edge).mul(float(1).sub(intro));
+		const alpha = smoothstep(0.5, 0.32, edge)
+			.mul(float(1).sub(intro))
+			.mul(mix(float(1), inside, settled));
 		material.colorNode = vec4(colour, alpha);
 		return material;
 	}

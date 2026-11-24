@@ -14,9 +14,9 @@
 /** The node thumbnail, in CSS px (see .node-image in NodeTooltip). */
 export const FRAME_WIDTH = 162;
 export const FRAME_HEIGHT = 176;
-const CORNER_RADIUS = 8;
+export const CORNER_RADIUS = 8;
 /** squircle.ts's exponent at smoothing 1. */
-const CORNER_EXPONENT = 4.5;
+export const CORNER_EXPONENT = 4.5;
 /** Room around the frame that particles may swing out into mid-morph. */
 export const FRAME_PADDING = 32;
 
