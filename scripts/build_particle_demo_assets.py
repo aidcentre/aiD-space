@@ -6,7 +6,7 @@ the four images side by side, each cropped to the node thumbnail's aspect
 particle. The stills are the raw Stable Diffusion frames, so they get the same
 lift the finished videos have (brighter, about two thirds the saturation).
 
-    python scripts/build_particle_demo_assets.py [--limit 50]
+    python scripts/build_particle_demo_assets.py [--limit N]   (default: all)
 
 Writes static/images/nodes/particle-demo/<id>.webp and
 src/lib/data/particleDemo.generated.ts. Articles missing from the site's
@@ -28,9 +28,9 @@ OUT_DIR = ROOT / 'static' / 'images' / 'nodes' / 'particle-demo'
 MANIFEST = ROOT / 'src' / 'lib' / 'data' / 'particleDemo.generated.ts'
 ARTICLES = ROOT / 'src' / 'lib' / 'data' / 'articles.generated.ts'
 
-# Particle grid: 256 rows, columns to match the 162x176 thumbnail. Must match
-# GRID_COLUMNS / GRID_ROWS in src/lib/particles/particleMorph.ts.
-COLUMNS, ROWS = 236, 256
+# Particle grid: 192 rows, columns to match the 162x176 thumbnail. Must match
+# GRID_COLUMNS / GRID_ROWS in src/lib/particles/morphData.ts.
+COLUMNS, ROWS = 177, 192
 STILLS = 4
 GAMMA = 1.3          # TD grade_level gamma1
 SATURATION = 0.65    # the particle feedback in TD washes colour out about this much
@@ -60,7 +60,7 @@ def fit(image: Image.Image) -> Image.Image:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument('--limit', type=int, default=50)
+    parser.add_argument('--limit', type=int, default=0, help='0 = every article with stills')
     args = parser.parse_args()
 
     known = set(re.findall(r'"id":\s*"([^"]+)"', ARTICLES.read_text(encoding='utf-8')))
@@ -68,7 +68,7 @@ def main() -> None:
 
     sheets: dict[str, str] = {}
     for folder in sorted(p for p in CACHE.iterdir() if p.is_dir()):
-        if len(sheets) >= args.limit:
+        if args.limit and len(sheets) >= args.limit:
             break
         stills = [folder / f'{k}.png' for k in range(STILLS)]
         if folder.name not in known or not all(p.exists() for p in stills):

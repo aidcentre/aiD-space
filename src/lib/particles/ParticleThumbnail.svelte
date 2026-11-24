@@ -1,5 +1,5 @@
 <script lang="ts" module>
-	import type { MorphData } from './particleMorph';
+	import type { MorphData } from './morphData';
 
 	/** Prepared articles, most recent last; each is ~3.8 MB of attributes. */
 	const prepared = new Map<string, Promise<MorphData>>();
@@ -30,13 +30,14 @@
 	 */
 	import { onMount } from 'svelte';
 	import type { Backend, ParticleMorph } from './particleMorph';
-	import { FRAME_PADDING, STILLS } from './particleMorph';
+	import { FRAME_PADDING, STILLS } from './morphData';
 
 	let {
 		sheet,
 		active,
 		class: className = '',
 		style = '',
+		forceWebGL = false,
 		onbackend
 	}: {
 		/** Sprite sheet of the article's four stills, or null for none. */
@@ -44,6 +45,8 @@
 		active: boolean;
 		class?: string;
 		style?: string;
+		/** Skip WebGPU even where the browser has it. */
+		forceWebGL?: boolean;
 		onbackend?: (backend: Backend | 'static') => void;
 	} = $props();
 
@@ -70,7 +73,7 @@
 				// Loaded on demand so three/webgpu stays out of every other route.
 				const { ParticleMorph } = await import('./particleMorph');
 				if (cancelled || !canvas) return;
-				const instance = new ParticleMorph(canvas);
+				const instance = new ParticleMorph(canvas, { forceWebGL });
 				const backend = await instance.init();
 				if (cancelled) return instance.dispose();
 				morph = instance;
@@ -121,7 +124,19 @@
 	});
 </script>
 
-<div class="particle-frame {className}" {style}>
+<!--
+	The outer frame carries only what the tooltip passes in (it is `absolute`
+	beside the node there). Its own CSS must not set `position`: Tailwind's
+	utilities live in a cascade layer, so any unlayered rule here would beat
+	`.absolute` and drop the frame into the flow, shoving the card down.
+-->
+<div class={className} {style}>
+	<div class="particle-stage">
+		{@render media()}
+	</div>
+</div>
+
+{#snippet media()}
 	{#if fallback}
 		{#if sheet}
 			<div
@@ -141,12 +156,14 @@
 			aria-hidden="true"
 		></canvas>
 	{/if}
-</div>
+{/snippet}
 
 <style>
-	.particle-frame {
+	.particle-stage {
 		position: relative;
-		overflow: visible;
+		width: 100%;
+		height: 100%;
+		border-radius: inherit;
 	}
 
 	canvas {

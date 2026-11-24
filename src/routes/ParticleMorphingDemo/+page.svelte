@@ -1,22 +1,33 @@
 <script lang="ts">
 	/**
-	 * /ParticleMorphingDemo: the node field with up to 50 articles whose hover
-	 * thumbnails are particle morphs of four stills instead of looping WebMs.
+	 * /ParticleMorphingDemo: the node field, every article with a sprite sheet,
+	 * whose hover thumbnails are particle morphs of four stills instead of
+	 * looping WebMs.
 	 *
 	 * Standalone on purpose: no Sanity content, no search, no article panel.
 	 * The articles are whichever have a sprite sheet from
 	 * scripts/build_particle_demo_assets.py.
 	 */
+	import { page } from '$app/state';
 	import NodeField from '$lib/ui/NodeField.svelte';
 	import NodeTooltip from '$lib/ui/NodeTooltip.svelte';
 	import ParticleThumbnail from '$lib/particles/ParticleThumbnail.svelte';
 	import { articles as allArticles, articleById } from '$lib/data/articles';
 	import { particleSheets } from '$lib/data/particleDemo.generated';
-	import { FRAME_HEIGHT, FRAME_WIDTH, HOLD, MORPH } from '$lib/particles/particleMorph';
+	import { FRAME_HEIGHT, FRAME_WIDTH, HOLD, MORPH, MORPH_DELAY } from '$lib/particles/morphData';
 	import type { Backend } from '$lib/particles/particleMorph';
 
-	const NODE_COUNT = 50;
-	const articles = allArticles.filter((article) => particleSheets[article.id]).slice(0, NODE_COUNT);
+	// Every prepared article by default; ?nodes=50 (or any count) thins the
+	// field out to that many.
+	const withSheets = allArticles.filter((article) => particleSheets[article.id]);
+	const nodeCount = Number(page.url.searchParams.get('nodes')) || withSheets.length;
+	// Spread across the list rather than the first N alphabetically.
+	const articles = withSheets.filter(
+		(_, i) =>
+			nodeCount >= withSheets.length ||
+			Math.floor((i * nodeCount) / withSheets.length) !==
+				Math.floor(((i - 1) * nodeCount) / withSheets.length)
+	);
 
 	let hoveredId = $state<string | null>(null);
 	let anchorEl = $state<HTMLDivElement | null>(null);
@@ -28,6 +39,9 @@
 	$effect(() => {
 		if (hoveredId) lastSheet = particleSheets[hoveredId] ?? null;
 	});
+
+	// ?renderer=webgl tries the WebGL 2 fallback on a browser that has WebGPU.
+	const forceWebGL = page.url.searchParams.get('renderer') === 'webgl';
 
 	const BACKEND_LABEL = { webgpu: 'WebGPU', webgl2: 'WebGL 2', static: 'static stills' };
 </script>
@@ -49,6 +63,7 @@
 					<ParticleThumbnail
 						sheet={lastSheet}
 						active={!!hoveredArticle}
+						{forceWebGL}
 						class={className}
 						style="{style}; width: {FRAME_WIDTH}px; height: {FRAME_HEIGHT}px; border-radius: 8px;"
 						onbackend={(value) => (backend = value)}
@@ -62,7 +77,7 @@
 <aside class="demo-info">
 	<p>particle-morphing-demo // {articles.length} nodes</p>
 	<p>renderer // {backend ? BACKEND_LABEL[backend] : '…'}</p>
-	<p>4 stills · {HOLD}s hold · {MORPH}s morph</p>
+	<p>4 stills · {HOLD}s hold · {MORPH}s morph (starts staggered over {MORPH_DELAY}s)</p>
 </aside>
 
 <style>

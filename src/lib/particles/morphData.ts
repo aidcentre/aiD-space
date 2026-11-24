@@ -18,16 +18,30 @@ const CORNER_RADIUS = 8;
 /** squircle.ts's exponent at smoothing 1. */
 const CORNER_EXPONENT = 4.5;
 /** Room around the frame that particles may swing out into mid-morph. */
-export const FRAME_PADDING = 48;
+export const FRAME_PADDING = 32;
 
-/** Must match scripts/build_particle_demo_assets.py. */
-export const GRID_COLUMNS = 236;
-export const GRID_ROWS = 256;
+/**
+ * 177x192 = 34k particles before the corners. Must match
+ * scripts/build_particle_demo_assets.py. (236x256 read too much like the
+ * photo itself; this is 0.75 x 0.75 of that, so it stays a stipple.)
+ */
+export const GRID_COLUMNS = 177;
+export const GRID_ROWS = 192;
 export const STILLS = 4;
 
-/** Seconds each still holds, then seconds to morph to the next. */
+/** Seconds each still holds once every particle has landed. */
 export const HOLD = 3;
-export const MORPH = 1.8;
+/**
+ * Each particle sets off a random 0-MORPH_DELAY s into the morph and takes a
+ * random FLIGHT_MIN-FLIGHT_MAX s to land, so the new still streams in over
+ * a few seconds and single particles can be followed, instead of all of
+ * them leaving at once.
+ */
+export const MORPH_DELAY = 2;
+export const FLIGHT_MIN = 1.0;
+export const FLIGHT_MAX = 1.6;
+/** Seconds from the first particle leaving to the last one landing. */
+export const MORPH = MORPH_DELAY + FLIGHT_MAX;
 
 /** Per still, per particle: x, y (CSS px from the frame centre, y up), packed RGB, luminance. */
 export type MorphData = Float32Array[];
