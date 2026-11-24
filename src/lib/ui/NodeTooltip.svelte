@@ -11,12 +11,12 @@
 	import { useScramble } from '$lib/actions/useScramble';
 	import {
 		FALLBACK_THUMBNAIL,
-		formatPublicationDate,
 		thumbnailUrl,
 		thumbnailVideoUrl,
 		type Article
 	} from '$lib/data/articles';
 	import { abstractFor, loadAbstracts } from '$lib/data/abstracts';
+	import { areaFor } from '$lib/data/areas';
 	import { contentMode } from '$lib/stores/contentMode';
 	import type { Snippet } from 'svelte';
 
@@ -225,7 +225,7 @@
 			>
 				<div use:squircle={{ radius: 8 }} class="node-pill">content-type // Article</div>
 				<div use:squircle={{ radius: 8 }} class="node-pill">
-					publication-date // {formatPublicationDate(article?.publicationDate ?? null)}
+					area // {areaFor(article).name}
 				</div>
 			</div>
 		</div>
